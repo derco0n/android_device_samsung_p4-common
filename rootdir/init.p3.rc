@@ -401,10 +401,10 @@ service bugreport /system/bin/dumpstate -d -v -o /data/storage/bugreports/bugrep
     keycodes 115 114
 
 # For 3g tabs
-#service cpboot-daemon /sbin/cbd -d -o t -p 7
-#    class main
-#    user root
-#    group radio cache inet misc audio sdcard_rw log
+service cpboot-daemon /sbin/cbd -d -o t -p 7
+    class main
+    user root
+    group radio cache inet misc audio sdcard_rw log
 
 service battery_charger /charger
     class charger
