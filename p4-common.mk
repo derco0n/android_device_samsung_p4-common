@@ -48,6 +48,7 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_COPY_FILES += \
      $(LOCAL_PATH)/97random:system/etc/init.d/97random \
+     $(LOCAL_PATH)/98dcache:system/etc/init.d/98dcache \
      $(LOCAL_PATH)/99su:system/etc/init.d/99su
 
 # LPM (from TW-UX 3.2)

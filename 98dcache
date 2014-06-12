@@ -1,0 +1,3 @@
+#!/system/bin/sh
+rm -r /data/dalvik-cache/*
+busybox mount -o bind /cache/dalvik-cache /data/dalvik-cache
