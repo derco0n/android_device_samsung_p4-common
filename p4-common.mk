@@ -55,7 +55,7 @@ PRODUCT_COPY_FILES += \
 #  the build script has an urge to rebuild this every single time even though 
 PRODUCT_COPY_FILES += \
 	$(LOCAL_PATH)/chromium/libwebviewchromium.so:system/lib/libwebviewchromium.so \
-	$(LOCAL_PATH)/chromium/libwebviewchromium.so:system/lib/libwebviewchromium_plat_support.so \
+	$(LOCAL_PATH)/chromium/libwebviewchromium_plat_support.so:system/lib/libwebviewchromium_plat_support.so \
 	$(LOCAL_PATH)/chromium/webviewchromium.jar:system/framework/webviewchromium.jar \
 	$(LOCAL_PATH)/chromium/webview/paks/am.pak:system/framework/webview/paks/am.pak \
 	$(LOCAL_PATH)/chromium/webview/paks/am.pak:system/framework/webview/paks/am.pak \
