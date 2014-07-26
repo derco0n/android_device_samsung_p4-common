@@ -54,10 +54,9 @@ PRODUCT_COPY_FILES += \
 #saves a world of butt hurt. the prebuilt is genuinely compiled from source but for some reason
 #  the build script has an urge to rebuild this every single time even though 
 PRODUCT_COPY_FILES += \
-	 $(LOCAL_PATH)/chromium/libwebviewchromium.so:system/lib/libwebviewchromium.so \
-	 $(LOCAL_PATH)/chromium/libwebviewchromium_plat_support.so:system/lib/libwebviewchromium_plat_support.so \
-	 $(LOCAL_PATH)/chromium/webviewchromium.jar:system/framework/webviewchromium.jar \
-	 $(LOCAL_PATH)/chromium/webview/paks/am.pak:system/framework/webview/paks/am.pak \
+	$(LOCAL_PATH)/chromium/libwebviewchromium.so:system/lib/libwebviewchromium.so \
+	$(LOCAL_PATH)/chromium/webviewchromium.jar:system/framework/webviewchromium.jar \
+	$(LOCAL_PATH)/chromium/webview/paks/am.pak:system/framework/webview/paks/am.pak \
 	$(LOCAL_PATH)/chromium/webview/paks/am.pak:system/framework/webview/paks/am.pak \
 	$(LOCAL_PATH)/chromium/webview/paks/ar.pak:system/framework/webview/paks/ar.pak \
 	$(LOCAL_PATH)/chromium/webview/paks/bg.pak:system/framework/webview/paks/bg.pak \
