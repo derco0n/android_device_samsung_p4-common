@@ -169,9 +169,9 @@ PRODUCT_PACKAGES += \
         libaudioutils \
         libtinyalsa
 
-#make use of that wasted cache parition
+#disable setup wizard. causes issues.
 PRODUCT_PROPERTY_OVERRIDES += \
-		dalvik.vm.dexopt-data-only=0
+		ro.setupwizard.mode=DISABLED
 
 PRODUCT_COPY_FILES += \
         $(LOCAL_PATH)/audio/asound.conf:system/etc/asound.conf \
