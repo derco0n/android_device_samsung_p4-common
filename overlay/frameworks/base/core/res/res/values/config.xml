@@ -133,4 +133,7 @@
     <integer name="config_activityShortDur">75</integer>
     <integer name="config_activityDefaultDur">145</integer>
 
+    <!-- Enables or disables fading edges when marquee is enabled in TextView. -->
+    <bool name="config_ui_enableFadingMarquee">false</bool>
+
 </resources>
