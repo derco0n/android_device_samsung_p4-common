@@ -1,0 +1,4 @@
+#!/system/bin/sh
+# Powertop recommended changes
+echo 0 > /proc/sys/kernel/nmi_watchdog
+echo 0 > /proc/sys/vm/dirty_writeback_centisecs
