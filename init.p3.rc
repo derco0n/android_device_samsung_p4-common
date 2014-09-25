@@ -456,3 +456,6 @@ service cpboot-daemon /sbin/cbd -d -o t -p 7
 
 service battery_charger /charger
     class charger
+
+on property:init.svc.surfaceflinger=stopped
+    write /sys/class/graphics/fb0/blank 1
