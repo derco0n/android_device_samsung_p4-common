@@ -127,8 +127,19 @@
     <bool translatable="false" name="config_wifi_dual_band_support">true</bool>
 
     <!-- Device type information conforming to Annex B format in WiFi Direct specification.
-         The default represents a dual-mode smartphone -->
-    <string translatable="false" name="config_wifi_p2p_device_type">10-0050F204-5</string>
+         The default (10-0050F204-5) represents a dual-mode smartphone -->
+    <!--# Primary Device Type
+        # Used format: <categ>-<OUI>-<subcateg>
+        # categ = Category as an integer value
+        # OUI = OUI and type octet as a 4-octet hex-encoded value; 0050F204 for
+        # default WPS OUI
+        # subcateg = OUI-specific Sub Category as an integer value
+        # Examples:
+        # 1-0050F204-1 (Computer / PC)
+        # 1-0050F204-2 (Computer / Server)
+        # 5-0050F204-1 (Storage / NAS)
+        # 6-0050F204-1 (Network Infrastructure / AP) -->
+    <string translatable="false" name="config_wifi_p2p_device_type">1-0050F204-1</string>
 
     <!-- The default iface on which to monitor data use -->
     <string name="config_datause_iface">wlan0</string>
