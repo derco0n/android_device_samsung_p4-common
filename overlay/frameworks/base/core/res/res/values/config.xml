@@ -144,8 +144,6 @@
     <!-- The default iface on which to monitor data use -->
     <string name="config_datause_iface">wlan0</string>
 
-    <bool name="config_forceDisableHardwareKeyboard">true</bool>
-
     <!--  Maximum number of supported users -->
     <integer name="config_multiuserMaximumUsers">5</integer>
 
