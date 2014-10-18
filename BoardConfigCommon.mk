@@ -132,6 +132,7 @@ BOARD_SUPPRESS_EMMC_WIPE := true
 SKIP_SET_METADATA := true
 
 #TWRP Flags
+#we don't have cpu temperature only battery temperature :-(
 TARGET_RECOVERY_FSTAB := device/samsung/p4-common/rootdir/fstab.p3
 HAVE_SELINUX := true
 DEVICE_RESOLUTION := 1280x800
@@ -150,3 +151,4 @@ TW_MAX_BRIGHTNESS := 255
 #TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
 TW_NO_USB_STORAGE := true
 TW_EXCLUDE_SUPERSU := true
+TW_NO_CPU_TEMP := true
