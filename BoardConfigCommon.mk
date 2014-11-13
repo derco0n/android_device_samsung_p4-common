@@ -37,6 +37,11 @@ BOARD_NEEDS_OLD_HWC_API := true
 #USE_CAMERA_STUB := true
 #BOARD_VENDOR_USE_NV_CAMERA := true
 
+# Lollipop
+TARGET_32_BIT_SURFACEFLINGER := true
+MALLOC_IMPL := dlmalloc
+USE_LEGACY_AUDIO_POLICY := 1
+
 # Optimization hwui
 HWUI_COMPILE_FOR_PERF := true
 

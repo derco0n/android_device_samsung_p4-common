@@ -112,7 +112,8 @@
          Wifi interfaces.  If the device doesn't want to support tethering over Wifi this
          should be empty.  An example would be "softap.*" -->
     <string-array translatable="false" name="config_tether_wifi_regexs">
-        <item>"wlan\\d"</item>
+        <item>"wlan0"</item>
+        <item>"softap.*"</item>
     </string-array>
 
     <!-- List of regexpressions describing the interface (if any) that represent tetherable
@@ -120,7 +121,6 @@
          should be empty. -->
     <string-array translatable="false" name="config_tether_bluetooth_regexs">
         <item>"bt-pan"</item>
-        <item>"bnep\\d"</item>
     </string-array>
 
    <!-- Boolean indicating whether the wifi chipset has dual frequency band support -->
@@ -178,7 +178,7 @@
         is true (in that case this is assumed true as well). It can allow you to tune down
         your device's memory use without going to the point of causing applications to turn
         off features. -->
-    <bool name="config_avoidGfxAccel">true</bool>
+    <bool name="config_avoidGfxAccel">false</bool>
 
     <!-- Whether WiFi display is supported by this device.
          There are many prerequisites for this feature to work correctly.
