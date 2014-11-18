@@ -112,6 +112,7 @@
     <bool name="config_screenOffAnimation">false</bool> -->
 
     <!--  Maximum number of supported users -->
+	<bool name="config_enableMultiUserUI">true</bool>
     <integer name="config_multiuserMaximumUsers">5</integer>
 
     <!-- reference volume index for music stream to limit headphone volume and display warning -->
@@ -136,5 +137,9 @@
     <!-- The duration (in milliseconds) of the activity open/close and fragment open/close animations. -->
     <integer name="config_activityShortDur">75</integer>
     <integer name="config_activityDefaultDur">145</integer>
+	
+	<!-- Decatf flags -->
+	<bool name="config_avoidGfxAccel">false</bool>
+	<bool name="config_ui_enableFadingMarquee">true</bool>
 
 </resources>
