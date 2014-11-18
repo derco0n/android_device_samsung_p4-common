@@ -152,3 +152,5 @@ TW_MAX_BRIGHTNESS := 255
 TW_NO_USB_STORAGE := true
 TW_EXCLUDE_SUPERSU := true
 TW_NO_CPU_TEMP := true
+#in the ongoing battle to reduce recovery size no true type font
+TW_DISABLE_TTF := true
