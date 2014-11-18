@@ -86,9 +86,10 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 #what a major ass pain
 #it takes up 1mb. what kind of storage doesn't have 1 fucking megabyte to spare???!!!!!
 PRODUCT_PACKAGES := \
- libwpa_client \
- hostapd \
- wpa_supplicant
+	libwpa_client \
+	hostapd \
+	wpa_supplicant \
+	su
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.root_access=1

@@ -397,17 +397,17 @@ service fuse_usbdrive /system/bin/sdcard -u 1023 -g 1023 /mnt/media_rw/usbdrive 
     disabled
 
 # bugreport is triggered by the VOLUME-DOWN and VOLUME-UP keys
-service bugreport /system/bin/dumpstate -d -v -o /data/storage/bugreports/bugreport
-    class main
-    disabled
-    oneshot
-    keycodes 115 114
+# doesn't this thing not exist since 4.3
 
 # For 3g tabs
 service cpboot-daemon /sbin/cbd -d -o t -p 7
     class main
     user root
     group radio cache inet misc audio sdcard_rw log
+
+service superuser /system/xbin/su --daemon
+	class main
+	user root
 
 service battery_charger /charger
     class charger
