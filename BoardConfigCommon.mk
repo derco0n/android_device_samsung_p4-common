@@ -29,7 +29,7 @@ DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 TARGET_NO_BOOTLOADER := true
 
 # Architecture
-TARGET_CPU_VARIANT := tegra2
+TARGET_CPU_VARIANT := generic
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 TARGET_ARCH_VARIANT := armv7-a
@@ -74,6 +74,10 @@ BOARD_USES_PROPRIETARY_OMX := TF101
 #Sound
 COMMON_GLOBAL_CFLAGS += -DICS_AUDIO_BLOB
 HAVE_PRE_KITKAT_AUDIO_BLOB := true
+BOARD_HAVE_PRE_KITKAT_AUDIO_POLICY_BLOB := true
+USE_LEGACY_AUDIO_POLICY := 1
+AUDIO_LEGACY_HACK := true
+TARGET_ENABLE_OFFLOAD_ENHANCEMENTS := true
 
 #CWM Recovery
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
@@ -111,7 +115,7 @@ BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
 
 # Use nicer font rendering
-BOARD_USE_SKIA_LCDTEXT := true
+#BOARD_USE_SKIA_LCDTEXT := true
 
 # Charging Mode (LPM)
 BOARD_CHARGING_MODE_BOOTING_LPM := "/sys/class/power_supply/battery/charging_mode_booting"
@@ -127,9 +131,16 @@ BOARD_NEEDS_LOWFPS_BOOTANI := true
 
 # Suppress EMMC WIPE
 BOARD_SUPPRESS_EMMC_WIPE := true
+SUPPRESS_EMMC_WIPE := true
+SUPPRESS_SECURE_ERASE := true
+WIPE_IS_SUPPORTED := false
 
 #skip dumb selinux metadata stuff
 SKIP_SET_METADATA := true
+
+# Lollipop
+TARGET_32_BIT_SURFACEFLINGER := true
+USE_LEGACY_AUDIO_POLICY := 1
 
 #TWRP Flags
 #we don't have cpu temperature only battery temperature :-(
@@ -144,8 +155,8 @@ TW_FLASH_FROM_STORAGE := true
 TW_HAS_DOWNLOAD_MODE := true
 TW_INTERNAL_STORAGE_PATH := "/data/media"
 TW_INTERNAL_STORAGE_MOUNT_POINT := "data"
-TW_NO_EXFAT_FUSE := true
-TW_NO_EXFAT := true
+#TW_NO_EXFAT_FUSE := true
+#TW_NO_EXFAT := true
 TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlight/brightness"
 TW_MAX_BRIGHTNESS := 255
 #TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
