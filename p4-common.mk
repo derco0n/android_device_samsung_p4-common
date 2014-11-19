@@ -29,7 +29,8 @@ PRODUCT_COPY_FILES := \
     $(LOCAL_PATH)/init.p3.rc:root/init.p3.rc \
     $(LOCAL_PATH)/ueventd.p3.rc:root/ueventd.p3.rc \
     $(LOCAL_PATH)/lpm.rc:root/lpm.rc \
-    $(LOCAL_PATH)/init.p3.usb.rc:root/init.p3.usb.rc
+    $(LOCAL_PATH)/init.p3.usb.rc:root/init.p3.usb.rc \
+    $(LOCAL_PATH)/init.p3.usb.rc:root/init.superuser.rc
 
 ifeq ($(F2FS_BUILD), true)
 PRODUCT_COPY_FILES += \
@@ -171,6 +172,11 @@ PRODUCT_PACKAGES += \
 
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
+
+# Superuser
+PRODUCT_PACKAGES += \
+    su \
+    Superuser
 
 # Recovery
 ifeq ($(F2FS_BUILD), true)
