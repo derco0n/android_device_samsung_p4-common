@@ -42,6 +42,10 @@ TARGET_32_BIT_SURFACEFLINGER := true
 MALLOC_IMPL := dlmalloc
 USE_LEGACY_AUDIO_POLICY := 1
 
+USE_PREBUILT_CHROMIUM := 1
+# Force using the prebuilts
+# PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
+
 # Optimization hwui
 HWUI_COMPILE_FOR_PERF := true
 
