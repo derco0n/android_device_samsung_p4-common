@@ -1,5 +1,4 @@
 import init.p3.usb.rc
-import init.superuser.rc
 
 on early-init
     mount debugfs debugfs /sys/kernel/debug

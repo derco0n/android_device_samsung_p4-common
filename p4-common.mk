@@ -29,8 +29,7 @@ PRODUCT_COPY_FILES := \
     $(LOCAL_PATH)/init.p3.rc:root/init.p3.rc \
     $(LOCAL_PATH)/ueventd.p3.rc:root/ueventd.p3.rc \
     $(LOCAL_PATH)/lpm.rc:root/lpm.rc \
-    $(LOCAL_PATH)/init.p3.usb.rc:root/init.p3.usb.rc \
-    $(LOCAL_PATH)/init.p3.usb.rc:root/init.superuser.rc
+    $(LOCAL_PATH)/init.p3.usb.rc:root/init.p3.usb.rc
 
 ifeq ($(F2FS_BUILD), true)
 PRODUCT_COPY_FILES += \
@@ -179,11 +178,6 @@ PRODUCT_PACKAGES += \
     webview
 $(call inherit-product, prebuilts/chromium/$(TARGET_DEVICE)/chromium_prebuilt.mk)
 endif
-
-# Superuser
-PRODUCT_PACKAGES += \
-    su \
-    Superuser
 
 # Recovery
 ifeq ($(F2FS_BUILD), true)
