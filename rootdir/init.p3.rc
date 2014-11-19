@@ -380,13 +380,6 @@ service gps-daemon /system/bin/gpsd -c /system/etc/gps.xml
     user gps
     group system inet sdcard_rw
 
-on property:my.gps=vzw
-service gps-daemon /system/bin/gpsd
-    class main
-    socket gpsd stream 660 gps system
-    user system
-    group system inet
-
 # virtual sdcard daemon running as media_rw (1023)
 service sdcard /system/bin/sdcard -u 1023 -g 1023 -l /data/media /mnt/shell/emulated
     class late_start
