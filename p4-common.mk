@@ -188,3 +188,4 @@ endif
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 
+$(call inherit-product, vendor/decatf/config/common.mk)
