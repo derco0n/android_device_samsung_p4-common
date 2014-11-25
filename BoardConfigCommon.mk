@@ -197,3 +197,11 @@ TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlig
 TW_MAX_BRIGHTNESS := 255
 TW_NO_EXFAT := true
 TW_EXCLUDE_SUPERSU := true
+
+# Android system toolchain
+# TARGET_GCC_VERSION_EXP := 4.8
+# TARGET_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/linaro-arm-eabi-$(TARGET_GCC_VERSION)
+# TARGET_TOOLS_PREFIX := $(TARGET_TOOLCHAIN_ROOT)/bin/arm-linux-gnueabi-
+
+# Kernel toolchain
+TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.8
