@@ -96,9 +96,18 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf \
+    $(LOCAL_PATH)/wifi/bcmdhd_mfg.bin:system/etc/wifi/bcmdhd_mfg.bin \
     $(LOCAL_PATH)/wifi/bcmdhd_apsta.bin:system/etc/wifi/bcmdhd_apsta.bin \
     $(LOCAL_PATH)/wifi/bcmdhd_p2p.bin:system/etc/wifi/bcmdhd_p2p.bin \
     $(LOCAL_PATH)/wifi/bcmdhd_sta.bin:system/etc/wifi/bcmdhd_sta.bin
+
+#Prebuilt chromium
+# COPY IN SYMBOLIC LINK FOR CHROMIUM APP
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/chromium/webview/webview.apk:system/app/webview/webview.apk \
+	$(LOCAL_PATH)/chromium/libwebviewchromium.so:/system/lib/libwebviewchromium.so \
+	$(LOCAL_PATH)/chromium/libwebviewchromium_loader.so:/system/lib/libwebviewchromium_loader.so \
+	$(LOCAL_PATH)/chromium/libwebviewchromium_plat_support.so:/system/lib/libwebviewchromium_plat_support.so
 
 PRODUCT_PACKAGES += \
         libinvensense_mpl

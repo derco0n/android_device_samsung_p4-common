@@ -21,7 +21,6 @@ BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR ?= device/samsung/p4-common/bluetoot
 BOARD_USES_GENERIC_AUDIO := false
 #USE_CAMERA_STUB := false
 COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS #flash compatibility
-TEGRACAP := true
 PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
 
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
@@ -139,9 +138,11 @@ WIPE_IS_SUPPORTED := false
 SKIP_SET_METADATA := true
 
 # Lollipop
+# https://gerrit.omnirom.org/#/c/10652/4/
 TARGET_32_BIT_SURFACEFLINGER := true
 MALLOC_IMPL := dlmalloc
 USE_LEGACY_AUDIO_POLICY := 1
+BOARD_NEEDS_SEC_RIL_WORKAROUND := true
 
 #TWRP Flags
 #we don't have cpu temperature only battery temperature :-(
