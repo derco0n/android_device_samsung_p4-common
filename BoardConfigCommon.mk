@@ -205,3 +205,6 @@ TW_EXCLUDE_SUPERSU := true
 
 # Kernel toolchain
 TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.8
+
+# Add backup-tool.sh to install script
+BACKUP_TOOL := true
