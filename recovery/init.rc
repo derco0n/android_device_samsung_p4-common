@@ -32,13 +32,13 @@ on init
     write /sys/class/android_usb/android0/idVendor 04E8
     write /sys/class/android_usb/android0/idProduct 6860
     write /sys/class/android_usb/android0/functions adb
-    write /sys/class/android_usb/android0/iManufacturer ${ro.product.manufacturer}
-    write /sys/class/android_usb/android0/iProduct ${ro.product.model}
     write /sys/class/android_usb/android0/iSerial ${ro.serialno}
 
 
 on boot
 
+    write /sys/class/android_usb/android0/iManufacturer ${ro.product.manufacturer}
+    write /sys/class/android_usb/android0/iProduct ${ro.product.model}
     ifup lo
     hostname twrp
     domainname recovery
@@ -64,6 +64,8 @@ on property:ro.debuggable=1
 # Restart adbd so it can run as root
 on property:service.adb.root=1
     write /sys/class/android_usb/android0/enable 0
+    write /sys/class/android_usb/android0/idVendor 04E8
+    write /sys/class/android_usb/android0/idProduct 6860
 	write /sys/class/android_usb/android0/functions mtp,adb
     restart adbd
     write /sys/class/android_usb/android0/enable 1

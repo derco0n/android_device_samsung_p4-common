@@ -83,7 +83,6 @@ TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 BOARD_CUSTOM_RECOVERY_KEYMAPPING := ../../device/samsung/p4-common/recovery/recovery_ui.c
 BOARD_HAS_NO_SELECT_BUTTON := true
 BOARD_HAS_LARGE_FILESYSTEM := true
-TARGET_RECOVERY_INITRC := device/samsung/p4-common/recovery/init.rc
 
 # Indicate that the board has an Internal SD Card
 BOARD_HAS_SDCARD_INTERNAL := true
@@ -157,13 +156,12 @@ TW_FLASH_FROM_STORAGE := true
 TW_HAS_DOWNLOAD_MODE := true
 TW_INTERNAL_STORAGE_PATH := "/data/media"
 TW_INTERNAL_STORAGE_MOUNT_POINT := "data"
-#TW_NO_EXFAT_FUSE := true
-#TW_NO_EXFAT := true
+TW_NO_EXFAT_FUSE := true
+TW_NO_EXFAT := true
 TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlight/brightness"
 TW_MAX_BRIGHTNESS := 255
 #TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
 TW_NO_USB_STORAGE := true
 TW_EXCLUDE_SUPERSU := true
-TW_NO_CPU_TEMP := true
 #in the ongoing battle to reduce recovery size no true type font
 TW_DISABLE_TTF := true

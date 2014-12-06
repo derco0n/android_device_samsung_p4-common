@@ -91,6 +91,9 @@ PRODUCT_PACKAGES := \
 	wpa_supplicant \
 	su
 
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/rootdir/init.recovery.p4wifi.rc:root/init.recovery.p4wifi.rc
+
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.root_access=1
 
