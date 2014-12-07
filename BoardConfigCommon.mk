@@ -164,4 +164,25 @@ TW_MAX_BRIGHTNESS := 255
 TW_NO_USB_STORAGE := true
 TW_EXCLUDE_SUPERSU := true
 #in the ongoing battle to reduce recovery size no true type font
-TW_DISABLE_TTF := true
+# TW_DISABLE_TTF := true
+
+# TARGET_USERIMAGES_USE_F2FS := false
+# TW_EXCLUDE_ENCRYPTED_BACKUPS := true
+# TW_INCLUDE_CRYPTO := false
+
+# TW_INCLUDE_CRYPTO := true
+TW_INCLUDE_L_CRYPTO := true
+TW_CRYPTO_FS_TYPE := "ext4"
+TW_CRYPTO_REAL_BLKDEV := "/dev/block/mmcblk0p8"
+TW_CRYPTO_MNT_POINT := "/data"
+TW_CRYPTO_FS_OPTIONS := "noatime,nosuid,nodev,journal_async_commit,errors=panic      wait,check,encryptable=footer"
+TW_CRYPTO_FS_FLAGS := "0x00000406"
+TW_CRYPTO_KEY_LOC := "footer"
+TWRP_EVENT_LOGGING := true
+# TW_EXCLUDE_MTP := true
+
+# Build omnirom twrp android-5.0 on android-4.0 sources
+PLATFORM_VERSION := 4.4.4
+
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 5583457484
+TW_EXTRA_RECOVERY_PARTITION := true
