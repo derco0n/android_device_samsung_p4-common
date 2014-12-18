@@ -114,6 +114,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
         Torch
 
+PRODUCT_PACKAGES += \
+        CMFileManager
+
 # Audio
 PRODUCT_PACKAGES += \
         audio.a2dp.default \
