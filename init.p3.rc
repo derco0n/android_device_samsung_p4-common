@@ -1,5 +1,4 @@
 import init.p3.usb.rc
-import /lpm.rc
 
 on early-init
     mount debugfs debugfs /sys/kernel/debug
@@ -442,5 +441,10 @@ service cpboot-daemon /sbin/cbd -d -o t -p 7
     user root
     group radio cache inet misc audio sdcard_rw log
 
-service battery_charger /charger
+service charger /sbin/healthd -c
+    # Use this to disable adb in charger mode
+    # but it does not work
+#    setprop persist.sys.usb.config none
     class charger
+    critical
+    seclabel u:r:healthd:s0

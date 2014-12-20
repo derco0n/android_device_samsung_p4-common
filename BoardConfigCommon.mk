@@ -44,6 +44,12 @@ USE_LEGACY_AUDIO_POLICY := 1
 BOARD_USES_LEGACY_MMAP := true
 BOARD_NEEDS_SEC_RIL_WORKAROUND := true
 
+# Lollipop charger mode
+BOARD_CHARGER_ENABLE_SUSPEND := true
+BOARD_CHARGER_DISABLE_INIT_BLANK := true
+# This is from CyanogenMod 12.0
+CHARGING_ENABLED_PATH :=  "/sys/class/power_supply/battery/charging_mode_booting"
+
 USE_PREBUILT_CHROMIUM := 1
 # Force using the prebuilts
 # PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes

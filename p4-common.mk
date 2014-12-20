@@ -28,9 +28,7 @@ TARGET_SCREEN_HEIGHT := 800
 PRODUCT_COPY_FILES := \
     $(LOCAL_PATH)/init.p3.rc:root/init.p3.rc \
     $(LOCAL_PATH)/ueventd.p3.rc:root/ueventd.p3.rc \
-    $(LOCAL_PATH)/lpm.rc:root/lpm.rc \
     $(LOCAL_PATH)/init.p3.usb.rc:root/init.p3.usb.rc \
-    $(LOCAL_PATH)/init.p3charger.rc:root/init.p3charger.rc
 
 ifeq ($(F2FS_BUILD), true)
 PRODUCT_COPY_FILES += \
@@ -58,21 +56,6 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/init_scripts/99power_opt:system/etc/init.d/99power_opt
-
-# LPM (from TW-UX 3.2)
-PRODUCT_COPY_FILES += \
-     $(LOCAL_PATH)/lpm/lib/libQmageDecoder.so:system/lib/libQmageDecoder.so \
-     $(LOCAL_PATH)/lpm/bin/lpmkey:system/bin/lpmkey \
-     $(LOCAL_PATH)/lpm/bin/playlpm:system/bin/playlpm \
-     $(LOCAL_PATH)/lpm/media/battery_charging_0.qmg:system/media/battery_charging_0.qmg \
-     $(LOCAL_PATH)/lpm/media/battery_charging_20.qmg:system/media/battery_charging_20.qmg \
-     $(LOCAL_PATH)/lpm/media/battery_charging_40.qmg:system/media/battery_charging_40.qmg \
-     $(LOCAL_PATH)/lpm/media/battery_charging_60.qmg:system/media/battery_charging_60.qmg \
-     $(LOCAL_PATH)/lpm/media/battery_charging_80.qmg:system/media/battery_charging_80.qmg \
-     $(LOCAL_PATH)/lpm/media/battery_charging_100.qmg:system/media/battery_charging_100.qmg \
-     $(LOCAL_PATH)/lpm/media/battery_error.qmg:system/media/battery_error.qmg \
-     $(LOCAL_PATH)/lpm/media/chargingwarning.qmg:system/media/chargingwarning.qmg \
-     $(LOCAL_PATH)/lpm/media/Disconnected.qmg:system/media/Disconnected.qmg
 
 PRODUCT_PROPERTY_OVERRIDES := \
     wifi.interface=wlan0 \
@@ -109,6 +92,10 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_PACKAGES += \
         libinvensense_mpl
+
+# Charger images
+PRODUCT_PACKAGES += \
+        charger_res_images
 
 # Torch
 PRODUCT_PACKAGES += \
