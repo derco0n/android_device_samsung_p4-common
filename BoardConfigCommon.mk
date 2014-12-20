@@ -49,6 +49,7 @@ BOARD_CHARGER_ENABLE_SUSPEND := true
 BOARD_CHARGER_DISABLE_INIT_BLANK := true
 # This is from CyanogenMod 12.0
 CHARGING_ENABLED_PATH :=  "/sys/class/power_supply/battery/charging_mode_booting"
+BOARD_CHARGER_DISABLE_ADBD := true
 
 USE_PREBUILT_CHROMIUM := 1
 # Force using the prebuilts
