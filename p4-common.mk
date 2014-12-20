@@ -68,6 +68,11 @@ PRODUCT_PROPERTY_OVERRIDES := \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true
 
+# Prompt for USB debugging authentication
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.adb.secure=1 \
+    ro.secure=1
+
 # Disable SELinux
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.boot.selinux=disabled \
