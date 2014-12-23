@@ -75,31 +75,12 @@ on post-fs-data
     chmod 0770 /efs/nv_data.bin.md5
     chmod 0770 /efs/nv_data.bin
 
-    chmod 0660 /data/misc/wifi/wpa_supplicant.conf
-    chmod 0660 /data/misc/wifi/p2p_supplicant.conf
-    chmod 0660 /data/misc/wifi/hostapd.conf
-    chmod 0660 /data/misc/wifi/softap.conf
-
-    # mkdir /data/wifi 0771 wifi wifi
-    mkdir /data/misc/wifi 0771 wifi wifi
-    chmod 0771 /data/misc/wifi/
-    # chmod 0771 /data/wifi/
-    mkdir /data/misc/dhcp 0771 dhcp dhcp
-    mkdir /data/misc/wifi/sockets 0771 wifi wifi
-    mkdir /data/misc/wifi/wpa_supplicant 0771 wifi wifi
-    mkdir /data/misc/wifi/p2p_supplicant 0771 wifi wifi
-    mkdir /data/misc/wifi/hostapd 0771 wifi wifi
-    chmod 0664 /system/etc/wifi/wpa_supplicant.conf
-    chown wifi wifi /system/etc/wifi/wpa_supplicant.conf
-    chmod 0664 /system/etc/wifi/p2p_supplicant.conf
-    chown wifi wifi /system/etc/wifi/p2p_supplicant.conf
-    chmod 0664 /system/etc/wifi/hostapd.conf
-    chown wifi wifi /system/etc/wifi/hostapd.conf
+    # Create the directories used by the Wireless subsystem
+    mkdir /data/misc/wifi 0770 wifi wifi
+    mkdir /data/misc/wifi/sockets 0770 wifi wifi
+    mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
+    mkdir /data/misc/dhcp 0770 dhcp dhcp
     chown dhcp dhcp /data/misc/dhcp
-    mkdir /data/misc/dhcpcd 0771 dhcp dhcp
-    chown dhcp dhcp /data/misc/dhcpcd
-    chown dhcp dhcp /data/misc/dhcp
-    setprop wifi.interface wlan0
 
 # Change Permission /data/app for booting time
     chmod 0771 /data/app
