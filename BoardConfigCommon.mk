@@ -52,7 +52,7 @@ CHARGING_ENABLED_PATH :=  "/sys/class/power_supply/battery/charging_mode_booting
 
 USE_PREBUILT_CHROMIUM := 1
 # Force using the prebuilts
-# PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
+PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
 
 # Optimization hwui
 HWUI_COMPILE_FOR_PERF := true
