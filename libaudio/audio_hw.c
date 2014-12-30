@@ -1623,6 +1623,24 @@ static int adev_set_mode(struct audio_hw_device *dev, audio_mode_t mode)
 static int adev_set_mic_mute(struct audio_hw_device *dev, bool state)
 {
     struct audio_device *adev = (struct audio_device *)dev;
+    struct stream_in *in = adev->active_in;
+
+    ALOGV("adev_set_mic_mute(%d) adev->mic_mute %d", state, adev->mic_mute);
+
+    if (in != NULL) {
+        in->sleep_req = true;
+        in_lock(in);
+        in->sleep_req = false;
+        adev_lock(adev);
+
+        // in call mute is handled by RIL
+        if (adev->mode != AUDIO_MODE_IN_CALL) {
+            do_in_standby(in);
+        }
+
+        adev_unlock(adev);
+        in_unlock(in);
+    }
 
     adev->mic_mute = state;
 
