@@ -37,7 +37,18 @@
 #include <audio_utils/resampler.h>
 #include <audio_route/audio_route.h>
 
+#include <dlfcn.h>
 
+#include "secril-client.h"
+
+// RILD required
+// from system/core/include/utils/Errors.h
+typedef int32_t status_t;
+enum {
+    OK = 0, // Everything's swell.
+    NO_ERROR = 0, // No errors.
+    INVALID_OPERATION = -ENOSYS,
+};
 
 #define PCM_CARD 0
 #define PCM_DEVICE 0
@@ -64,6 +75,13 @@ enum {
     OUT_BUFFER_TYPE_SHORT,
     OUT_BUFFER_TYPE_LONG,
 };
+
+typedef enum {
+    TTY_MODE_OFF,
+    TTY_MODE_VCO,
+    TTY_MODE_HCO,
+    TTY_MODE_FULL
+} tty_modes_t;
 
 struct pcm_config pcm_config_out = {
     .channels = 2,
@@ -116,6 +134,12 @@ struct audio_device {
     // struct mixer* mixer;
     bool screen_off;
 
+    // RIL
+    bool incall_mode;
+    float voice_volume;
+    tty_modes_t tty_mode;
+    bool bt_nrec;
+
     int lock_cnt;
 
     struct stream_out *active_out;
@@ -167,6 +191,14 @@ struct stream_in {
     struct audio_device *dev;
 };
 
+
+static struct mixer* open_mixer();
+static void close_mixer(struct mixer* mixer);
+
+static void select_devices(struct audio_device *adev, struct mixer* mixer);
+static void select_input_source(struct audio_device *adev, struct mixer* mixer);
+static void select_voice_route(struct audio_device *adev, struct mixer* mixer);
+
 static uint32_t out_get_sample_rate(const struct audio_stream *stream);
 static size_t out_get_buffer_size(const struct audio_stream *stream);
 static audio_format_t out_get_format(const struct audio_stream *stream);
@@ -177,6 +209,234 @@ static int get_next_buffer(struct resampler_buffer_provider *buffer_provider,
                                    struct resampler_buffer* buffer);
 static void release_buffer(struct resampler_buffer_provider *buffer_provider,
                                   struct resampler_buffer* buffer);
+
+static void out_lock(struct stream_out *out);
+static void out_unlock(struct stream_out *out);
+static void in_lock(struct stream_in *in);
+static void in_unlock(struct stream_in *in);
+static void adev_lock(struct audio_device *adev);
+static void adev_unlock(struct audio_device *adev);
+
+/* secril-client */
+static void*           mSecRilLibHandle;
+static HRilClient      mRilClient;
+static bool            mActivatedCP;
+static HRilClient      (*openClientRILD)  (void);
+static int             (*disconnectRILD)  (HRilClient);
+static int             (*closeClientRILD) (HRilClient);
+static int             (*isConnectedRILD) (HRilClient);
+static int             (*connectRILD)     (HRilClient);
+static int             (*setCallVolume)   (HRilClient, SoundType, int);
+static int             (*setCallAudioPath)(HRilClient, AudioPath);
+static int             (*setCallClockSync)(HRilClient, SoundClockCondition);
+static void            loadRILD(void);
+static status_t        connectRILDIfRequired(void);
+
+/* secril helper functions */
+
+static void loadRILD(void)
+{
+    mSecRilLibHandle = dlopen("libsecril-client.so", RTLD_NOW);
+
+    if (mSecRilLibHandle) {
+        ALOGD("libsecril-client.so is loaded");
+
+        openClientRILD   = (HRilClient (*)(void))
+                              dlsym(mSecRilLibHandle, "OpenClient_RILD");
+        disconnectRILD   = (int (*)(HRilClient))
+                              dlsym(mSecRilLibHandle, "Disconnect_RILD");
+        closeClientRILD  = (int (*)(HRilClient))
+                              dlsym(mSecRilLibHandle, "CloseClient_RILD");
+        isConnectedRILD  = (int (*)(HRilClient))
+                              dlsym(mSecRilLibHandle, "isConnected_RILD");
+        connectRILD      = (int (*)(HRilClient))
+                              dlsym(mSecRilLibHandle, "Connect_RILD");
+        setCallVolume    = (int (*)(HRilClient, SoundType, int))
+                              dlsym(mSecRilLibHandle, "SetCallVolume");
+        setCallAudioPath = (int (*)(HRilClient, AudioPath))
+                              dlsym(mSecRilLibHandle, "SetCallAudioPath");
+        setCallClockSync = (int (*)(HRilClient, SoundClockCondition))
+                              dlsym(mSecRilLibHandle, "SetCallClockSync");
+
+        if (!openClientRILD  || !disconnectRILD   || !closeClientRILD ||
+            !isConnectedRILD || !connectRILD      ||
+            !setCallVolume   || !setCallAudioPath || !setCallClockSync) {
+            ALOGE("Can't load all functions from libsecril-client.so");
+
+            dlclose(mSecRilLibHandle);
+            mSecRilLibHandle = NULL;
+        } else {
+            mRilClient = openClientRILD();
+            if (!mRilClient) {
+                ALOGE("OpenClient_RILD() error");
+
+                dlclose(mSecRilLibHandle);
+                mSecRilLibHandle = NULL;
+            } else {
+                ALOGE("OpenClient_RILD() done");
+            }
+        }
+    } else {
+        ALOGE("Can't load libsecril-client.so");
+    }
+}
+
+static status_t connectRILDIfRequired(void)
+{
+    if (!mSecRilLibHandle) {
+        ALOGE("connectIfRequired() lib is not loaded");
+        return INVALID_OPERATION;
+    }
+
+    if (isConnectedRILD(mRilClient)) {
+        return OK;
+    }
+
+    if (connectRILD(mRilClient) != RIL_CLIENT_ERR_SUCCESS) {
+        ALOGE("Connect_RILD() error");
+        return INVALID_OPERATION;
+    }
+
+    return OK;
+}
+
+static int set_voice_volume(struct audio_device *adev, float volume)
+{
+    ALOGD("### setVoiceVolume_l");
+
+    int mode = adev->mode;
+    adev->voice_volume = volume;
+
+    adev_lock(adev);
+
+    if ( (mode == AUDIO_MODE_IN_CALL) && (mSecRilLibHandle) &&
+         (connectRILDIfRequired() == OK) ) {
+
+        // uint32_t device = AUDIO_DEVICE_OUT_EARPIECE;
+        // if (mOutput != 0) {
+        //     device = adev->out_device;
+        // }
+
+        uint32_t device = adev->out_device;
+        int int_volume = (int)(volume * 5);
+        SoundType type;
+
+        ALOGD("### route(%d) call volume(%f)", device, volume);
+        switch (device) {
+            case AUDIO_DEVICE_OUT_EARPIECE:
+                ALOGD("### earpiece call volume");
+                type = SOUND_TYPE_VOICE;
+                break;
+
+            case AUDIO_DEVICE_OUT_SPEAKER:
+                ALOGD("### speaker call volume");
+                type = SOUND_TYPE_SPEAKER;
+                break;
+
+            case AUDIO_DEVICE_OUT_BLUETOOTH_SCO:
+            case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET:
+            case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT:
+                ALOGD("### bluetooth call volume");
+                type = SOUND_TYPE_BTVOICE;
+                break;
+
+            case AUDIO_DEVICE_OUT_WIRED_HEADSET:
+            case AUDIO_DEVICE_OUT_WIRED_HEADPHONE: // Use receive path with 3 pole headset.
+                ALOGD("### headset call volume");
+                type = SOUND_TYPE_HEADSET;
+                break;
+
+            default:
+                ALOGW("### Call volume setting error!!!0x%08x \n", device);
+                type = SOUND_TYPE_VOICE;
+                break;
+        }
+        setCallVolume(mRilClient, type, int_volume);
+    }
+
+    adev_unlock(adev);
+
+    ALOGD("### setVoiceVolume_l: done");
+
+    return 0;
+}
+
+static status_t set_incall_path(struct audio_device* adev)
+{
+    unsigned int out_device = adev->out_device;
+    int mode = adev->mode;
+    bool bt_nrec = adev->bt_nrec;
+
+    ALOGV("set_incall_path: device %x", out_device);
+
+    // Setup sound path for CP clocking
+    if ((mSecRilLibHandle) &&
+        (connectRILDIfRequired() == OK)) {
+
+        if (mode == AUDIO_MODE_IN_CALL) {
+            ALOGD("### incall mode route (%d)", out_device);
+            AudioPath path;
+
+            switch(out_device){
+                case AUDIO_DEVICE_OUT_EARPIECE:
+                    ALOGD("### incall mode earpiece route");
+                    path = SOUND_AUDIO_PATH_HANDSET;
+                    break;
+
+                case AUDIO_DEVICE_OUT_SPEAKER:
+                    ALOGD("### incall mode speaker route");
+                    path = SOUND_AUDIO_PATH_SPEAKER;
+                    break;
+
+                case AUDIO_DEVICE_OUT_BLUETOOTH_SCO:
+                case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET:
+                case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT:
+                    ALOGD("### incall mode bluetooth route %s NR", bt_nrec ? "" : "NO");
+                    if (bt_nrec) {
+                        path = SOUND_AUDIO_PATH_BLUETOOTH;
+                    } else {
+                        path = SOUND_AUDIO_PATH_BLUETOOTH_NO_NR;
+                    }
+                    break;
+
+                case AUDIO_DEVICE_OUT_WIRED_HEADPHONE:
+                    ALOGD("### incall mode headphone route");
+                    path = SOUND_AUDIO_PATH_HEADPHONE;
+                    break;
+                case AUDIO_DEVICE_OUT_WIRED_HEADSET:
+                    ALOGD("### incall mode headset route");
+                    path = SOUND_AUDIO_PATH_HEADSET;
+                    break;
+                default:
+                    ALOGW("### incall mode Error!! route = [%d]", out_device);
+                    path = SOUND_AUDIO_PATH_HANDSET;
+                    break;
+            }
+
+            setCallAudioPath(mRilClient, path);
+
+            // if (mMixer != NULL) {
+            //     TRACE_DRIVER_IN(DRV_MIXER_GET)
+            //     struct mixer_ctl *ctl= mixer_get_ctl_by_name(mMixer, "Voice Call Path");
+            //     TRACE_DRIVER_OUT
+            //     ALOGE_IF(ctl == NULL, "setIncallPath_l() could not get mixer ctl");
+            //     if (ctl != NULL) {
+            //         ALOGV("setIncallPath_l() Voice Call Path, (%x)", device);
+            //         TRACE_DRIVER_IN(DRV_MIXER_SEL)
+            //         mixer_ctl_set_enum_by_string(ctl, getVoiceRouteFromDevice(device));
+            //         TRACE_DRIVER_OUT
+            //     }
+            // }
+
+            struct mixer* mixer;
+            mixer = open_mixer();
+            select_voice_route(adev, mixer);
+            close_mixer(mixer);
+        }
+    }
+    return NO_ERROR;
+}
+
 
 /*
  * NOTE: when multiple mutexes have to be acquired, always take the
@@ -211,6 +471,7 @@ static void select_devices(struct audio_device *adev, struct mixer* mixer)
     int main_mic_on;
     int headset_mic_on;
     int bt_sco_on;
+    int earpiece_on;
 
     headphone_on = adev->out_device & (AUDIO_DEVICE_OUT_WIRED_HEADSET |
                                     AUDIO_DEVICE_OUT_WIRED_HEADPHONE);
@@ -219,6 +480,7 @@ static void select_devices(struct audio_device *adev, struct mixer* mixer)
     main_mic_on = adev->in_device & AUDIO_DEVICE_IN_BUILTIN_MIC;
     headset_mic_on = adev->in_device & AUDIO_DEVICE_IN_WIRED_HEADSET;
     bt_sco_on = adev->in_device & AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET;
+    earpiece_on = adev->out_device & AUDIO_DEVICE_OUT_EARPIECE;
 
     // audio_route_reset(adev->ar);
 
@@ -257,6 +519,8 @@ static void select_devices(struct audio_device *adev, struct mixer* mixer)
         mixer_ctl_set_enum_by_string(m_route_ctl, "HP_NO_MIC");
     } else if (headphone_on) {
         mixer_ctl_set_enum_by_string(m_route_ctl, "HP");
+    } else if (earpiece_on) {
+        mixer_ctl_set_enum_by_string(m_route_ctl, "RCV");
     }
 
     m_route_ctl = mixer_get_ctl_by_name(mixer, "Capture MIC Path");
@@ -337,6 +601,46 @@ static void select_input_source(struct audio_device *adev, struct mixer* mixer)
 
     ALOGD("select_input_source: done.");
  }
+
+static void select_voice_route(struct audio_device *adev, struct mixer* mixer)
+{
+
+    unsigned int out_device = adev->out_device;
+    tty_modes_t tty_mode = adev->tty_mode;
+    struct mixer_ctl *ctl= mixer_get_ctl_by_name(mixer, "Voice Call Path");
+
+    switch (out_device) {
+        case AUDIO_DEVICE_OUT_EARPIECE:
+            mixer_ctl_set_enum_by_string(ctl, "RCV");
+        case AUDIO_DEVICE_OUT_SPEAKER:
+            mixer_ctl_set_enum_by_string(ctl, "SPK");
+        case AUDIO_DEVICE_OUT_WIRED_HEADPHONE:
+        case AUDIO_DEVICE_OUT_WIRED_HEADSET:
+            switch (tty_mode) {
+            case TTY_MODE_VCO:
+                mixer_ctl_set_enum_by_string(ctl, "TTY_VCO");
+            case TTY_MODE_HCO:
+                mixer_ctl_set_enum_by_string(ctl, "TTY_HCO");
+            case TTY_MODE_FULL:
+                mixer_ctl_set_enum_by_string(ctl, "TTY_FULL");
+            case TTY_MODE_OFF:
+            default:
+                if (out_device == AUDIO_DEVICE_OUT_WIRED_HEADPHONE) {
+                    mixer_ctl_set_enum_by_string(ctl, "HP_NO_MIC");
+                } else {
+                    mixer_ctl_set_enum_by_string(ctl, "HP");
+                }
+            }
+        case AUDIO_DEVICE_OUT_BLUETOOTH_SCO:
+        case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET:
+        case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT:
+            mixer_ctl_set_enum_by_string(ctl, "BT");
+        default:
+            mixer_ctl_set_enum_by_string(ctl, "OFF");
+    }
+
+    ALOGD("select_voice_route() out_device %d tty_mode %d", out_device, tty_mode);
+}
 
 /* must be called with hw device and output stream mutexes locked */
 static void do_out_standby(struct stream_out *out)
@@ -692,12 +996,14 @@ static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
     if (ret >= 0) {
         val = atoi(value);
         if ((adev->out_device != val) && (val != 0)) {
-            if (adev->out_device != val) {
-                if (adev->mode != AUDIO_MODE_IN_CALL) {
 
-                    if (!out->standby)
-                       do_out_standby(out);
-                }
+            if (adev->mode != AUDIO_MODE_IN_CALL) {
+                if (!out->standby)
+                   do_out_standby(out);
+            }
+
+            if (adev->mode == AUDIO_MODE_IN_CALL) {
+                set_incall_path(adev);
             }
 
             adev->out_device = val;
@@ -1446,6 +1752,44 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
             adev->screen_off = true;
     }
 
+    ret = str_parms_get_str(parms, AUDIO_PARAMETER_KEY_BT_NREC, value, sizeof(value));
+    if (ret >= 0) {
+        if (strcmp(value, AUDIO_PARAMETER_VALUE_ON) == 0) {
+            adev->bt_nrec = true;
+        } else {
+            adev->bt_nrec = false;
+            ALOGD("adev_set_parameters() turning noise reduction and echo cancellation off for BT "
+                 "headset");
+        }
+    }
+
+    ret = str_parms_get_str(parms, AUDIO_PARAMETER_KEY_TTY_MODE, value, sizeof(value));
+    if (ret >= 0) {
+        unsigned int tty_mode;
+
+        if (strcmp(value, AUDIO_PARAMETER_VALUE_TTY_OFF) == 0) {
+            tty_mode = TTY_MODE_OFF;
+        } else if (strcmp(value, AUDIO_PARAMETER_VALUE_TTY_VCO) == 0) {
+            tty_mode = TTY_MODE_VCO;
+        } else if (strcmp(value, AUDIO_PARAMETER_VALUE_TTY_HCO) == 0) {
+            tty_mode = TTY_MODE_HCO;
+        } else if (strcmp(value, AUDIO_PARAMETER_VALUE_TTY_FULL) == 0) {
+            tty_mode = TTY_MODE_FULL;
+        } else {
+            tty_mode = TTY_MODE_OFF;
+        }
+
+        if (tty_mode != adev->tty_mode) {
+            ALOGV("adev_set_parameters() new tty mode %d", tty_mode);
+            adev->tty_mode = tty_mode;
+
+            if (adev->out_device && adev->mode == AUDIO_MODE_IN_CALL) {
+                // setIncallPath_l(mOutput->device());
+                set_incall_path(adev);
+            }
+        }
+    }
+
     str_parms_destroy(parms);
     return ret;
 }
@@ -1494,25 +1838,119 @@ static int adev_set_mode(struct audio_hw_device *dev, audio_mode_t mode)
     ALOGD("adev_set_mode()");
 
     struct audio_device *adev = (struct audio_device *)dev;
-    // struct stream_out *out = adev->active_out;
-    // struct stream_in *in = adev->active_in;
+    struct stream_out *out = adev->active_out;
+    struct stream_in *in = adev->active_in;
 
+    bool out_locked = false;
+    bool in_locked = false;
 
-    // out->sleep_req = true;
-    // out_lock(out);
-    // out->sleep_req = false;
-    // in->sleep_req = true;
-    // in_lock(in);
-    // in->sleep_req = false;
+    if (out != NULL && !out->standby) {
+        out->sleep_req = true;
+        out_lock(out);
+        out->sleep_req = false;
+        out_locked = true;
+    }
+    if (in != NULL && !in->standby) {
+        in->sleep_req = true;
+        in_lock(in);
+        in->sleep_req = false;
+        in_locked = true;
+    }
     adev_lock(adev);
 
     audio_mode_t prev_mode = adev->mode;
     adev->mode = mode;
     ALOGD("adev_set_mode() : new %d, old %d", mode, prev_mode);
 
+
+    bool modeNeedsCPActive = mode == AUDIO_MODE_IN_CALL ||
+                                mode == AUDIO_MODE_RINGTONE;
+    // activate call clock in radio when entering in call or ringtone mode
+    if (modeNeedsCPActive)
+    {
+        if ((!mActivatedCP) && (mSecRilLibHandle) && (connectRILDIfRequired() == OK)) {
+            setCallClockSync(mRilClient, SOUND_CLOCK_START);
+            mActivatedCP = true;
+        }
+    }
+
+    if (mode == AUDIO_MODE_IN_CALL && !adev->incall_mode) {
+        if (out && !out->standby) {
+            ALOGV("adev_set_mode() in call force output standby");
+            out_standby(&out->stream.common);
+        }
+        if (in && !in->standby) {
+            ALOGV("adev_set_mode() in call force input standby");
+            in_standby(&in->stream.common);
+        }
+
+        ALOGV("adev_set_mode() openPcmOut_l()");
+        // openPcmOut_l();
+        // openMixer_l();
+        // setInputSource_l(AUDIO_SOURCE_DEFAULT);
+        // setVoiceVolume_l(mVoiceVol);
+
+        start_output_stream(out);
+
+        adev->in_source = AUDIO_SOURCE_DEFAULT;
+        struct mixer* mixer;
+        mixer = open_mixer();
+        select_input_source(adev, mixer);
+        close_mixer(mixer);
+
+        set_voice_volume(adev, adev->voice_volume);
+
+        adev->incall_mode = true;
+    }
+
+    if (mode != AUDIO_MODE_IN_CALL && adev->incall_mode) {
+        
+        // if (mMixer != NULL) {
+        //     TRACE_DRIVER_IN(DRV_MIXER_GET)
+        //     struct mixer_ctl *ctl= mixer_get_ctl_by_name(mMixer, "Playback Path");
+        //     TRACE_DRIVER_OUT
+        //     if (ctl != NULL) {
+        //         ALOGV("setMode() reset Playback Path to RCV");
+        //         TRACE_DRIVER_IN(DRV_MIXER_SEL)
+        //         mixer_ctl_set_enum_by_string(ctl, "RCV");
+        //         TRACE_DRIVER_OUT
+        //     }
+        // }
+
+        adev->out_device = AUDIO_DEVICE_OUT_EARPIECE;
+        struct mixer* mixer;
+        mixer = open_mixer();
+        select_devices(adev, mixer);
+        select_input_source(adev, mixer);
+        close_mixer(mixer);
+
+        // ALOGV("setMode() closePcmOut_l()");
+        // closeMixer_l();
+        // closePcmOut_l();
+
+        if (out && !out->standby) {
+            ALOGV("adev_set_mode() in call force output standby");
+            out_standby(&out->stream.common);
+        }
+        if (in && !in->standby) {
+            ALOGV("adev_set_mode() in call force input standby");
+            in_standby(&in->stream.common);
+        }
+
+        adev->incall_mode = false;
+    }
+
+    if (!modeNeedsCPActive) {
+        if(mActivatedCP)
+            mActivatedCP = false;
+    }
+
+
     adev_unlock(adev);
-    // in_unlock(in);
-    // out_unlock(out);
+    if (in != NULL && in_locked)
+        in_unlock(in);
+    if (out != NULL && out_locked)
+        out_unlock(out);
 
     return 0;
 }
@@ -1707,6 +2145,10 @@ static int adev_open(const hw_module_t* module, const char* name,
     adev->mode = AUDIO_MODE_NORMAL;
 
     *device = &adev->hw_device.common;
+
+    /* RIL */
+    loadRILD();
+    adev->voice_volume = 1.0f;
 
     ALOGD("adev_open: done");
 

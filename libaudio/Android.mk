@@ -13,6 +13,7 @@ LOCAL_SHARED_LIBRARIES := liblog libcutils libtinyalsa libaudioutils libaudiorou
 LOCAL_MODULE_TAGS := optional
 LOCAL_CFLAGS += -Wno-unused-parameter
 LOCAL_CFLAGS += -g
+LOCAL_LDFLAGS += -ldl
 
 include $(BUILD_SHARED_LIBRARY)
 
