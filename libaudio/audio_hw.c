@@ -1812,7 +1812,17 @@ static int adev_set_voice_volume(struct audio_hw_device *dev, float volume)
 
 static int adev_set_master_volume(struct audio_hw_device *dev, float volume)
 {
-    return -ENOSYS;
+    // return -ENOSYS;
+
+    ALOGV("Set master volume to %f.\n", volume);
+    // We return an error code here to let the audioflinger do in-software
+    // volume on top of the maximum volume that we set through the SND API.
+    // return error - software mixer will handle it
+
+    // This is from Crespo device source which is AOSP 4.3.1 based.
+    // I don't know if it works for AOSP 5.0
+
+    return -1;
 }
 
 #ifndef ICS_AUDIO_BLOB
