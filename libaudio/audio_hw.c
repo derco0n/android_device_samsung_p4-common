@@ -1298,6 +1298,16 @@ static int out_get_render_position(const struct audio_stream_out *stream,
 
 static int out_add_audio_effect(const struct audio_stream *stream, effect_handle_t effect)
 {
+    int status;
+    effect_descriptor_t desc;
+
+    status = (*effect)->get_descriptor(effect, &desc);
+    if (status != 0)
+        goto exit;
+
+    ALOGD("out_add_audio_effect(), effect type: %08x", desc.type.timeLow);
+
+exit:
     return 0;
 }
 
@@ -1645,6 +1655,16 @@ static uint32_t in_get_input_frames_lost(struct audio_stream_in *stream)
 
 static int in_add_audio_effect(const struct audio_stream *stream, effect_handle_t effect)
 {
+    int status;
+    effect_descriptor_t desc;
+
+    status = (*effect)->get_descriptor(effect, &desc);
+    if (status != 0)
+        goto exit;
+
+    ALOGD("in_add_audio_effect(), effect type: %08x", desc.type.timeLow);
+
+exit:
     return 0;
 }
 
