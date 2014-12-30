@@ -1,0 +1,61 @@
+<mixer>
+  <!--playback paths-->
+  <ctl name="Playback Path" value="OFF"/>
+  <ctl name="Capture MIC Path" value="MIC OFF"/>
+  <ctl name="Input Source" value="Default"/>
+
+
+  <!--outputs-->
+  <path name="speaker">
+    <ctl name="Playback Path" value="SPK"/>
+  </path>
+
+  <path name="headphone">
+    <ctl name="Playback Path" value="HP_NO_MIC"/>
+  </path>
+
+  <path name="headset">
+    <ctl name="Playback Path" value="HP"/>
+  </path>
+
+  <path name="speaker-and-headphone">
+    <ctl name="Playback Path" value="SPK_HP"/>
+  </path>
+
+  <path name="output-off">
+    <ctl name="Playback Path" value="OFF"/>
+  </path>
+
+
+  <!--inputs-->
+  <path name="main-mic">
+    <ctl name="Capture MIC Path" value="Main Mic"/>
+  </path>
+
+  <path name="headset-mic">
+    <ctl name="Capture MIC Path" value="Hands Free Mic"/>
+  </path>
+
+  <path name="bt-sco-mic">
+    <ctl name="Capture MIC Path" value="BT Sco Mic"/>
+  </path>
+
+  <path name="mic-off">
+    <ctl name="Capture MIC Path" value="MIC OFF"/>
+  </path>
+
+
+  <!--input sources-->
+  <path name="in-source-default">
+    <ctl name="Input Source" value="Default"/>
+  </path>
+
+  <path name="in-source-camcorder">
+    <ctl name="Input Source" value="Camcorder"/>
+  </path>
+
+  <path name="in-source-voice-recog">
+    <ctl name="Input Source" value="Voice Recognition"/>
+  </path>
+
+</mixer>

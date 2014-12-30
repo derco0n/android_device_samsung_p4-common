@@ -116,16 +116,20 @@ PRODUCT_PACKAGES += \
 
 # Audio
 PRODUCT_PACKAGES += \
+        audio.primary.tegra \
+        audio_policy.tegra \
         audio.a2dp.default \
-        audio.usb.default \
-        libaudioutils \
-        libtinyalsa
+        audio.usb.default
+
+# audio mixer paths
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/libaudio/mixer_paths.xml:system/etc/mixer_paths.xml
 
 PRODUCT_COPY_FILES += \
         $(LOCAL_PATH)/audio/asound.conf:system/etc/asound.conf \
         $(LOCAL_PATH)/audio/audio_policy.conf:system/etc/audio_policy.conf \
         $(LOCAL_PATH)/audio/nvaudio_conf.xml:system/etc/nvaudio_conf.xml
-        
+
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/tablet_core_hardware.xml:system/etc/permissions/tablet_core_hardware.xml \
