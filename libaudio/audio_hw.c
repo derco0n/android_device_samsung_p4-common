@@ -41,7 +41,6 @@
 
 #define PCM_CARD 0
 #define PCM_DEVICE 0
-#define PCM_DEVICE_SCO 2
 
 #define MIXER_CARD 0
 
@@ -54,10 +53,6 @@
 #define IN_PERIOD_SIZE_LOW_LATENCY 512
 #define IN_PERIOD_COUNT 4
 #define IN_SAMPLING_RATE 44100
-
-#define SCO_PERIOD_SIZE 256
-#define SCO_PERIOD_COUNT 4
-#define SCO_SAMPLING_RATE 8000
 
 /* minimum sleep time in out_write() when write threshold is not reached */
 #define MIN_WRITE_SLEEP_US 2000
@@ -105,14 +100,6 @@ struct pcm_config pcm_config_in_low_latency = {
     .format = PCM_FORMAT_S16_LE,
     .start_threshold = 1,
     .stop_threshold = (IN_PERIOD_SIZE_LOW_LATENCY * IN_PERIOD_COUNT),
-};
-
-struct pcm_config pcm_config_sco = {
-    .channels = 1,
-    .rate = SCO_SAMPLING_RATE,
-    .period_size = SCO_PERIOD_SIZE,
-    .period_count = SCO_PERIOD_COUNT,
-    .format = PCM_FORMAT_S16_LE,
 };
 
 struct audio_device {
@@ -164,7 +151,6 @@ struct stream_in {
     pthread_mutex_t lock; /* see note below on mutex acquisition order */
     struct pcm *pcm;
     struct pcm_config *pcm_config;          /* current configuration */
-    struct pcm_config *pcm_config_non_sco;  /* configuration to return after SCO is done */
     bool standby;
 
     unsigned int requested_rate;
@@ -278,6 +264,8 @@ static void select_devices(struct audio_device *adev, struct mixer* mixer)
         mixer_ctl_set_enum_by_string(m_route_ctl, "Main Mic");
     } else if (headset_mic_on) {
         mixer_ctl_set_enum_by_string(m_route_ctl, "Hands Free Mic");
+    } else if (bt_sco_on) {
+        mixer_ctl_set_enum_by_string(m_route_ctl, "BT Sco Mic");
     } else {
         mixer_ctl_set_enum_by_string(m_route_ctl, "MIC OFF");
     }
@@ -405,38 +393,9 @@ static int start_output_stream(struct stream_out *out)
 
     ALOGD("start_output_stream()");
 
-    /*
-     * Due to the lack of sample rate converters in the SoC,
-     * it greatly simplifies things to have only the main
-     * (speaker/headphone) PCM or the BC SCO PCM open at
-     * the same time.
-     */
-    if (adev->out_device & AUDIO_DEVICE_OUT_ALL_SCO) {
-        device = PCM_DEVICE_SCO;
-        out->pcm_config = &pcm_config_sco;
-    } else {
-        device = PCM_DEVICE;
-        out->pcm_config = &pcm_config_out;
-        out->buffer_type = OUT_BUFFER_TYPE_UNKNOWN;
-    }
-
-    /*
-     * All open PCMs can only use a single group of rates at once:
-     * Group 1: 11.025, 22.05, 44.1
-     * Group 2: 8, 16, 32, 48
-     * Group 1 is used for digital audio playback since 44.1 is
-     * the most common rate, but group 2 is required for SCO.
-     */
-    // if (adev->active_in) {
-    //     struct stream_in *in = adev->active_in;
-    //     in_lock(in);
-    //     if (((out->pcm_config->rate % 8000 == 0) &&
-    //              (in->pcm_config->rate % 8000) != 0) ||
-    //              ((out->pcm_config->rate % 11025 == 0) &&
-    //              (in->pcadev->active_out =m_config->rate % 11025) != 0))
-    //         do_in_standby(in);
-    //     in_unlock(in);
-    // }
+    device = PCM_DEVICE;
+    out->pcm_config = &pcm_config_out;
+    out->buffer_type = OUT_BUFFER_TYPE_UNKNOWN;
 
     out->pcm = pcm_open(PCM_CARD, device, PCM_OUT | PCM_NORESTART | PCM_MONOTONIC, out->pcm_config);
 
@@ -478,43 +437,11 @@ static int start_output_stream(struct stream_out *out)
 static int start_input_stream(struct stream_in *in)
 {
     struct audio_device *adev = in->dev;
-    unsigned int device;
     int ret;
 
     ALOGD("start_input_stream()");
 
-    /*
-     * Due to the lack of sample rate converters in the SoC,
-     * it greatly simplifies things to have only the main
-     * mic PCM or the BC SCO PCM open at the same time.
-     */
-    if (adev->in_device & AUDIO_DEVICE_IN_ALL_SCO) {
-        device = PCM_DEVICE_SCO;
-        in->pcm_config = &pcm_config_sco;
-    } else {
-        device = PCM_DEVICE;
-        in->pcm_config = in->pcm_config_non_sco;
-    }
-
-    /*
-     * All open PCMs can only use a single group of rates at once:
-     * Group 1: 11.025, 22.05, 44.1
-     * Group 2: 8, 16, 32, 48
-     * Group 1 is used for digital audio playback since 44.1 is
-     * the most common rate, but group 2 is required for SCO.
-     */
-    // if (adev->active_out) {
-    //     struct stream_out *out = adev->active_out;
-    //     out_lock(out);
-    //     if (((in->pcm_config->rate % 8000 == 0) &&
-    //              (out->pcm_config->rate % 8000) != 0) ||
-    //              ((in->pcm_config->rate % 11025 == 0) &&
-    //              (out->pcm_config->rate % 11025) != 0))
-    //         do_out_standby(out);
-    //     out_unlock(out);
-    // }
-
-    in->pcm = pcm_open(PCM_CARD, device, PCM_IN, in->pcm_config);
+    in->pcm = pcm_open(PCM_CARD, PCM_DEVICE, PCM_IN, in->pcm_config);
 
     if (in->pcm && !pcm_is_ready(in->pcm)) {
         ALOGE("pcm_open(in) failed: %s", pcm_get_error(in->pcm));
@@ -765,18 +692,6 @@ static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
     if (ret >= 0) {
         val = atoi(value);
         if ((adev->out_device != val) && (val != 0)) {
-            /*
-             * If SCO is turned on/off, we need to put audio into standby
-             * because SCO uses a different PCM.
-             */
-            if ((val & AUDIO_DEVICE_OUT_ALL_SCO) ^
-                    (adev->out_device & AUDIO_DEVICE_OUT_ALL_SCO)) {
-
-                if (!out->standby)
-                    do_out_standby(out);
-
-            }
-
             if (adev->out_device != val) {
                 if (adev->mode != AUDIO_MODE_IN_CALL) {
 
@@ -808,14 +723,7 @@ static uint32_t out_get_latency(const struct audio_stream_out *stream)
     struct audio_device *adev = out->dev;
     size_t period_count;
 
-    adev_lock(adev);
-
-    if (adev->screen_off && !adev->active_in && !(adev->out_device & AUDIO_DEVICE_OUT_ALL_SCO))
-        period_count = OUT_LONG_PERIOD_COUNT;
-    else
-        period_count = OUT_SHORT_PERIOD_COUNT;
-
-    adev_unlock(adev);
+    period_count = OUT_LONG_PERIOD_COUNT;
 
     return (pcm_config_out.period_size * period_count * 1000) / pcm_config_out.rate;
 }
@@ -838,7 +746,6 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
     size_t out_frames;
     int buffer_type;
     int kernel_frames;
-    bool sco_on;
 
     bool in_locked = false;
     bool restart_input = false;
@@ -949,11 +856,10 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
     }
     buffer_type = (adev->screen_off && !adev->active_in) ?
             OUT_BUFFER_TYPE_LONG : OUT_BUFFER_TYPE_SHORT;
-    sco_on = (adev->out_device & AUDIO_DEVICE_OUT_ALL_SCO);
 
     /* detect changes in screen ON/OFF state and adapt buffer size
      * if needed. Do not change buffer size when routed to SCO device. */
-    if (!sco_on && (buffer_type != out->buffer_type)) {
+    if (buffer_type != out->buffer_type) {
         size_t period_count;
 
         if (buffer_type == OUT_BUFFER_TYPE_LONG)
@@ -992,7 +898,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
         out_frames = in_frames;
     }
 
-    if (!sco_on) {
+    {
         int total_sleep_time_us = 0;
         size_t period_size = out->pcm_config->period_size;
 
@@ -1246,15 +1152,6 @@ static int in_set_parameters(struct audio_stream *stream, const char *kvpairs)
     if (ret >= 0) {
         val = atoi(value) & ~AUDIO_DEVICE_BIT_IN;
         if ((adev->in_device != val) && (val != 0)) {
-            /*
-             * If SCO is turned on/off, we need to put audio into standby
-             * because SCO uses a different PCM.
-             */
-            if ((val & AUDIO_DEVICE_IN_ALL_SCO) ^
-                    (adev->in_device & AUDIO_DEVICE_IN_ALL_SCO)) {
-                if (!in->standby)
-                    do_in_standby(in);
-            }
 
             if (adev->mode != AUDIO_MODE_IN_CALL) {
                 if (!in->standby)
@@ -1725,7 +1622,6 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
     /* default PCM config */
     in->pcm_config = (config->sample_rate == IN_SAMPLING_RATE) && (flags & AUDIO_INPUT_FLAG_FAST) ?
             &pcm_config_in_low_latency : &pcm_config_in;
-    in->pcm_config_non_sco = in->pcm_config;
 
     ALOGD("adev_open_input_stream() done");
 
