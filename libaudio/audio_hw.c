@@ -29,13 +29,16 @@
 
 #include <hardware/audio.h>
 #include <hardware/hardware.h>
+#include <hardware/audio_effect.h>
 
 #include <system/audio.h>
 
 #include <tinyalsa/asoundlib.h>
 
 #include <audio_utils/resampler.h>
+#include <audio_utils/echo_reference.h>
 #include <audio_route/audio_route.h>
+#include <audio_effects/effect_aec.h>
 
 #include <dlfcn.h>
 
@@ -69,6 +72,15 @@ enum {
 #define MIN_WRITE_SLEEP_US 2000
 #define MAX_WRITE_SLEEP_US ((OUT_PERIOD_SIZE * OUT_SHORT_PERIOD_COUNT * 1000000) \
                                 / OUT_SAMPLING_RATE)
+
+/* from Tuna */
+#define MAX_PREPROCESSORS 3 /* maximum one AGC + one NS + one AEC per input stream */
+
+struct effect_info_s {
+    effect_handle_t effect_itfe;
+    size_t num_channel_configs;
+    channel_config_t* channel_configs;
+};
 
 enum {
     OUT_BUFFER_TYPE_UNKNOWN,
@@ -180,10 +192,23 @@ struct stream_in {
     unsigned int requested_rate;
     struct resampler_itfe *resampler;
     struct resampler_buffer_provider buf_provider;
-    int16_t *buffer;
-    size_t buffer_size;
-    size_t frames_in;
+
+    // int16_t *buffer;
+    // size_t buffer_size;
+    // size_t frames_in;
+    int16_t *read_buf;
+    size_t read_buf_size;
+    size_t read_buf_frames;
+
+    int16_t *proc_buf_in;
+    int16_t *proc_buf_out;
+    size_t proc_buf_size;
+    size_t proc_buf_frames;
+
     int read_status;
+
+    int num_preprocessors;
+    struct effect_info_s preprocessors[MAX_PREPROCESSORS];
 
     bool sleep_req;
     int lock_cnt;
@@ -678,10 +703,20 @@ static void do_in_standby(struct stream_in *in)
             release_resampler(in->resampler);
             in->resampler = NULL;
         }
-        if (in->buffer) {
-            free(in->buffer);
-            in->buffer = NULL;
+        if (in->read_buf) {
+            free(in->read_buf);
+            in->read_buf = NULL;
         }
+
+        if (in->proc_buf_in) {
+            free(in->proc_buf_in);
+            in->proc_buf_in = NULL;
+        }
+        if (in->proc_buf_out) {
+            free(in->proc_buf_out);
+            in->proc_buf_out = NULL;
+        }
+
         in->standby = true;
     } else {
         ALOGD("do_in_standby() did nothing. Called with in->standby already true.");
@@ -771,10 +806,10 @@ static int start_input_stream(struct stream_in *in)
         ALOGD("start_input_stream() created resampler %d -> %d", in->pcm_config->rate,
             in_get_sample_rate(&in->stream.common));
     }
-    in->buffer_size = pcm_frames_to_bytes(in->pcm,
+    in->read_buf_size = pcm_frames_to_bytes(in->pcm,
                                           in->pcm_config->period_size);
-    in->buffer = malloc(in->buffer_size);
-    in->frames_in = 0;
+    in->read_buf = malloc(in->read_buf_size);
+    in->read_buf_frames = 0;
 
     adev->active_in = in;
 
@@ -800,29 +835,29 @@ static int get_next_buffer(struct resampler_buffer_provider *buffer_provider,
         return -ENODEV;
     }
 
-    if (in->frames_in == 0) {
+    if (in->read_buf_frames == 0) {
         in->read_status = pcm_read(in->pcm,
-                                   (void*)in->buffer,
-                                   in->buffer_size);
+                                   (void*)in->read_buf,
+                                   in->read_buf_size);
         if (in->read_status != 0) {
             ALOGE("get_next_buffer() pcm_read error %d", in->read_status);
             buffer->raw = NULL;
             buffer->frame_count = 0;
             return in->read_status;
         }
-        in->frames_in = in->pcm_config->period_size;
+        in->read_buf_frames = in->pcm_config->period_size;
         if (in->pcm_config->channels == 2) {
             unsigned int i;
 
             /* Discard right channel */
-            for (i = 1; i < in->frames_in; i++)
-                in->buffer[i] = in->buffer[i * 2];
+            for (i = 1; i < in->read_buf_frames; i++)
+                in->read_buf[i] = in->read_buf[i * 2];
         }
     }
 
-    buffer->frame_count = (buffer->frame_count > in->frames_in) ?
-                                in->frames_in : buffer->frame_count;
-    buffer->i16 = in->buffer + (in->pcm_config->period_size - in->frames_in);
+    buffer->frame_count = (buffer->frame_count > in->read_buf_frames) ?
+                                in->read_buf_frames : buffer->frame_count;
+    buffer->i16 = in->read_buf + (in->pcm_config->period_size - in->read_buf_frames);
 
     return in->read_status;
 
@@ -839,7 +874,7 @@ static void release_buffer(struct resampler_buffer_provider *buffer_provider,
     in = (struct stream_in *)((char *)buffer_provider -
                                    offsetof(struct stream_in, buf_provider));
 
-    in->frames_in -= buffer->frame_count;
+    in->read_buf_frames -= buffer->frame_count;
 }
 
 /* read_frames() reads frames from kernel driver, down samples to capture rate
@@ -877,6 +912,134 @@ static ssize_t read_frames(struct stream_in *in, void *buffer, ssize_t frames)
 
         frames_wr += frames_rd;
     }
+    return frames_wr;
+}
+
+/* process_frames() reads frames from kernel driver (via read_frames()),
+ * calls the active audio pre processings and output the number of frames requested
+ * to the buffer specified */
+static ssize_t process_frames(struct stream_in *in, void* buffer, ssize_t frames)
+{
+    ssize_t frames_wr = 0;
+    audio_buffer_t in_buf;
+    audio_buffer_t out_buf;
+    int i;
+    // bool has_aux_channels = (~in->main_channels & in->aux_channels);
+    void *proc_buf_out;
+
+    // if (has_aux_channels)
+    //     proc_buf_out = in->proc_buf_out;
+    // else
+        proc_buf_out = buffer;
+
+    /* since all the processing below is done in frames and using the config.channels
+     * as the number of channels, no changes is required in case aux_channels are present */
+    while (frames_wr < frames) {
+        /* first reload enough frames at the end of process input buffer */
+        if (in->proc_buf_frames < (size_t)frames) {
+            ssize_t frames_rd;
+
+            if (in->proc_buf_size < (size_t)frames) {
+                size_t size_in_bytes = pcm_frames_to_bytes(in->pcm, frames);
+
+                in->proc_buf_size = (size_t)frames;
+                in->proc_buf_in = (int16_t *)realloc(in->proc_buf_in, size_in_bytes);
+                ALOG_ASSERT((in->proc_buf_in != NULL),
+                            "process_frames() failed to reallocate proc_buf_in");
+                // if (has_aux_channels) {
+                //     in->proc_buf_out = (int16_t *)realloc(in->proc_buf_out, size_in_bytes);
+                //     ALOG_ASSERT((in->proc_buf_out != NULL),
+                //                 "process_frames() failed to reallocate proc_buf_out");
+                //     proc_buf_out = in->proc_buf_out;
+                // }
+                ALOGV("process_frames(): proc_buf_in %p extended to %d bytes",
+                     in->proc_buf_in, size_in_bytes);
+            }
+            frames_rd = read_frames(in,
+                                    in->proc_buf_in +
+                                        in->proc_buf_frames * in->pcm_config->channels,
+                                    frames - in->proc_buf_frames);
+            if (frames_rd < 0) {
+                frames_wr = frames_rd;
+                break;
+            }
+            in->proc_buf_frames += frames_rd;
+        }
+
+        // if (in->echo_reference != NULL)
+        //     push_echo_reference(in, in->proc_buf_frames);
+
+         /* in_buf.frameCount and out_buf.frameCount indicate respectively
+          * the maximum number of frames to be consumed and produced by process() */
+        in_buf.frameCount = in->proc_buf_frames;
+        in_buf.s16 = in->proc_buf_in;
+        out_buf.frameCount = frames - frames_wr;
+        out_buf.s16 = (int16_t *)proc_buf_out + frames_wr * in->pcm_config->channels;
+
+        /* FIXME: this works because of current pre processing library implementation that
+         * does the actual process only when the last enabled effect process is called.
+         * The generic solution is to have an output buffer for each effect and pass it as
+         * input to the next.
+         */
+        for (i = 0; i < in->num_preprocessors; i++) {
+            (*in->preprocessors[i].effect_itfe)->process(in->preprocessors[i].effect_itfe,
+                                               &in_buf,
+                                               &out_buf);
+        }
+
+        /* process() has updated the number of frames consumed and produced in
+         * in_buf.frameCount and out_buf.frameCount respectively
+         * move remaining frames to the beginning of in->proc_buf_in */
+        in->proc_buf_frames -= in_buf.frameCount;
+
+        if (in->proc_buf_frames) {
+            memcpy(in->proc_buf_in,
+                   in->proc_buf_in + in_buf.frameCount * in->pcm_config->channels,
+                   in->proc_buf_frames * in->pcm_config->channels * sizeof(int16_t));
+        }
+
+        /* if not enough frames were passed to process(), read more and retry. */
+        if (out_buf.frameCount == 0) {
+            ALOGW("No frames produced by preproc");
+            continue;
+        }
+
+        if ((frames_wr + (ssize_t)out_buf.frameCount) <= frames) {
+            frames_wr += out_buf.frameCount;
+        } else {
+            /* The effect does not comply to the API. In theory, we should never end up here! */
+            ALOGE("preprocessing produced too many frames: %d + %d  > %d !",
+                  (unsigned int)frames_wr, out_buf.frameCount, (unsigned int)frames);
+            frames_wr = frames;
+        }
+    }
+
+    /* Remove aux_channels that have been added on top of main_channels
+     * Assumption is made that the channels are interleaved and that the main
+     * channels are first. */
+    // if (has_aux_channels)
+    // {
+    //     size_t src_channels = in->pcm_config->channels;
+    //     size_t dst_channels = popcount(in->main_channels);
+    //     int16_t* src_buffer = (int16_t *)proc_buf_out;
+    //     int16_t* dst_buffer = (int16_t *)buffer;
+
+    //     if (dst_channels == 1) {
+    //         for (i = frames_wr; i > 0; i--)
+    //         {
+    //             *dst_buffer++ = *src_buffer;
+    //             src_buffer += src_channels;
+    //         }
+    //     } else {
+    //         for (i = frames_wr; i > 0; i--)
+    //         {
+    //             memcpy(dst_buffer, src_buffer, dst_channels*sizeof(int16_t));
+    //             dst_buffer += dst_channels;
+    //             src_buffer += src_channels;
+    //         }
+    //     }
+    // }
+
     return frames_wr;
 }
 
@@ -1604,9 +1767,9 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
     if (ret < 0)
         goto exit;
 
-    /*if (in->num_preprocessors != 0) {
+    if (in->num_preprocessors != 0) {
         ret = process_frames(in, buffer, frames_rq);
-    } else */if (in->resampler != NULL) {
+    } else if (in->resampler != NULL) {
         ret = read_frames(in, buffer, frames_rq);
     } else if (in->pcm_config->channels == 2) {
         /*
@@ -1616,11 +1779,11 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
         unsigned int i;
         int16_t *in_buffer = (int16_t *)buffer;
 
-        ret = pcm_read(in->pcm, in->buffer, bytes * 2);
+        ret = pcm_read(in->pcm, in->read_buf, bytes * 2);
 
         /* Discard right channel */
         for (i = 0; i < frames_rq; i++)
-            in_buffer[i] = in->buffer[i * 2];
+            in_buffer[i] = in->read_buf[i * 2];
     } else {
         ret = pcm_read(in->pcm, buffer, bytes);
     }
@@ -1653,24 +1816,221 @@ static uint32_t in_get_input_frames_lost(struct audio_stream_in *stream)
     return 0;
 }
 
+/* in audio effect helpers */
+
+#define GET_COMMAND_STATUS(status, fct_status, cmd_status) \
+            do {                                           \
+                if (fct_status != 0)                       \
+                    status = fct_status;                   \
+                else if (cmd_status != 0)                  \
+                    status = cmd_status;                   \
+            } while(0)
+
+static int in_configure_reverse(struct stream_in *in)
+{
+    int32_t cmd_status;
+    uint32_t size = sizeof(int);
+    effect_config_t config;
+    int32_t status = 0;
+    int32_t fct_status = 0;
+    int i;
+
+    if (in->num_preprocessors > 0) {
+        // config.inputCfg.channels = in->main_channels;
+        // config.outputCfg.channels = in->main_channels;
+        config.inputCfg.channels = in->pcm_config->channels;
+        config.outputCfg.channels = in->pcm_config->channels;
+        config.inputCfg.format = AUDIO_FORMAT_PCM_16_BIT;
+        config.outputCfg.format = AUDIO_FORMAT_PCM_16_BIT;
+        config.inputCfg.samplingRate = in->requested_rate;
+        config.outputCfg.samplingRate = in->requested_rate;
+        config.inputCfg.mask =
+                ( EFFECT_CONFIG_SMP_RATE | EFFECT_CONFIG_CHANNELS | EFFECT_CONFIG_FORMAT );
+        config.outputCfg.mask =
+                ( EFFECT_CONFIG_SMP_RATE | EFFECT_CONFIG_CHANNELS | EFFECT_CONFIG_FORMAT );
+
+        for (i = 0; i < in->num_preprocessors; i++)
+        {
+            if ((*in->preprocessors[i].effect_itfe)->process_reverse == NULL)
+                continue;
+            fct_status = (*(in->preprocessors[i].effect_itfe))->command(
+                                                        in->preprocessors[i].effect_itfe,
+                                                        EFFECT_CMD_SET_CONFIG_REVERSE,
+                                                        sizeof(effect_config_t),
+                                                        &config,
+                                                        &size,
+                                                        &cmd_status);
+            GET_COMMAND_STATUS(status, fct_status, cmd_status);
+        }
+    }
+    return status;
+}
+
+#define MAX_NUM_CHANNEL_CONFIGS 10
+
+static void in_read_audio_effect_channel_configs(struct stream_in *in,
+                                                 struct effect_info_s *effect_info)
+{
+    /* size and format of the cmd are defined in hardware/audio_effect.h */
+    effect_handle_t effect = effect_info->effect_itfe;
+    uint32_t cmd_size = 2 * sizeof(uint32_t);
+    uint32_t cmd[] = { EFFECT_FEATURE_AUX_CHANNELS, MAX_NUM_CHANNEL_CONFIGS };
+    /* reply = status + number of configs (n) + n x channel_config_t */
+    uint32_t reply_size =
+            2 * sizeof(uint32_t) + (MAX_NUM_CHANNEL_CONFIGS * sizeof(channel_config_t));
+    int32_t reply[reply_size];
+    int32_t cmd_status;
+
+    ALOG_ASSERT((effect_info->num_channel_configs == 0),
+                "in_read_audio_effect_channel_configs() num_channel_configs not cleared");
+    ALOG_ASSERT((effect_info->channel_configs == NULL),
+                "in_read_audio_effect_channel_configs() channel_configs not cleared");
+
+    /* if this command is not supported, then the effect is supposed to return -EINVAL.
+     * This error will be interpreted as if the effect supports the main_channels but does not
+     * support any aux_channels */
+    cmd_status = (*effect)->command(effect,
+                                EFFECT_CMD_GET_FEATURE_SUPPORTED_CONFIGS,
+                                cmd_size,
+                                (void*)&cmd,
+                                &reply_size,
+                                (void*)&reply);
+
+    if (cmd_status != 0) {
+        ALOGV("in_read_audio_effect_channel_configs(): "
+                "fx->command returned %d", cmd_status);
+        return;
+    }
+
+    if (reply[0] != 0) {
+        ALOGW("in_read_audio_effect_channel_configs(): "
+                "command EFFECT_CMD_GET_FEATURE_SUPPORTED_CONFIGS error %d num configs %d",
+                reply[0], (reply[0] == -ENOMEM) ? reply[1] : MAX_NUM_CHANNEL_CONFIGS);
+        return;
+    }
+
+    /* the feature is not supported */
+    ALOGV("in_read_audio_effect_channel_configs()(): "
+            "Feature supported and adding %d channel configs to the list", reply[1]);
+    effect_info->num_channel_configs = reply[1];
+    effect_info->channel_configs =
+            (channel_config_t *) malloc(sizeof(channel_config_t) * reply[1]); /* n x configs */
+    memcpy(effect_info->channel_configs, (reply + 2), sizeof(channel_config_t) * reply[1]);
+}
+
 static int in_add_audio_effect(const struct audio_stream *stream, effect_handle_t effect)
 {
+    struct stream_in *in = (struct stream_in *)stream;
     int status;
     effect_descriptor_t desc;
+
+    // pthread_mutex_lock(&in->dev->lock);
+    // pthread_mutex_lock(&in->lock);
+    in->sleep_req = true;
+    in_lock(in);
+    in->sleep_req = false;
+    adev_lock(in->dev);
+
+    if (in->num_preprocessors >= MAX_PREPROCESSORS) {
+        status = -ENOSYS;
+        goto exit;
+    }
 
     status = (*effect)->get_descriptor(effect, &desc);
     if (status != 0)
         goto exit;
 
+    in->preprocessors[in->num_preprocessors].effect_itfe = effect;
+    /* add the supported channel of the effect in the channel_configs */
+    in_read_audio_effect_channel_configs(in, &in->preprocessors[in->num_preprocessors]);
+
+    in->num_preprocessors++;
+
+    /* check compatibility between main channel supported and possible auxiliary channels */
+    // in_update_aux_channels(in, effect);
+
     ALOGD("in_add_audio_effect(), effect type: %08x", desc.type.timeLow);
 
+    if (memcmp(&desc.type, FX_IID_AEC, sizeof(effect_uuid_t)) == 0) {
+        // in->need_echo_reference = true;
+        do_in_standby(in);
+        in_configure_reverse(in);
+    }
+
 exit:
-    return 0;
+
+    ALOGW_IF(status != 0, "in_add_audio_effect() error %d", status);
+    // pthread_mutex_unlock(&in->lock);
+    // pthread_mutex_unlock(&in->dev->lock);
+    adev_unlock(in->dev);
+    in_unlock(in);
+    return status;
 }
 
 static int in_remove_audio_effect(const struct audio_stream *stream, effect_handle_t effect)
 {
-    return 0;
+    struct stream_in *in = (struct stream_in *)stream;
+    int i;
+    int status = -EINVAL;
+    effect_descriptor_t desc;
+
+    // pthread_mutex_lock(&in->dev->lock);
+    // pthread_mutex_lock(&in->lock);
+    in->sleep_req = true;
+    in_lock(in);
+    in->sleep_req = false;
+    adev_lock(in->dev);
+
+    if (in->num_preprocessors <= 0) {
+        status = -ENOSYS;
+        goto exit;
+    }
+
+    for (i = 0; i < in->num_preprocessors; i++) {
+        if (status == 0) { /* status == 0 means an effect was removed from a previous slot */
+            in->preprocessors[i - 1].effect_itfe = in->preprocessors[i].effect_itfe;
+            in->preprocessors[i - 1].channel_configs = in->preprocessors[i].channel_configs;
+            in->preprocessors[i - 1].num_channel_configs = in->preprocessors[i].num_channel_configs;
+            ALOGV("in_remove_audio_effect moving fx from %d to %d", i, i - 1);
+            continue;
+        }
+        if (in->preprocessors[i].effect_itfe == effect) {
+            ALOGV("in_remove_audio_effect found fx at index %d", i);
+            free(in->preprocessors[i].channel_configs);
+            status = 0;
+        }
+    }
+
+    if (status != 0)
+        goto exit;
+
+    in->num_preprocessors--;
+    /* if we remove one effect, at least the last preproc should be reset */
+    in->preprocessors[in->num_preprocessors].num_channel_configs = 0;
+    in->preprocessors[in->num_preprocessors].effect_itfe = NULL;
+    in->preprocessors[in->num_preprocessors].channel_configs = NULL;
+
+
+    /* check compatibility between main channel supported and possible auxiliary channels */
+    // in_update_aux_channels(in, NULL);
+
+    status = (*effect)->get_descriptor(effect, &desc);
+    if (status != 0)
+        goto exit;
+
+    ALOGD("in_remove_audio_effect(), effect type: %08x", desc.type.timeLow);
+
+    if (memcmp(&desc.type, FX_IID_AEC, sizeof(effect_uuid_t)) == 0) {
+        // in->need_echo_reference = false;
+        do_in_standby(in);
+    }
+
+exit:
+
+    ALOGW_IF(status != 0, "in_remove_audio_effect() error %d", status);
+    adev_unlock(in->dev);
+    in_unlock(in);
+    return status;
 }
 
 static int adev_open_output_stream(struct audio_hw_device *dev,
