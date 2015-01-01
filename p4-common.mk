@@ -112,7 +112,9 @@ PRODUCT_PACKAGES += \
         Torch
 
 PRODUCT_PACKAGES += \
-        CMFileManager
+        CMFileManager \
+        DSPManager \
+        javax.btobex
 
 # Audio
 PRODUCT_PACKAGES += \
