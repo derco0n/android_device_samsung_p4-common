@@ -121,7 +121,8 @@ PRODUCT_PACKAGES += \
         audio.primary.tegra \
         audio_policy.tegra \
         audio.a2dp.default \
-        audio.usb.default
+        audio.usb.default \
+        audio.r_submix.default
 
 # audio mixer paths
 PRODUCT_COPY_FILES += \
