@@ -1767,9 +1767,9 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
     if (ret < 0)
         goto exit;
 
-    if (in->num_preprocessors != 0) {
+    /*if (in->num_preprocessors != 0) {
         ret = process_frames(in, buffer, frames_rq);
-    } else if (in->resampler != NULL) {
+    } else */if (in->resampler != NULL) {
         ret = read_frames(in, buffer, frames_rq);
     } else if (in->pcm_config->channels == 2) {
         /*
