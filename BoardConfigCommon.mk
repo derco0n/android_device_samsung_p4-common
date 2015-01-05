@@ -162,7 +162,7 @@ TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlig
 TW_MAX_BRIGHTNESS := 255
 #TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
 TW_NO_USB_STORAGE := true
-TW_EXCLUDE_SUPERSU := true
+# TW_EXCLUDE_SUPERSU := true
 #in the ongoing battle to reduce recovery size no true type font
 # TW_DISABLE_TTF := true
 
@@ -178,7 +178,7 @@ TW_CRYPTO_MNT_POINT := "/data"
 TW_CRYPTO_FS_OPTIONS := "noatime,nosuid,nodev,journal_async_commit,errors=panic      wait,check,encryptable=footer"
 TW_CRYPTO_FS_FLAGS := "0x00000406"
 TW_CRYPTO_KEY_LOC := "footer"
-TWRP_EVENT_LOGGING := true
+# TWRP_EVENT_LOGGING := true
 # TW_EXCLUDE_MTP := true
 
 # Build omnirom twrp android-5.0 on android-4.0 sources
