@@ -30,4 +30,8 @@
 
     <!-- Use hardware layers in recents -->
     <bool name="config_recents_use_hardware_layers">true</bool>
+
+	<!-- Whether to enable to show task manager or not -->
+	<bool name="config_showTaskManagerSwitcher">true</bool>
+
 </resources>
