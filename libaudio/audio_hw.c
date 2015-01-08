@@ -513,9 +513,11 @@ static const char* get_output_route(struct audio_device *adev)
             else return "HP_NO_MIC";
         case (AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_WIRED_HEADSET):
         case (AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_WIRED_HEADPHONE):
-        case (AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET):
             if (mode == AUDIO_MODE_RINGTONE) return "RING_SPK_HP";
             else return "SPK_HP";
+        case (AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET):
+            if (mode == AUDIO_MODE_RINGTONE) return "RING_SPK";
+            else return "SPK_LINEOUT";
         case AUDIO_DEVICE_OUT_BLUETOOTH_SCO:
         case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET:
         case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT:
