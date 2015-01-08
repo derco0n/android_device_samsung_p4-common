@@ -495,6 +495,7 @@ static const char* get_output_route(struct audio_device *adev)
     int out_device = adev->out_device;
     unsigned int mode = adev->mode;
 
+    ALOGV("get_output_route() out_device %d mode %u", out_device, mode);
     switch(out_device) {
         case AUDIO_DEVICE_OUT_EARPIECE:
             return "RCV";
@@ -532,6 +533,7 @@ static const char* get_input_route(struct audio_device *adev)
     if (adev->mic_mute)
         return "MIC OFF";
 
+    ALOGV("get_input_route() in_device %d mode %u", in_device, mode);
     switch(in_device) {
         case AUDIO_DEVICE_IN_BUILTIN_MIC:
             return "Main Mic";
