@@ -490,88 +490,77 @@ static void close_mixer(struct mixer* mixer)
     mixer_close(mixer);
 }
 
+static const char* get_output_route(struct audio_device *adev)
+{
+    unsigned int out_device = adev->out_device;
+    unsigned int mode = adev->mode;
+
+    switch(out_device) {
+        case AUDIO_DEVICE_OUT_EARPIECE:
+            return "RCV";
+        case AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET:
+            if (mode == AUDIO_MODE_RINGTONE) return "RING_SPK";
+            else return "LINEOUT";
+        case AUDIO_DEVICE_OUT_SPEAKER:
+            if (mode == AUDIO_MODE_RINGTONE) return "RING_SPK";
+            else return "SPK";
+        case AUDIO_DEVICE_OUT_WIRED_HEADSET:
+            if (mode == AUDIO_MODE_RINGTONE) return "RING_HP";
+            else return "HP";
+        case AUDIO_DEVICE_OUT_WIRED_HEADPHONE:
+            if (mode == AUDIO_MODE_RINGTONE) return "RING_NO_MIC";
+            else return "HP_NO_MIC";
+        case (AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_WIRED_HEADSET):
+        case (AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_WIRED_HEADPHONE):
+        case (AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET):
+            if (mode == AUDIO_MODE_RINGTONE) return "RING_SPK_HP";
+            else return "SPK_HP";
+        case AUDIO_DEVICE_OUT_BLUETOOTH_SCO:
+        case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET:
+        case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT:
+            return "BT";
+        default:
+            return "OFF";
+    }
+}
+
+static const char* get_input_route(struct audio_device *adev)
+{
+    unsigned int in_device = adev->in_device;
+    unsigned int mode = adev->mode;
+
+    if (adev->mic_mute)
+        return "MIC OFF";
+
+    switch(in_device) {
+        case AUDIO_DEVICE_IN_BUILTIN_MIC:
+            return "Main Mic";
+        case AUDIO_DEVICE_IN_WIRED_HEADSET:
+            return "Hands Free Mic";
+        case AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET:
+            return "BT Sco Mic";
+        default:
+            return "MIC OFF";
+    }
+}
+
 static void select_devices(struct audio_device *adev, struct mixer* mixer)
 {
-    int headphone_on;
-    int headset_on;
-    int speaker_on;
-    int anlg_dock_headset;
-    int main_mic_on;
-    int headset_mic_on;
-    int bt_sco_on;
-    int earpiece_on;
-
-    headphone_on = adev->out_device & (AUDIO_DEVICE_OUT_WIRED_HEADSET |
-                                    AUDIO_DEVICE_OUT_WIRED_HEADPHONE);
-    headset_on = adev->out_device & AUDIO_DEVICE_OUT_WIRED_HEADSET;
-    speaker_on = adev->out_device & AUDIO_DEVICE_OUT_SPEAKER;
-    anlg_dock_headset = adev->out_device & AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET;
-
-
-    main_mic_on = adev->in_device & AUDIO_DEVICE_IN_BUILTIN_MIC;
-    headset_mic_on = adev->in_device & AUDIO_DEVICE_IN_WIRED_HEADSET;
-    bt_sco_on = adev->in_device & AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET;
-    earpiece_on = adev->out_device & AUDIO_DEVICE_OUT_EARPIECE;
-
-    // audio_route_reset(adev->ar);
-
-    // if (main_mic_on)
-    //     audio_route_apply_path(adev->ar, "main-mic");
-    // else if (headset_mic_on)
-    //     audio_route_apply_path(adev->ar, "headset-mic");
-    // else if (bt_sco_on)
-    //     audio_route_apply_path(adev->ar, "bt-sco-mic");
-    // else
-    //     audio_route_apply_path(adev->ar, "mic-off");
-
-    // if (speaker_on && headphone_on)
-    //     audio_route_apply_path(adev->ar, "speaker-and-headphone");
-    // else if (headset_on)
-    //     audio_route_apply_path(adev->ar, "headset");
-    // else if (headphone_on)
-    //     audio_route_apply_path(adev->ar, "headphone");
-    // else if (speaker_on)
-    //     audio_route_apply_path(adev->ar, "speaker");
-    // else
-    //     audio_route_apply_path(adev->ar, "output-off");
-
-    // audio_route_update_mixer(adev->ar);
-
-
     // struct mixer* mixer = adev->mixer;
     struct mixer_ctl *m_route_ctl = NULL;
 
     m_route_ctl = mixer_get_ctl_by_name(mixer, "Playback Path");
-    if (speaker_on && headphone_on) {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "SPK_HP");
-    } else if (speaker_on) {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "SPK");
-    } else if (headset_on) {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "HP_NO_MIC");
-    } else if (headphone_on) {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "HP");
-    } else if (anlg_dock_headset) {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "LINEOUT");
-    } else if (earpiece_on) {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "RCV");
-    }
+    const char* out_route = get_output_route(adev);
+
+    mixer_ctl_set_enum_by_string(m_route_ctl, out_route);
+    ALOGD("select_devices(): Playback Path = %s", out_route);
+
 
     m_route_ctl = mixer_get_ctl_by_name(mixer, "Capture MIC Path");
-    if (main_mic_on) {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "Main Mic");
-    } else if (headset_mic_on) {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "Hands Free Mic");
-    } else if (bt_sco_on) {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "BT Sco Mic");
-    } else {
-        mixer_ctl_set_enum_by_string(m_route_ctl, "MIC OFF");
-    }
+    const char* in_route = get_input_route(adev);
 
-    ALOGD("hp=%c speaker=%c main-mic=%c headset-mic=%c",
-            headphone_on ? 'y' : 'n',
-            speaker_on ? 'y' : 'n',
-            main_mic_on ? 'y' : 'n',
-            headset_mic_on ? 'y' : 'n');
+    mixer_ctl_set_enum_by_string(m_route_ctl, in_route);
+    ALOGD("select_devices(): Capture MIC Path = %s", in_route);
 }
 
 static void select_input_source(struct audio_device *adev, struct mixer* mixer)
