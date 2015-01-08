@@ -137,9 +137,9 @@ struct audio_device {
 
     pthread_mutex_t lock; /* see note below on mutex acquisition order */
     audio_mode_t mode;
-    unsigned int out_device;
-    unsigned int in_device;
-    unsigned int in_source;
+    int out_device;
+    int in_device;
+    int in_source;
     bool standby;
     bool mic_mute;
     // struct audio_route *ar;
@@ -389,7 +389,7 @@ static int set_voice_volume(struct audio_device *adev, float volume)
 
 static status_t set_incall_path(struct audio_device* adev)
 {
-    unsigned int out_device = adev->out_device;
+    int out_device = adev->out_device;
     int mode = adev->mode;
     bool bt_nrec = adev->bt_nrec;
 
@@ -492,7 +492,7 @@ static void close_mixer(struct mixer* mixer)
 
 static const char* get_output_route(struct audio_device *adev)
 {
-    unsigned int out_device = adev->out_device;
+    int out_device = adev->out_device;
     unsigned int mode = adev->mode;
 
     switch(out_device) {
@@ -526,7 +526,7 @@ static const char* get_output_route(struct audio_device *adev)
 
 static const char* get_input_route(struct audio_device *adev)
 {
-    unsigned int in_device = adev->in_device;
+    int in_device = adev->in_device;
     unsigned int mode = adev->mode;
 
     if (adev->mic_mute)
@@ -627,7 +627,7 @@ static void select_input_source(struct audio_device *adev, struct mixer* mixer)
 static void select_voice_route(struct audio_device *adev, struct mixer* mixer)
 {
 
-    unsigned int out_device = adev->out_device;
+    int out_device = adev->out_device;
     tty_modes_t tty_mode = adev->tty_mode;
     struct mixer_ctl *ctl= mixer_get_ctl_by_name(mixer, "Voice Call Path");
 
@@ -1141,7 +1141,7 @@ static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
     struct str_parms *parms;
     char value[32];
     int ret;
-    unsigned int val;
+    int val;
 
     ALOGD("out_set_parameters()");
 
@@ -1167,7 +1167,7 @@ static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
                 set_incall_path(adev);
             }
 
-            adev->out_device = val;
+            adev->out_device = (int)val;
             // select_devices(adev);
         }
     }
@@ -1599,7 +1599,7 @@ static int in_set_parameters(struct audio_stream *stream, const char *kvpairs)
     struct str_parms *parms;
     char value[32];
     int ret;
-    unsigned int val;
+    int val;
 
     ALOGD("in_set_parameters()");
 
