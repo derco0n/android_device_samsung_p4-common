@@ -354,6 +354,7 @@ static int set_voice_volume(struct audio_device *adev, float volume)
                 break;
 
             case AUDIO_DEVICE_OUT_SPEAKER:
+            case AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET:
                 ALOGD("### speaker call volume");
                 type = SOUND_TYPE_SPEAKER;
                 break;
@@ -409,6 +410,7 @@ static status_t set_incall_path(struct audio_device* adev)
                     break;
 
                 case AUDIO_DEVICE_OUT_SPEAKER:
+                case AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET:
                     ALOGD("### incall mode speaker route");
                     path = SOUND_AUDIO_PATH_SPEAKER;
                     break;
@@ -493,6 +495,7 @@ static void select_devices(struct audio_device *adev, struct mixer* mixer)
     int headphone_on;
     int headset_on;
     int speaker_on;
+    int anlg_dock_headset;
     int main_mic_on;
     int headset_mic_on;
     int bt_sco_on;
@@ -502,6 +505,9 @@ static void select_devices(struct audio_device *adev, struct mixer* mixer)
                                     AUDIO_DEVICE_OUT_WIRED_HEADPHONE);
     headset_on = adev->out_device & AUDIO_DEVICE_OUT_WIRED_HEADSET;
     speaker_on = adev->out_device & AUDIO_DEVICE_OUT_SPEAKER;
+    anlg_dock_headset = adev->out_device & AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET;
+
+
     main_mic_on = adev->in_device & AUDIO_DEVICE_IN_BUILTIN_MIC;
     headset_mic_on = adev->in_device & AUDIO_DEVICE_IN_WIRED_HEADSET;
     bt_sco_on = adev->in_device & AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET;
@@ -544,6 +550,8 @@ static void select_devices(struct audio_device *adev, struct mixer* mixer)
         mixer_ctl_set_enum_by_string(m_route_ctl, "HP_NO_MIC");
     } else if (headphone_on) {
         mixer_ctl_set_enum_by_string(m_route_ctl, "HP");
+    } else if (anlg_dock_headset) {
+        mixer_ctl_set_enum_by_string(m_route_ctl, "LINEOUT");
     } else if (earpiece_on) {
         mixer_ctl_set_enum_by_string(m_route_ctl, "RCV");
     }
@@ -638,6 +646,7 @@ static void select_voice_route(struct audio_device *adev, struct mixer* mixer)
         case AUDIO_DEVICE_OUT_EARPIECE:
             mixer_ctl_set_enum_by_string(ctl, "RCV");
         case AUDIO_DEVICE_OUT_SPEAKER:
+        case AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET:
             mixer_ctl_set_enum_by_string(ctl, "SPK");
         case AUDIO_DEVICE_OUT_WIRED_HEADPHONE:
         case AUDIO_DEVICE_OUT_WIRED_HEADSET:
