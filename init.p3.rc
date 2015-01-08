@@ -49,7 +49,7 @@ on post-fs-data
     chown media_rw media_rw /data/media
 
 # change back to bluetooth from system
-#    chown bluetooth bluetooth /data/misc/bluetooth
+    chown bluetooth net_bt_stack /data/misc/bluetooth
 
 # Fuse sdcard
     setprop ro.crypto.fuse_sdcard true
@@ -159,25 +159,21 @@ on boot
     mkdir /dev/bus/usb 0755 root root
 
 # bluetooth
-    mkdir /data/misc/bluetooth 0770 bluetooth bluetooth
-    chown bluetooth bluetooth /data/misc/bluetooth
-
     # UART device
-    chown bluetooth bluetooth /dev/ttyHS2
     chmod 0660 /dev/ttyHS2
+    chown bluetooth net_bt_stack /dev/ttyHS2
 
     # power up/down interface
-    chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
-    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
-    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
     chmod 0660 /sys/class/rfkill/rfkill0/state
+    chmod 0660 /sys/class/rfkill/rfkill0/type
+    chown bluetooth net_bt_stack /sys/class/rfkill/rfkill0/state
+    chown bluetooth net_bt_stack /sys/class/rfkill/rfkill0/type
 
     # bluetooth MAC address programming
-    chown bluetooth bluetooth ro.bt.bdaddr_path
-    setprop ro.bt.bdaddr_path "/efs/bluetooth/bt_addr"
-
-    # Enable Bluetooth 802.11 PAL when Bluetooth is turned on
-    setprop ro.config.bt.amp no
+    chown bluetooth net_bt_stack ro.bt.bdaddr_path
+    chown bluetooth net_bt_stack /system/etc/bluetooth
+    chown bluetooth net_bt_stack /data/misc/bluetooth
+    setprop ro.bt.bdaddr_path "/data/misc/bluetooth/bdaddr"
 
 # UART/USB path switching
     chown system radio /sys/class/sec/sec_misc/uartsel
