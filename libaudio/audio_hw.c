@@ -529,13 +529,13 @@ static const char* get_output_route(struct audio_device *adev)
 
 static const char* get_input_route(struct audio_device *adev)
 {
-    int in_device = adev->in_device;
+    int in_device = AUDIO_DEVICE_BIT_IN | adev->in_device;
     unsigned int mode = adev->mode;
 
     if (adev->mic_mute)
         return "MIC OFF";
 
-    ALOGV("get_input_route() in_device %d mode %u", in_device, mode);
+    ALOGV("get_input_route() in_device %d mode %u", (in_device & ~AUDIO_DEVICE_BIT_IN), mode);
     switch(in_device) {
         case AUDIO_DEVICE_IN_BUILTIN_MIC:
             return "Main Mic";
