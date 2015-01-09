@@ -1171,8 +1171,12 @@ static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
                 set_incall_path(adev);
             }
 
+            ALOGD("out_set_parameters() out_device = %x", val);
             adev->out_device = (int)val;
-            // select_devices(adev);
+            struct mixer* mixer;
+            mixer = open_mixer();
+            select_devices(adev, mixer);
+            close_mixer(mixer);
         }
     }
 
