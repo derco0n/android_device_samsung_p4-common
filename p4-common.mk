@@ -66,7 +66,6 @@ PRODUCT_PROPERTY_OVERRIDES := \
     wifi.supplicant_scan_interval=15 \
     media.stagefright.cache-params=6144/-1/30 \
     ro.sf.lcd_density=160 \
-    ro.bq.gpu_to_cpu_unsupported=1 \
     dalvik.vm.dexopt-data-only=1 \
     dalvik.vm.debug.alloc=0 \
     debug.hwui.render_dirty_regions=false \
@@ -119,6 +118,9 @@ PRODUCT_PACKAGES += \
         CMFileManager \
         DSPManager \
         javax.btobex
+
+PRODUCT_PACKAGES += \
+    hwcomposer.tegra
 
 # Audio
 PRODUCT_PACKAGES += \
