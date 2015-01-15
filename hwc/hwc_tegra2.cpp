@@ -188,7 +188,9 @@ static int tegra2_set(struct hwc_composer_device_1 *dev,
     hwc_layer_list_t* lst = (hwc_layer_list_t*) pdev->set_xlatebuf;
 
 	copy_display_contents_1_to_layer_list(lst,contents);
-	
+	int ret = pdev->org->set(pdev->org, contents->dpy, contents->sur, lst);
+	copy_layer_list_to_display_contents_1(contents,lst);
+
 	//Wait until all buffers are available
 	unsigned int d;
 	for (d = 0; d < contents->numHwLayers; d++) {
@@ -201,10 +203,6 @@ static int tegra2_set(struct hwc_composer_device_1 *dev,
 		// And let surfaceFlinger read inmediately...
 		contents->hwLayers[d].releaseFenceFd = -1;
 	}
-
-	int ret = pdev->org->set(pdev->org, contents->dpy, contents->sur, lst);
-	
-	copy_layer_list_to_display_contents_1(contents,lst);
 
     return ret;
 }
@@ -686,7 +684,7 @@ static int tegra2_open(const struct hw_module_t *module, const char *name,
 	
 	// Try to query the original hw composer for the time between frames...
 	int value = 0;
-	
+
 	if (dev->org->query && dev->org->query(dev->org,HWC_VSYNC_PERIOD,&value) == 0 && value != 0) {
 		ALOGD("Got time between frames from original hwcomposer: time in ns = %d",value);
 		
