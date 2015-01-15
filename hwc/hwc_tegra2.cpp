@@ -411,7 +411,8 @@ static int nvhost_syncpt_wait(int ctrl_fd, int id, int thresh, unsigned int time
 static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev)
 {
 	unsigned int syncpt = 0;
-	unsigned long max_wait_us = pdev->time_between_frames_us; // NVHOST_NO_TIMEOUT
+	// unsigned long max_wait_us = pdev->time_between_frames_us; // NVHOST_NO_TIMEOUT
+	unsigned long max_wait_us = 1000000000;
 	
 	/* get syncpt threshold */
 	if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &syncpt)) {
@@ -684,7 +685,7 @@ static int tegra2_open(const struct hw_module_t *module, const char *name,
 	
 	// Try to query the original hw composer for the time between frames...
 	int value = 0;
-
+#if 0
 	if (dev->org->query && dev->org->query(dev->org,HWC_VSYNC_PERIOD,&value) == 0 && value != 0) {
 		ALOGD("Got time between frames from original hwcomposer: time in ns = %d",value);
 		
@@ -702,6 +703,10 @@ static int tegra2_open(const struct hw_module_t *module, const char *name,
 			ALOGD("Got time between frames from framebuffer: time in ns = %d",value);
 		}
 	}	
+#endif
+
+	value = 16672550;
+	ALOGD("Using DispSync refresh rate: time in ns = %d",value);
 
 	if (!value) {
 		ALOGD("Unable to get time between frames. Assuming 60 hz rate");
