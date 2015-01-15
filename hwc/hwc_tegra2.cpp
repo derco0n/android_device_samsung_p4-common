@@ -530,7 +530,7 @@ static int tegra2_query(struct hwc_composer_device_1* dev, int what, int *value)
 	switch (what) {
     case HWC_BACKGROUND_LAYER_SUPPORTED:
         // we support the background layer
-        value[0] = 1;
+        value[0] = 0;
         break;
 
     case HWC_VSYNC_PERIOD:
