@@ -478,22 +478,20 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
         int err;
 
         // Wait while display is blanked
-        pthread_mutex_lock(&pdev->vsync_mutex);
-        while (pdev->fbblanked && pdev->vsync_running) {
-
+        if (pdev->fbblanked && pdev->vsync_running) {
             // When framebuffer is blanked, there must be no interrupts, so we can't wait on it
+            pthread_mutex_lock(&pdev->vsync_mutex);
             pthread_cond_wait(&pdev->vsync_cond, &pdev->vsync_mutex);
-
-        };
+            pthread_mutex_unlock(&pdev->vsync_mutex);
+        }
         if (!pdev->vsync_running)
             break;
-        pthread_mutex_unlock(&pdev->vsync_mutex);
-
-        // Wait for the next vsync
-        tegra2_wait_vsync(pdev);
 
         // Do the VSYNC call
         if (pdev->enabled_vsync && pdev->procs && !pdev->fbblanked) {
+
+            // Wait for the next vsync
+            tegra2_wait_vsync(pdev);
 
             // Get current time in exactly the same timebase as Choreographer
             struct timespec now;
@@ -523,7 +521,7 @@ static int tegra2_eventControl(struct hwc_composer_device_1 *dev, int dpy,
             : pdev->org->methods->eventControl(pdev->org,event,enabled);
 
     if (ret != 0 && event == HWC_EVENT_VSYNC) {
-        // ALOGD("Emulated VSYNC ints are %s", enabled ? "On" : "Off" );
+        ALOGD("Emulated VSYNC ints are %s", enabled ? "On" : "Off" );
 
         pdev->enabled_vsync = (enabled) ? true : false;
         ret = 0;
