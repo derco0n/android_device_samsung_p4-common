@@ -119,20 +119,54 @@ static void copy_layer1_to_layer(hwc_layer_t* dst,hwc_layer_1_t* src)
     dst->handle = src->handle;
     dst->transform = src->transform;
     dst->blending = src->blending;
-    memcpy(&dst->sourceCrop,&src->sourceCrop,sizeof( hwc_rect_t ));
-    memcpy(&dst->displayFrame,&src->displayFrame,sizeof( hwc_rect_t ));
+    // memcpy(&dst->sourceCrop,&src->sourceCrop,sizeof( hwc_rect_t ));
+    // memcpy(&dst->displayFrame,&src->displayFrame,sizeof( hwc_rect_t ));
+    // memcpy(&dst->visibleRegionScreen,&src->visibleRegionScreen,sizeof( hwc_region_t ));
+
+    dst->sourceCrop.left = src->sourceCrop.left;
+    dst->sourceCrop.top = src->sourceCrop.top;
+    dst->sourceCrop.bottom = src->sourceCrop.bottom;
+    dst->sourceCrop.right = src->sourceCrop.right;
+    dst->displayFrame.left = src->displayFrame.left;
+    dst->displayFrame.top = src->displayFrame.top;
+    dst->displayFrame.bottom = src->displayFrame.bottom;
+    dst->displayFrame.right = src->displayFrame.right;
+
+    // dst->visibleRegionScreen.numRects = src->visibleRegionScreen.numRects;
+    // dst->visibleRegionScreen.rects->left = src->visibleRegionScreen.rects->left;
+    // dst->visibleRegionScreen.rects->top; = src->visibleRegionScreen.rects->top;
+    // dst->visibleRegionScreen.rects->bottom = src->visibleRegionScreen.rects->bottom;
+    // dst->visibleRegionScreen.rects->right = src->visibleRegionScreen.rects->right;
+
     memcpy(&dst->visibleRegionScreen,&src->visibleRegionScreen,sizeof( hwc_region_t ));
 }
 
 static void copy_layer_to_layer1(hwc_layer_1_t* dst,hwc_layer_t* src)
 {
+    dst->compositionType = src->compositionType;
     dst->hints = src->hints;
     dst->flags = src->flags;
     dst->handle = src->handle;
     dst->transform = src->transform;
     dst->blending = src->blending;
-    memcpy(&dst->sourceCrop,&src->sourceCrop,sizeof( hwc_rect_t ));
-    memcpy(&dst->displayFrame,&src->displayFrame,sizeof( hwc_rect_t ));
+    // memcpy(&dst->sourceCrop,&src->sourceCrop,sizeof( hwc_rect_t ));
+    // memcpy(&dst->displayFrame,&src->displayFrame,sizeof( hwc_rect_t ));
+    // memcpy(&dst->visibleRegionScreen,&src->visibleRegionScreen,sizeof( hwc_region_t ));
+
+    dst->sourceCrop.left = src->sourceCrop.left;
+    dst->sourceCrop.top = src->sourceCrop.top;
+    dst->sourceCrop.bottom = src->sourceCrop.bottom;
+    dst->sourceCrop.right = src->sourceCrop.right;
+    dst->displayFrame.left = src->displayFrame.left;
+    dst->displayFrame.top = src->displayFrame.top;
+    dst->displayFrame.bottom = src->displayFrame.bottom;
+    dst->displayFrame.right = src->displayFrame.right;
+
+    // dst->visibleRegionScreen.numRects = src->visibleRegionScreen.numRects;
+    // dst->visibleRegionScreen.rects->left = src->visibleRegionScreen.rects->left;
+    // dst->visibleRegionScreen.rects->top; = src->visibleRegionScreen.rects->top;
+    // dst->visibleRegionScreen.rects->bottom = src->visibleRegionScreen.rects->bottom;
+    // dst->visibleRegionScreen.rects->right = src->visibleRegionScreen.rects->right;
     memcpy(&dst->visibleRegionScreen,&src->visibleRegionScreen,sizeof( hwc_region_t ));
 }
 
