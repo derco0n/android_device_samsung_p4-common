@@ -17,5 +17,5 @@
  */
 -->
 <resources>
-    <bool name="def_wifi_on">true</bool>
+    <bool name="def_wifi_on">false</bool>
 </resources>
