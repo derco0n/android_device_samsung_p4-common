@@ -24,6 +24,11 @@ LOCAL_SHARED_LIBRARIES := liblog libcutils libhardware \
 
 LOCAL_SRC_FILES := hwc_tegra2.cpp
 
+# Workaround for buggy Samsung Tegra 2 hwcomposer
+ifeq ($(BOARD_HAVE_SAMSUNG_T20_HWCOMPOSER),true)
+	LOCAL_CFLAGS += -DSAMSUNG_T20_HWCOMPOSER
+endif
+
 LOCAL_C_INCLUDES += $(LOCAL_PATH)
 LOCAL_CPP_INCLUDES += $(LOCAL_PATH)
 

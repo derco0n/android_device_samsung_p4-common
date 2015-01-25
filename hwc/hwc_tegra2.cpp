@@ -272,6 +272,25 @@ static int tegra2_prepare(hwc_composer_device_1_t *dev,
     }
     hwc_layer_list_t* lst = (hwc_layer_list_t*) pdev->prepare_xlatebuf;
 
+#ifdef SAMSUNG_T20_HWCOMPOSER
+    /* Buggy Samsung hwcomposer workaround */
+    if (contents->numHwLayers == 3) {
+        if (contents->hwLayers[0].displayFrame.top == 0 &&
+            contents->hwLayers[0].displayFrame.bottom == pdev->yres &&
+            contents->hwLayers[1].displayFrame.top == 0 &&
+            contents->hwLayers[1].displayFrame.bottom == pdev->yres) {
+            // int bottom_pad = contents->hwLayers[2].sourceCrop.bottom -
+            //     contents->hwLayers[2].sourceCrop.top;
+            int bottom_pad = 1;
+
+            contents->hwLayers[0].displayFrame.bottom =
+                contents->hwLayers[0].displayFrame.bottom - bottom_pad;
+            contents->hwLayers[0].sourceCrop.bottom =
+                contents->hwLayers[0].sourceCrop.bottom - bottom_pad;
+        }
+    }
+#endif
+
     copy_display_contents_1_to_layer_list(lst,contents);
 
     int ret = pdev->org->prepare(pdev->org, lst);
