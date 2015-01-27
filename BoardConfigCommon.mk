@@ -175,9 +175,9 @@ TW_INCLUDE_L_CRYPTO := true
 TW_CRYPTO_FS_TYPE := "ext4"
 TW_CRYPTO_REAL_BLKDEV := "/dev/block/mmcblk0p8"
 TW_CRYPTO_MNT_POINT := "/data"
-TW_CRYPTO_FS_OPTIONS := "noatime,nosuid,nodev,journal_async_commit,errors=panic      wait,check,encryptable=/efs/userdata_footer"
+TW_CRYPTO_FS_OPTIONS := "noatime,nosuid,nodev,journal_async_commit,errors=panic      wait,check,encryptable=footer"
 TW_CRYPTO_FS_FLAGS := "0x00000406"
-TW_CRYPTO_KEY_LOC := "/efs/userdata_footer"
+TW_CRYPTO_KEY_LOC := "footer"
 # TWRP_EVENT_LOGGING := true
 # TW_EXCLUDE_MTP := true
 
