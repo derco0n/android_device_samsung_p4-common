@@ -275,18 +275,26 @@ static int tegra2_prepare(hwc_composer_device_1_t *dev,
 #ifdef SAMSUNG_T20_HWCOMPOSER
     /* Buggy Samsung hwcomposer workaround */
     if (contents->numHwLayers == 3) {
-        if (contents->hwLayers[0].displayFrame.top == 0 &&
+
+        ALOGV("layer 0 transform %u. layer 1 transform %u",
+            contents->hwLayers[0].transform, contents->hwLayers[1].transform);
+
+        if (contents->hwLayers[0].transform == 0 &&
+            contents->hwLayers[0].displayFrame.top == 0 &&
             contents->hwLayers[0].displayFrame.bottom == pdev->yres &&
+            // StatusBar
+            contents->hwLayers[1].sourceCrop.top == 0 &&
+            contents->hwLayers[1].sourceCrop.bottom == pdev->yres &&
             contents->hwLayers[1].displayFrame.top == 0 &&
             contents->hwLayers[1].displayFrame.bottom == pdev->yres) {
             // int bottom_pad = contents->hwLayers[2].sourceCrop.bottom -
             //     contents->hwLayers[2].sourceCrop.top;
             int bottom_pad = 1;
 
-            contents->hwLayers[0].displayFrame.bottom =
-                contents->hwLayers[0].displayFrame.bottom - bottom_pad;
-            contents->hwLayers[0].sourceCrop.bottom =
-                contents->hwLayers[0].sourceCrop.bottom - bottom_pad;
+            contents->hwLayers[1].displayFrame.bottom =
+                contents->hwLayers[1].displayFrame.bottom - bottom_pad;
+            contents->hwLayers[1].sourceCrop.bottom =
+                contents->hwLayers[1].sourceCrop.bottom - bottom_pad;
         }
     }
 #endif
