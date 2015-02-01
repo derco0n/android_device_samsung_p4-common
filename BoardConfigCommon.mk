@@ -146,6 +146,31 @@ BOARD_NEEDS_SEC_RIL_WORKAROUND := true
 TARGET_ENABLE_NON_PIE_SUPPORT := true
 BOARD_USES_LEGACY_MMAP := true
 
+
+BOARD_SEPOLICY_DIRS += \
+	device/samsung/p4-common/sepolicy
+
+BOARD_SEPOLICY_UNION += \
+	bluetooth.te \
+	file_contexts \
+	device.te \
+	gpsd.te \
+	file.te \
+	init.te \
+	init_shell.te \
+	installd.te \
+	keystore.te \
+	logd.te \
+	mediaserver.te \
+	servicemanager.te \
+	surfaceflinger.te \
+	system_app.te \
+	system_server.te \
+	wpa.te \
+	ueventd.te \
+	untrusted_app.te \
+	zygote.te
+
 #TWRP Flags
 #we don't have cpu temperature only battery temperature :-(
 TARGET_RECOVERY_FSTAB := device/samsung/p4-common/rootdir/fstab.p3

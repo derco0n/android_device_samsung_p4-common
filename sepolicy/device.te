@@ -1,0 +1,7 @@
+type knv_device, dev_type;
+type nvhost_device, dev_type;
+
+type timerirq_device, dev_type;
+type akm8975_device, dev_type;
+
+type rfkill_device, dev_type;
