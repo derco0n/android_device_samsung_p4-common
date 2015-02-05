@@ -1,9 +1,8 @@
+allow system_server knv_device:chr_file rw_file_perms;
 allow system_server timerirq_device:chr_file rw_file_perms;
 allow system_server uhid_device:chr_file rw_file_perms;
 allow system_server akm8975_device:chr_file rw_file_perms;
 
-# allow system_server app_data_file:file r_file_perms;
-# allow system_server app_data_file:dir r_dir_perms;
-
 allow system_server efs_file:file r_file_perms;
 allow system_server efs_file:dir r_dir_perms;
+allow system_server wifi_efs_file:file rw_file_perms;

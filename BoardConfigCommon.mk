@@ -152,15 +152,15 @@ BOARD_SEPOLICY_DIRS += \
 
 BOARD_SEPOLICY_UNION += \
 	bluetooth.te \
-	file_contexts \
 	device.te \
+	drmserver.te \
 	gpsd.te \
 	file.te \
+	file_contexts \
 	init.te \
 	init_shell.te \
-	installd.te \
 	keystore.te \
-	logd.te \
+	macloader.te \
 	mediaserver.te \
 	servicemanager.te \
 	surfaceflinger.te \
@@ -169,7 +169,7 @@ BOARD_SEPOLICY_UNION += \
 	wpa.te \
 	ueventd.te \
 	untrusted_app.te \
-	zygote.te
+	vold.te
 
 #TWRP Flags
 #we don't have cpu temperature only battery temperature :-(

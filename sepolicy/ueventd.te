@@ -1,2 +1,6 @@
 allow ueventd sysfs_devices_tegradc:dir r_dir_perms;
 allow ueventd sysfs_devices_tegradc:file rw_file_perms;
+
+allow ueventd sysfs_voodoo_sound:file rw_file_perms;
+
+allow ueventd tmpfs_mmcblk0p6:blk_file { create setattr rw_file_perms };
