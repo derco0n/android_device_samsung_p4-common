@@ -1,0 +1,3 @@
+allow vold efs_file:dir getattr;
+
+allow vold kernel:system module_request;

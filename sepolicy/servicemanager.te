@@ -1,0 +1,2 @@
+# allow servicemanager security_file:file r_file_perms;
+# allow servicemanager security_file:dir r_dir_perms;
