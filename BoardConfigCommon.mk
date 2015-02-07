@@ -219,3 +219,27 @@ TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.8
 
 # Add backup-tool.sh to install script
 BACKUP_TOOL := true
+
+BOARD_SEPOLICY_DIRS += \
+	device/samsung/p4-common/sepolicy
+
+BOARD_SEPOLICY_UNION += \
+	bluetooth.te \
+	device.te \
+	drmserver.te \
+	gpsd.te \
+	file.te \
+	file_contexts \
+	init.te \
+	init_shell.te \
+	keystore.te \
+	macloader.te \
+	mediaserver.te \
+	servicemanager.te \
+	surfaceflinger.te \
+	system_app.te \
+	system_server.te \
+	wpa.te \
+	ueventd.te \
+	untrusted_app.te \
+	vold.te

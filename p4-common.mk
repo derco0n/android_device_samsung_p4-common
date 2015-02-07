@@ -74,8 +74,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Disable SELinux
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.boot.selinux=disabled \
-    ro.build.selinux=0
+    ro.boot.selinux=permissive \
+    ro.build.selinux=1
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.root_access=1
