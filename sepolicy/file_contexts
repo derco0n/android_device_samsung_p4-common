@@ -10,7 +10,8 @@
 /dev/rfkill                       u:object_r:rfkill_device:s0
 /dev/ttyHS0                       u:object_r:gps_device:s0
 /dev/ttyHS2                       u:object_r:hci_attach_dev:s0
-/dev/ttyACM0                      u:object_r:radio_device:s0
+/dev/ttyGS1                       u:object_r:radio_device:s0
+/dev/umts.*                       u:object_r:radio_device:s0
 
 /dev/timerirq                     u:object_r:timerirq_device:s0
 /dev/akm8975                      u:object_r:akm8975_device:s0

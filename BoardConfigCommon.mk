@@ -235,6 +235,7 @@ BOARD_SEPOLICY_UNION += \
 	keystore.te \
 	macloader.te \
 	mediaserver.te \
+	rild.te \
 	servicemanager.te \
 	surfaceflinger.te \
 	system_app.te \
