@@ -4,7 +4,7 @@
 # specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
 
 /dev/block/platform/sdhci-tegra.3/by-num/p4 	/system            ext4    ro                                                                        wait
-/dev/block/platform/sdhci-tegra.3/by-num/p4 	/system            f2fs    ro,inline_xattr,inline_data,inline_dentry                                 wait
+# /dev/block/platform/sdhci-tegra.3/by-num/p4 	/system            f2fs    ro,inline_xattr,inline_data,inline_dentry                                 wait
 /dev/block/platform/sdhci-tegra.3/by-num/p5 	/cache             ext4    noatime,nosuid,nodev,journal_async_commit,errors=panic                    wait,check
 /dev/block/platform/sdhci-tegra.3/by-num/p5 	/cache             f2fs    noatime,nosuid,nodev,nodiratime,discard,inline_xattr,inline_data,inline_dentry wait,check
 /dev/block/platform/sdhci-tegra.3/by-num/p8 	/data              ext4    noatime,nosuid,nodev,journal_async_commit,errors=panic                    wait,check,encryptable=footer,length=-16384
