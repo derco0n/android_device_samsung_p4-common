@@ -1,1 +1,3 @@
 allow rild self:process execmem;
+
+allow rild block_device:dir search;
