@@ -5,3 +5,6 @@ type sysfs_devices_tegradc, fs_type, sysfs_type;
 type sysfs_voodoo_sound, fs_type, sysfs_type;
 
 type tmpfs_mmcblk0p6, file_type;
+
+# things under /data/misc/radio
+type radio_data_misc_file, file_type;

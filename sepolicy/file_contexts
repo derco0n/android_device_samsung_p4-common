@@ -30,3 +30,5 @@
 /system/bin/macloader               u:object_r:macloader_exec:s0
 
 /sys/devices/virtual/misc/voodoo_sound/(.*) u:object_r:sysfs_voodoo_sound:s0
+
+/data/misc/radio(/.*)?             u:object_r:radio_data_misc_file:s0
