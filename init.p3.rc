@@ -277,6 +277,9 @@ on boot
      write /sys/kernel/mm/ksm/pages_to_scan 200
      write /sys/kernel/mm/ksm/run 1
 
+     # defer KSM in favor of power saving
+     write /sys/kernel/mm/ksm/deferred_timer 1
+
 # DEBUG_LEVEL
     chown system radio /sys/devices/platform/sec_debug_level
     chmod 0664 /sys/devices/platform/sec_debug_level
