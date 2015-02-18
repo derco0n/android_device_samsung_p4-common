@@ -33,7 +33,7 @@
 /dev/usb_mtp_gadget 0660	system	system
 
 # misc partition (P4VZW: changed to system:radio)
-/dev/block/mmcblk0p6   0660        system        radio
+# /dev/block/mmcblk0p6   0660        system        radio
 
 # modem interface
 /dev/umts*      0660    system  radio
@@ -42,7 +42,7 @@
 # modem partition
 /dev/block/mmcblk0p7   0660        system        radio
 # For P4VZW
-/dev/block/mmcblk0p4   0660        system        radio
+# /dev/block/mmcblk0p4   0660        system        radio
 
 # for MPL
 /dev/mpu	0660	system	system
