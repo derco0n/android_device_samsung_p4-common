@@ -226,10 +226,12 @@ BOARD_SEPOLICY_DIRS += \
 BOARD_SEPOLICY_UNION += \
 	bluetooth.te \
 	device.te \
+	debuggerd.te \
 	drmserver.te \
 	gpsd.te \
 	file.te \
 	file_contexts \
+	healthd.te \
 	init.te \
 	init_shell.te \
 	keystore.te \

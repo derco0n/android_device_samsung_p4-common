@@ -1,0 +1,4 @@
+
+# Fix boot from lpm charging
+allow healthd tmpfs_mmcblk0p6:blk_file rw_file_perms;
+allow healthd block_device:dir search;
