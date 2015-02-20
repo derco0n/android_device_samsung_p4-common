@@ -47,12 +47,6 @@
 #include <utils/String8.h>
 #include <utils/Vector.h>
 
-#ifdef HAVE_ANDROID_OS
-#include <linux/rtc.h>
-#include <utils/Atomic.h>
-#include <linux/android_alarm.h>
-#endif
-
 // Get the original hw composer
 static hwc_module_t* get_hwc(void)
 {
@@ -530,26 +524,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 
             // Get current time in exactly the same timebase as Choreographer
             struct timespec now;
-
-#ifdef HAVE_ANDROID_OS
-            static int s_fd = -1;
-            int result;
-
-            if (s_fd == -1) {
-                int fd = open("/dev/alarm", O_RDONLY);
-                if (android_atomic_cmpxchg(-1, fd, &s_fd)) {
-                    close(fd);
-                }
-            }
-
-            result = ioctl(s_fd,
-                    ANDROID_ALARM_GET_TIME(ANDROID_ALARM_SYSTEMTIME), &now);
-            if (result != 0) {
-#endif
-                clock_gettime(CLOCK_MONOTONIC,&now);
-#ifdef HAVE_ANDROID_OS
-            }
-#endif
+            clock_gettime(CLOCK_MONOTONIC,&now);
 
             unsigned long long now_ns = (now.tv_sec) * 1000000000ULL + (now.tv_nsec);
 
