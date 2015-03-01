@@ -178,7 +178,7 @@ static void p3_power_hint(struct power_module *module, power_hint_t hint,
     case POWER_HINT_VSYNC:
         break;
 
-#if 1
+#if 0
     case POWER_HINT_INTERACTION:
         if (boostpulse_open(p3) >= 0) {
             len = write(p3->boostpulse_fd, "1", 1);
