@@ -26,7 +26,8 @@
 #include <hardware/hardware.h>
 #include <hardware/power.h>
 
-#define SCALINGMAXFREQ_PATH "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"
+#define CPU0_SCALINGMAXFREQ_PATH "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"
+#define CPU1_SCALINGMAXFREQ_PATH "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq"
 #define CPUFREQ_INTERACTIVE "/sys/devices/system/cpu/cpufreq/interactive/"
 // #define BOOST_PATH      "/sys/devices/system/cpu/cpufreq/interactive/boost"
 #define BOOSTPULSE_PATH "/sys/devices/system/cpu/cpufreq/interactive/boostpulse"
@@ -98,7 +99,7 @@ static void store_max_freq(char* max_freq)
     char buf[MAX_BUF_SZ];
 
     /* read the current scaling max freq */
-    len = sysfs_read(SCALINGMAXFREQ_PATH, buf, sizeof(buf));
+    len = sysfs_read(CPU0_SCALINGMAXFREQ_PATH, buf, sizeof(buf));
 
     /* make sure it's not the screen off freq, if the "on"
      * call is skipped (can happen if you press the power
@@ -131,15 +132,18 @@ static void p3_power_set_interactive( __attribute__((unused)) struct power_modul
     if (!on) {
         store_max_freq(scaling_max_freq);
 
-        sysfs_write(SCALINGMAXFREQ_PATH, screen_off_max_freq);
+        sysfs_write(CPU0_SCALINGMAXFREQ_PATH, screen_off_max_freq);
+        sysfs_write(CPU1_SCALINGMAXFREQ_PATH, screen_off_max_freq);
         sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "99");
     } else if (low_power_mode) {
         store_max_freq(scaling_max_freq);
 
-        sysfs_write(SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
+        sysfs_write(CPU0_SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
+        sysfs_write(CPU1_SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
         sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "99");
     } else {
-        sysfs_write(SCALINGMAXFREQ_PATH, scaling_max_freq);
+        sysfs_write(CPU0_SCALINGMAXFREQ_PATH, scaling_max_freq);
+        sysfs_write(CPU1_SCALINGMAXFREQ_PATH, scaling_max_freq);
         sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
     }
 }
@@ -196,11 +200,13 @@ static void p3_power_hint(struct power_module *module, power_hint_t hint,
             store_max_freq(normal_max_freq);
 
             low_power_mode = true;
-            sysfs_write(SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
+            sysfs_write(CPU0_SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
+            sysfs_write(CPU1_SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
             sysfs_write(CPUFREQ_INTERACTIVE "hispeed_freq", LOW_POWER_MAX_FREQ);
         } else {
             low_power_mode = false;
-            sysfs_write(SCALINGMAXFREQ_PATH, normal_max_freq);
+            sysfs_write(CPU0_SCALINGMAXFREQ_PATH, normal_max_freq);
+            sysfs_write(CPU1_SCALINGMAXFREQ_PATH, normal_max_freq);
             sysfs_write(CPUFREQ_INTERACTIVE "hispeed_freq", NORMAL_MAX_FREQ);
         }
         pthread_mutex_unlock(&p3->lock);
