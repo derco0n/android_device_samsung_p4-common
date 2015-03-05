@@ -291,10 +291,10 @@ static int tegra2_prepare(hwc_composer_device_1_t *dev,
             //     contents->hwLayers[2].sourceCrop.top;
             int bottom_pad = 1;
 
-            contents->hwLayers[1].displayFrame.bottom =
-                contents->hwLayers[1].displayFrame.bottom - bottom_pad;
-            contents->hwLayers[1].sourceCrop.bottom =
-                contents->hwLayers[1].sourceCrop.bottom - bottom_pad;
+            contents->hwLayers[0].displayFrame.bottom =
+                contents->hwLayers[0].displayFrame.bottom - bottom_pad;
+            contents->hwLayers[0].sourceCrop.bottom =
+                contents->hwLayers[0].sourceCrop.bottom - bottom_pad;
         }
     }
 #endif
