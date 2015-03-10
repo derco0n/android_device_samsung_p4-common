@@ -47,6 +47,8 @@
 #include <utils/String8.h>
 #include <utils/Vector.h>
 
+#include "hwcomposer_v0.h"
+
 // Get the original hw composer
 static hwc_module_t* get_hwc(void)
 {
