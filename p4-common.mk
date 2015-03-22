@@ -30,13 +30,8 @@ PRODUCT_COPY_FILES := \
     $(LOCAL_PATH)/ueventd.p3.rc:root/ueventd.p3.rc \
     $(LOCAL_PATH)/init.p3.usb.rc:root/init.p3.usb.rc \
 
-ifeq ($(F2FS_BUILD), true)
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/fstab.p3-f2fs:root/fstab.p3
-else
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/fstab.p3:root/fstab.p3
-endif
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/media/media_profiles.xml:system/etc/media_profiles.xml \
@@ -65,7 +60,9 @@ PRODUCT_PROPERTY_OVERRIDES := \
     dalvik.vm.dexopt-data-only=1 \
     dalvik.vm.debug.alloc=0 \
     debug.hwui.render_dirty_regions=false \
-    ro.zygote.disable_gl_preload=true
+    ro.zygote.disable_gl_preload=true \
+    persist.sys.isUsbOtgEnabled=true \
+    persist.sys.media.legacy-drm=true
 
 # Prompt for USB debugging authentication
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -114,11 +111,16 @@ PRODUCT_PACKAGES += \
     hwcomposer.tegra
 
 # Audio
+# PRODUCT_PACKAGES += \
+#    audio.a2dp.default \
+#    audio.usb.default \
+#    libaudioutils \
+#    libtinyalsa
 PRODUCT_PACKAGES += \
-        audio.primary.tegra \
-        audio.a2dp.default \
-        audio.usb.default \
-        audio.r_submix.default
+    audio.primary.tegra \
+    audio.a2dp.default \
+    audio.usb.default \
+    audio.r_submix.default
 
 # audio mixer paths
 PRODUCT_COPY_FILES += \
@@ -179,20 +181,8 @@ PRODUCT_PACKAGES += \
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
 
-# Chromium Prebuilt
-ifeq ($(PRODUCT_PREBUILT_WEBVIEWCHROMIUM),yes)
-PRODUCT_PACKAGES += \
-    webview
-$(call inherit-product, prebuilts/chromium/$(TARGET_DEVICE)/chromium_prebuilt.mk)
-endif
-
 # Recovery
-ifeq ($(F2FS_BUILD), true)
-PRODUCT_COPY_FILES += $(LOCAL_PATH)/twrp.fstab-f2fs:recovery/root/etc/twrp.fstab
-else
 PRODUCT_COPY_FILES += $(LOCAL_PATH)/twrp.fstab:recovery/root/etc/twrp.fstab
-endif
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
-
 $(call inherit-product, vendor/decatf/config/common.mk)

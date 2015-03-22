@@ -40,12 +40,12 @@ BOARD_NEEDS_OLD_HWC_API := true
 # Lollipop
 TARGET_32_BIT_SURFACEFLINGER := true
 MALLOC_IMPL := dlmalloc
-# USE_LEGACY_AUDIO_POLICY := 1
 BOARD_USES_LEGACY_MMAP := true
-BOARD_NEEDS_SEC_RIL_WORKAROUND := true
 BOARD_HAVE_SAMSUNG_T20_HWCOMPOSER := true
-OTA_EXTRA_OPTIONS := -r
 COMMON_GLOBAL_CFLAGS += -DADD_LEGACY_ACQUIRE_BUFFER_SYMBOL
+TARGET_ENABLE_NON_PIE_SUPPORT := true
+
+OTA_EXTRA_OPTIONS := -r
 
 # Lollipop charger mode
 BOARD_CHARGER_ENABLE_SUSPEND := true
@@ -53,9 +53,9 @@ BOARD_CHARGER_DISABLE_INIT_BLANK := true
 # This is from CyanogenMod 12.0
 CHARGING_ENABLED_PATH :=  "/sys/class/power_supply/battery/charging_mode_booting"
 
-USE_PREBUILT_CHROMIUM := 1
+# USE_PREBUILT_CHROMIUM := 1
 # Force using the prebuilts
-PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
+# PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
 
 # Optimization hwui
 HWUI_COMPILE_FOR_PERF := true
@@ -110,11 +110,13 @@ USE_OPENGL_RENDERER := true
 # Enable WEBGL in WebKit
 ENABLE_WEBGL := true
 
+### Audio ###
 BOARD_HAVE_PRE_KITKAT_AUDIO_BLOB := true
 BOARD_HAVE_PRE_KITKAT_AUDIO_POLICY_BLOB := true
+# ICS audio
 # COMMON_GLOBAL_CFLAGS += -DICS_AUDIO_BLOB
 # COMMON_GLOBAL_CFLAGS += -DAUDIO_LEGACY_HACK
-# TARGET_ENABLE_OFFLOAD_ENHANCEMENTS := true
+# USE_LEGACY_AUDIO_POLICY := 1
 
 # skia SIGILL bootloop fix
 COMMON_GLOBAL_CFLAGS += -DOLD_TEGRA
@@ -131,11 +133,7 @@ BOARD_HAS_LARGE_FILESYSTEM := true
 TARGET_RECOVERY_INITRC := device/samsung/p4-common/recovery/init.rc
 
 RECOVERY_FSTAB_VERSION := 2
-ifeq ($(F2FS_BUILD), true)
-TARGET_RECOVERY_FSTAB := device/samsung/p4-common/fstab.p3-f2fs
-else
 TARGET_RECOVERY_FSTAB := device/samsung/p4-common/fstab.p3
-endif
 
 # Indicate that the board has an Internal SD Card
 BOARD_HAS_SDCARD_INTERNAL := true
@@ -218,13 +216,13 @@ TW_EXCLUDE_SUPERSU := true
 
 # Kernel toolchain
 # TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.8
-TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-cortex-linux-gnueabi-linaro_4.9.3-2015.01
+TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-cortex-linux-gnueabi-linaro_4.9.3-2015.03
 
 # Add backup-tool.sh to install script
 BACKUP_TOOL := true
 
 BOARD_SEPOLICY_DIRS += \
-	device/samsung/p4-common/sepolicy
+	device/samsung/p4-common/sepolicy \
 
 BOARD_SEPOLICY_UNION += \
 	bluetooth.te \
