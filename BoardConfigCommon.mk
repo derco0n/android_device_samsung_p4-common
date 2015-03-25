@@ -68,9 +68,9 @@ DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 TARGET_NO_BOOTLOADER := true
 
 # Architecture
-# TARGET_CPU_VARIANT := generic
+TARGET_CPU_VARIANT := generic
 # TARGET_CPU_VARIANT := cortex-a9
-TARGET_CPU_VARIANT := tegra2
+# TARGET_CPU_VARIANT := tegra2
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 TARGET_ARCH_VARIANT := armv7-a
@@ -121,25 +121,11 @@ BOARD_HAVE_PRE_KITKAT_AUDIO_POLICY_BLOB := true
 # skia SIGILL bootloop fix
 COMMON_GLOBAL_CFLAGS += -DOLD_TEGRA
 
-TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
-#TARGET_RECOVERY_UI_LIB := librecovery_ui_ventana
-
-# custom recovery ui
-BOARD_CUSTOM_RECOVERY_KEYMAPPING := ../../device/samsung/p4-common/recovery/recovery_ui.c
-BOARD_HAS_NO_SELECT_BUTTON := true
-BOARD_HAS_LARGE_FILESYSTEM := true
-
-# override recovery init.rc
-TARGET_RECOVERY_INITRC := device/samsung/p4-common/recovery/init.rc
-
-RECOVERY_FSTAB_VERSION := 2
-TARGET_RECOVERY_FSTAB := device/samsung/p4-common/fstab.p3
 
 # Indicate that the board has an Internal SD Card
 BOARD_HAS_SDCARD_INTERNAL := true
 
 # device-specific extensions to the updater binary
-#TARGET_RECOVERY_UPDATER_LIBS += librecovery_updater_ventana
 TARGET_RELEASETOOLS_EXTENSIONS := device/samsung/p4-common
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
@@ -176,9 +162,6 @@ BOARD_USE_SKIA_LCDTEXT := true
 # Charging Mode (LPM)
 BOARD_CHARGING_MODE_BOOTING_LPM := "/sys/class/power_supply/battery/charging_mode_booting"
 
-# Custom graphics for recovery
-BOARD_CUSTOM_GRAPHICS := ../../../device/samsung/p4-common/recovery/graphics.c
-
 # Preload bootanimation in to memory
 TARGET_BOOTANIMATION_PRELOAD := true
 TARGET_BOOTANIMATION_TEXTURE_CACHE := true
@@ -191,32 +174,14 @@ BOARD_SUPPRESS_EMMC_WIPE := true
 # Skip SELinux metadata
 # SKIP_SET_METADATA := true
 
-#TWRP Flags
-DEVICE_RESOLUTION := 1280x800
-RECOVERY_SDCARD_ON_DATA := true
-BOARD_HAS_NO_REAL_SDCARD := true
-TW_NO_REBOOT_BOOTLOADER := true
-TW_NO_USB_STORAGE := true
-TW_FLASH_FROM_STORAGE := true
-TW_HAS_DOWNLOAD_MODE := true
-SP1_NAME := "efs"
-SP1_BACKUP_METHOD := files
-SP1_MOUNTABLE := 1
-TW_ALWAYS_RMRF := true
-TW_NO_EXFAT_FUSE := true
-TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlight/brightness"
-TW_MAX_BRIGHTNESS := 255
-TW_NO_EXFAT := true
-TW_EXCLUDE_SUPERSU := true
-
 # Android system toolchain
 # TARGET_GCC_VERSION_EXP := 4.8
 # TARGET_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/linaro-arm-eabi-$(TARGET_GCC_VERSION)
 # TARGET_TOOLS_PREFIX := $(TARGET_TOOLCHAIN_ROOT)/bin/arm-linux-gnueabi-
 
 # Kernel toolchain
-# TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.8
-TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-cortex-linux-gnueabi-linaro_4.9.3-2015.03
+TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.7
+# TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-cortex-linux-gnueabi-linaro_4.9.3-2015.03
 
 # Add backup-tool.sh to install script
 BACKUP_TOOL := true
@@ -248,3 +213,59 @@ BOARD_SEPOLICY_UNION += \
 	ueventd.te \
 	untrusted_app.te \
 	vold.te
+
+
+### Recovery
+TARGET_RECOVERY_FSTAB := device/samsung/p4-common/recovery/fstab.p3
+
+### TWRP
+
+# custom recovery ui
+TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
+#TARGET_RECOVERY_UI_LIB := librecovery_ui_ventana
+
+BOARD_CUSTOM_RECOVERY_KEYMAPPING := ../../device/samsung/p4-common/recovery/recovery_ui.c
+BOARD_HAS_NO_SELECT_BUTTON := true
+BOARD_HAS_LARGE_FILESYSTEM := true
+
+# Custom graphics for recovery
+BOARD_CUSTOM_GRAPHICS := ../../../device/samsung/p4-common/recovery/graphics.c
+
+#we don't have cpu temperature only battery temperature :-(
+HAVE_SELINUX := true
+DEVICE_RESOLUTION := 1280x800
+BOARD_HAS_NO_REAL_SDCARD := true
+RECOVERY_SDCARD_ON_DATA := true
+TW_NO_REBOOT_BOOTLOADER := true
+# TW_ALWAYS_RMRF := true
+TW_FLASH_FROM_STORAGE := true
+TW_HAS_DOWNLOAD_MODE := true
+TW_INTERNAL_STORAGE_PATH := "/data/media"
+TW_INTERNAL_STORAGE_MOUNT_POINT := "data"
+TW_NO_EXFAT_FUSE := true
+TW_NO_EXFAT := true
+TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlight/brightness"
+TW_MAX_BRIGHTNESS := 255
+#TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
+TW_NO_USB_STORAGE := true
+# TW_EXCLUDE_SUPERSU := true
+#in the ongoing battle to reduce recovery size no true type font
+# TW_DISABLE_TTF := true
+
+# TARGET_USERIMAGES_USE_F2FS := false
+# TW_EXCLUDE_ENCRYPTED_BACKUPS := true
+# TW_INCLUDE_CRYPTO := false
+
+# TW_INCLUDE_CRYPTO := true
+TW_INCLUDE_L_CRYPTO := true
+TW_CRYPTO_FS_TYPE := "ext4"
+TW_CRYPTO_REAL_BLKDEV := "/dev/block/mmcblk0p8"
+TW_CRYPTO_MNT_POINT := "/data"
+TW_CRYPTO_FS_OPTIONS := "noatime,nosuid,nodev,journal_async_commit,errors=panic      wait,check,encryptable=footer"
+TW_CRYPTO_FS_FLAGS := "0x00000406"
+TW_CRYPTO_KEY_LOC := "footer"
+# TWRP_EVENT_LOGGING := true
+# TW_EXCLUDE_MTP := true
+
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 5583457484
+TW_EXTRA_RECOVERY_PARTITION := true

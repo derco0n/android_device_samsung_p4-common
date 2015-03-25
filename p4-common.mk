@@ -182,7 +182,10 @@ DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
 
 # Recovery
-PRODUCT_COPY_FILES += $(LOCAL_PATH)/twrp.fstab:recovery/root/etc/twrp.fstab
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/twrp.fstab:recovery/root/etc/twrp.fstab
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/init.recovery.p4wifi.rc:root/init.recovery.p4wifi.rc
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product, vendor/decatf/config/common.mk)
