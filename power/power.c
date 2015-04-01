@@ -118,8 +118,8 @@ static void p3_power_init( __attribute__((unused)) struct power_module *module)
      * cpufreq interactive governor: timer 20ms, min sample 30ms.
      */
 
-    sysfs_write(CPUFREQ_INTERACTIVE "timer_rate", "500000");
-    sysfs_write(CPUFREQ_INTERACTIVE "min_sample_time", "50000");
+    sysfs_write(CPUFREQ_INTERACTIVE "timer_rate", "30000");
+    sysfs_write(CPUFREQ_INTERACTIVE "min_sample_time", "40000");
     sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
 }
 
