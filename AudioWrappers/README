@@ -1,0 +1,105 @@
+Wrapper around audio HALs that are compiled against the ICS API.
+
+Makes it possible to build a ROM without ICS_AUDIO_BLOB set or other workarounds
+in the framework. Parts of the Android framework are backwards compatible with
+audio HALs that only implement the ICS API. The audio HAL API however is not
+designed to be ABI compatible and a recompilation would be necessary (well with
+adjustments). Since we cannot do that we need to either add support for it into
+the framework (ICS_AUDIO_BLOB / MR0_AUDIO_BLOB) or wrap the audio HALs.
+
+The wrapper does the following things:
+   * wraps audio_policy and audio.primary HALs
+   * wraps audio_policy_service_ops
+   * converts audio_devices_t enum between Android <=4.1 and >= 4.2 APIs
+
+When the primary audio HAL is wrapped it is possible to use a stock audio policy
+and A2DP HAL (at least in case of endeavoru). This fixes a couple of bugs
+related to incorrect stream volumes and moving streams between devices.
+
+
+Confiuration
+------------
+
+See config.mk for possible configuration variables.
+
+
+TODO
+----
+
+* Grep for TODO :)
+* Better logging configurability (maybe at runtime)
+* Expects the vendor blobs to be named vendor-audio_policy.tegra.so and
+  vendor-audio.primary.tegra.so at the moment.
+* More testing
+
+
+Known Issues
+------------
+
+* set_stream_volume_index_for_device is not properly emulated resulting in wrong
+  volumes for streams after the device is rebooted. This is caused by
+  AudioFlinger setting the volumes for each stream on each device. Since the
+  function is not properly implemented the value of the last device will be
+  used as the initial volume.
+  See StreamState.applyAllVolumes in AudioService.java.
+  Framework workaround for headset/speaker devices: http://review.cyanogenmod.org/#/c/33778/
+* The code in AudioFlinger::findSuitableHwDev_l that compares wanted devices
+  against the output of the wrapped get_supported_devices() function will not
+  properly work because the old audio_devices_t flags could represent input
+  and output devices independently. Now it's not possible anymore.
+  If that is confusing then look at the flags table below. For example how to
+  specify that only AUDIO_DEVICE_OUT_EARPIECE and AUDIO_DEVICE_IN_VOICE_CALL
+  is supported without implicitly supporting AUDIO_DEVICE_IN_COMMUNICATION
+  and AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT.
+  get_supported_devices for the endeavoru ICS blob returns
+  0x8ff8607f_16 = 10001111111110000110000001111111_2 which seems weird anyway.
+
+
+Misc
+----
+
+Catch interesing output:
+
+    $ adb logcat -s AudioFlinger:D AudioPolicyServiceWrapper:D AudioWrapper:D AudioPolicyWrapper:D AudioWrapperCommon:D
+
+
+Flags
+-----
+
+Following table lists the audio_devices enum values.
+
+Bit Nr. Hex Value API <= 4.1                                 API >= 4.2 output devices                  API >= 4.2 input devices
+------- --------- ------------------------------------------ ------------------------------------------ ------------------------------------
+
+31      80000000  AUDIO_DEVICE_IN_DEFAULT                                                               AUDIO_DEVICE_BIT_IN
+30      40000000                                             AUDIO_DEVICE_OUT_DEFAULT                   AUDIO_DEVICE_IN_DEFAULT
+29      20000000
+28      10000000
+27      8000000
+26      4000000
+25      2000000
+24      1000000
+23      800000    AUDIO_DEVICE_IN_BACK_MIC
+22      400000    AUDIO_DEVICE_IN_VOICE_CALL
+21      200000    AUDIO_DEVICE_IN_AUX_DIGITAL
+20      100000    AUDIO_DEVICE_IN_WIRED_HEADSET
+19      80000     AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET
+18      40000     AUDIO_DEVICE_IN_BUILTIN_MIC
+17      20000     AUDIO_DEVICE_IN_AMBIENT
+16      10000     AUDIO_DEVICE_IN_COMMUNICATION
+15      8000      AUDIO_DEVICE_OUT_DEFAULT                   AUDIO_DEVICE_OUT_REMOTE_SUBMIX
+14      4000      AUDIO_DEVICE_OUT_USB_DEVICE                AUDIO_DEVICE_OUT_USB_DEVICE
+13      2000      AUDIO_DEVICE_OUT_USB_ACCESSORY             AUDIO_DEVICE_OUT_USB_ACCESSORY
+12      1000      AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET         AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET         AUDIO_DEVICE_IN_USB_DEVICE
+11      800       AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET         AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET         AUDIO_DEVICE_IN_USB_ACCESSORY
+10      400       AUDIO_DEVICE_OUT_AUX_DIGITAL               AUDIO_DEVICE_OUT_AUX_DIGITAL               AUDIO_DEVICE_IN_DGTL_DOCK_HEADSET
+9       200       AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_SPEAKER    AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_SPEAKER    AUDIO_DEVICE_IN_ANLG_DOCK_HEADSET
+8       100       AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES AUDIO_DEVICE_IN_REMOTE_SUBMIX
+7       80        AUDIO_DEVICE_OUT_BLUETOOTH_A2DP            AUDIO_DEVICE_OUT_BLUETOOTH_A2DP            AUDIO_DEVICE_IN_BACK_MIC
+6       40        AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT      AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT      AUDIO_DEVICE_IN_VOICE_CALL
+5       20        AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET     AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET     AUDIO_DEVICE_IN_AUX_DIGITAL
+4       10        AUDIO_DEVICE_OUT_BLUETOOTH_SCO             AUDIO_DEVICE_OUT_BLUETOOTH_SCO             AUDIO_DEVICE_IN_WIRED_HEADSET
+3       8         AUDIO_DEVICE_OUT_WIRED_HEADPHONE           AUDIO_DEVICE_OUT_WIRED_HEADPHONE           AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET
+2       4         AUDIO_DEVICE_OUT_WIRED_HEADSET             AUDIO_DEVICE_OUT_WIRED_HEADSET             AUDIO_DEVICE_IN_BUILTIN_MIC
+1       2         AUDIO_DEVICE_OUT_SPEAKER                   AUDIO_DEVICE_OUT_SPEAKER                   AUDIO_DEVICE_IN_AMBIENT
+0       1         AUDIO_DEVICE_OUT_EARPIECE                  AUDIO_DEVICE_OUT_EARPIECE                  AUDIO_DEVICE_IN_COMMUNICATION
