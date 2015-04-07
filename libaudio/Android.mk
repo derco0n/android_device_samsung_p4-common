@@ -1,5 +1,7 @@
 LOCAL_PATH:= $(call my-dir)
 
+ifeq ($(BOARD_OPENSOURCE_AUDIOHAL),true)
+
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := audio.primary.tegra
@@ -17,3 +19,5 @@ LOCAL_CFLAGS += -g
 LOCAL_LDFLAGS += -ldl
 
 include $(BUILD_SHARED_LIBRARY)
+
+endif
