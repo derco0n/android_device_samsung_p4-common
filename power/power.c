@@ -120,7 +120,7 @@ static void p3_power_init( __attribute__((unused)) struct power_module *module)
 
     sysfs_write(CPUFREQ_INTERACTIVE "timer_rate", "30000");
     sysfs_write(CPUFREQ_INTERACTIVE "min_sample_time", "40000");
-    sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "95");
+    sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
 }
 
 static void p3_power_set_interactive( __attribute__((unused)) struct power_module *module, int on)
@@ -144,7 +144,7 @@ static void p3_power_set_interactive( __attribute__((unused)) struct power_modul
     } else {
         sysfs_write(CPU0_SCALINGMAXFREQ_PATH, scaling_max_freq);
         sysfs_write(CPU1_SCALINGMAXFREQ_PATH, scaling_max_freq);
-        sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "95");
+        sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
     }
 }
 
