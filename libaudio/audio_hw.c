@@ -1355,7 +1355,14 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
             (AUDIO_DEVICE_OUT_AUX_DIGITAL |
             AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET)) {
         size_t spdif_bytes_writn = 0;
-        int spdif_ret;
+        unsigned int spdif_ret;
+        spdif_ret = write(out->spdif_fd, buffer, bytes);
+
+        if (spdif_ret != bytes) {
+            ALOGE("wrote (%d) to spdif device. expected (%d).", spdif_ret, bytes);
+        }
+
+ /*
         size_t remaining;
 
         while (spdif_bytes_writn < bytes) {
@@ -1371,7 +1378,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
             spdif_bytes_writn += spdif_ret;
             buffer += spdif_ret;
         }
-
+*/
         ret = 0;
         bytes = spdif_bytes_writn;
 
