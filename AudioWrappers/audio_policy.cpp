@@ -145,7 +145,8 @@ static audio_io_handle_t ap_get_output(struct audio_policy *pol,
                                        uint32_t sampling_rate,
                                        audio_format_t format,
                                        audio_channel_mask_t channelMask,
-                                       audio_output_flags_t flags)
+                                       audio_output_flags_t flags,
+                                       const audio_offload_info_t *offloadInfo)
 {
     RETURN_WRAPPED_CALL(pol, get_output, stream, sampling_rate, format, channelMask, flags);
 }

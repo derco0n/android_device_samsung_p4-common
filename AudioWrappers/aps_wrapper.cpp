@@ -148,7 +148,7 @@ static int aps_close_input(void *service, audio_io_handle_t input)
 static int aps_set_stream_output(void *service, audio_stream_type_t stream,
                                  audio_io_handle_t output)
 {
-    WRAPPED_CALL(service, set_stream_output, stream, output);
+    WRAPPED_CALL(service, invalidate_stream, stream);
 }
 
 static int aps_move_effects(void *service, int session,
