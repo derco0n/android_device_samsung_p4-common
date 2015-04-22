@@ -233,11 +233,13 @@ BOARD_SEPOLICY_UNION += \
 	file.te \
 	file_contexts \
 	healthd.te \
+	hostapd.te \
 	init.te \
 	init_shell.te \
 	keystore.te \
 	macloader.te \
 	mediaserver.te \
+	netd.te \
 	rild.te \
 	service_contexts \
 	servicemanager.te \
