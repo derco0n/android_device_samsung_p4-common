@@ -62,7 +62,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
     persist.sys.isUsbOtgEnabled=true \
-    persist.sys.media.legacy-drm=true
+    persist.sys.media.legacy-drm=true \
+    persist.sys.media.use-awesome=true
 
 # Prompt for USB debugging authentication
 PRODUCT_PROPERTY_OVERRIDES += \
