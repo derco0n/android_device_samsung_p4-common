@@ -1,0 +1,1 @@
+allow hostapd rfkill_device:file r_file_perms; 
