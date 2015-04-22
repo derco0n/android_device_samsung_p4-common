@@ -82,7 +82,7 @@ static int ap_set_device_connection_state(struct audio_policy *pol,
                                           audio_policy_dev_state_t state,
                                           const char *device_address)
 {
-    ALOGI("%s: device: 0x%x, state: %d, address: %s", __FUNCTION__, device, state,
+    ALOGV("%s: device: 0x%x, state: %d, address: %s", __FUNCTION__, device, state,
           device_address);
     device = convert_audio_devices(device, JB_TO_ICS);
     RETURN_WRAPPED_CALL(pol, set_device_connection_state, (wrapper::audio_devices_t) device,
@@ -94,7 +94,7 @@ static audio_policy_dev_state_t ap_get_device_connection_state(
                                             audio_devices_t device,
                                             const char *device_address)
 {
-    ALOGI("%s: device: 0x%x, address: %s", __FUNCTION__, device, device_address);
+    ALOGV("%s: device: 0x%x, address: %s", __FUNCTION__, device, device_address);
     device = convert_audio_devices(device, JB_TO_ICS);
     RETURN_WRAPPED_CALL(pol, get_device_connection_state, (wrapper::audio_devices_t) device,
                         device_address);
@@ -197,7 +197,7 @@ static void ap_init_stream_volume(struct audio_policy *pol,
                                   audio_stream_type_t stream, int index_min,
                                   int index_max)
 {
-    ALOGI("%s: stream %d, index_min %d, index_max: %d", __FUNCTION__, stream, index_min, index_max);
+    ALOGV("%s: stream %d, index_min %d, index_max: %d", __FUNCTION__, stream, index_min, index_max);
     WRAPPED_CALL(pol, init_stream_volume, stream, index_min, index_max);
 }
 
@@ -205,7 +205,7 @@ static int ap_set_stream_volume_index(struct audio_policy *pol,
                                       audio_stream_type_t stream,
                                       int index)
 {
-    ALOGI("%s: stream %d, index %d", __FUNCTION__, stream, index);
+    ALOGV("%s: stream %d, index %d", __FUNCTION__, stream, index);
     RETURN_WRAPPED_CALL(pol, set_stream_volume_index, stream, index);
 }
 
@@ -214,7 +214,7 @@ static int ap_get_stream_volume_index(const struct audio_policy *pol,
                                       int *index)
 {
     int ret = WRAPPED_POLICY(pol)->get_stream_volume_index(WRAPPED_POLICY(pol), stream, index);
-    ALOGI("%s: stream %d, index %d", __FUNCTION__, stream, *index);
+    ALOGV("%s: stream %d, index %d", __FUNCTION__, stream, *index);
     return ret;
 }
 
@@ -224,7 +224,7 @@ static int ap_set_stream_volume_index_for_device(struct audio_policy *pol,
                                       int index,
                                       audio_devices_t device)
 {
-    ALOGI("%s: stream %d, index %d, device: 0x%x", __FUNCTION__, stream, index, device);
+    ALOGV("%s: stream %d, index %d, device: 0x%x", __FUNCTION__, stream, index, device);
     device = convert_audio_devices(device, JB_TO_ICS);
     // This function does not exist for ICS audio HALs so the have to call the
     // old function that doesn't differentiate between devices.
@@ -243,7 +243,7 @@ static int ap_get_stream_volume_index_for_device(const struct audio_policy *pol,
     device = convert_audio_devices(device, JB_TO_ICS);
     ret = WRAPPED_POLICY(pol)->get_stream_volume_index(WRAPPED_POLICY(pol), stream, index);
     //ret = WRAPPED_POLICY(pol)->get_stream_volume_index_for_device(WRAPPED_POLICY(pol), stream, index, device);
-    ALOGI("%s: stream %d, index %d, device: 0x%x", __FUNCTION__, stream, *index, device);
+    ALOGV("%s: stream %d, index %d, device: 0x%x", __FUNCTION__, stream, *index, device);
     return ret;
 }
 #endif
@@ -257,7 +257,7 @@ static uint32_t ap_get_strategy_for_stream(const struct audio_policy *pol,
 static audio_devices_t ap_get_devices_for_stream(const struct audio_policy *pol,
                                           audio_stream_type_t stream)
 {
-    ALOGI("%s: stream_type: %d", __FUNCTION__, stream);
+    ALOGV("%s: stream_type: %d", __FUNCTION__, stream);
     wrapper::audio_devices_t result;
     result = WRAPPED_POLICY(pol)->get_devices_for_stream(WRAPPED_POLICY(pol), stream);
     return convert_audio_devices(result, ICS_TO_JB);
@@ -431,7 +431,7 @@ static int wrapper_ap_dev_open(const hw_module_t* module, const char* name,
     struct wrapper_ap_device *dev;
     int ret = 0;
 
-    ALOGI("Wrapping vendor audio policy");
+    ALOGV("Wrapping vendor audio policy");
 
     *device = NULL;
 

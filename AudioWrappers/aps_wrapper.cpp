@@ -55,7 +55,7 @@ static audio_io_handle_t aps_open_output(void *service,
                                          uint32_t *pLatencyMs,
                                          audio_output_flags_t flags)
 {
-    ALOGI("%s: 0x%x, %d, %d, %x, %d, %x", __FUNCTION__, *pDevices, *pSamplingRate,
+    ALOGV("%s: 0x%x, %d, %d, %x, %d, %x", __FUNCTION__, *pDevices, *pSamplingRate,
           *pFormat, *pChannelMask, *pLatencyMs, flags);
     audio_devices_t devices = convert_audio_devices(*pDevices, ICS_TO_JB);
 
@@ -80,7 +80,7 @@ static audio_io_handle_t aps_open_output_on_module(void *service,
                                                    uint32_t *pLatencyMs,
                                                    audio_output_flags_t flags)
 {
-    ALOGI("%s: 0x%x, %d, %d, %x, %d, %x", __FUNCTION__, *pDevices, *pSamplingRate,
+    ALOGV("%s: 0x%x, %d, %d, %x, %d, %x", __FUNCTION__, *pDevices, *pSamplingRate,
           *pFormat, *pChannelMask, *pLatencyMs, flags);
     audio_devices_t devices = convert_audio_devices(*pDevices, ICS_TO_JB);
     WRAPPED_CALL(service, open_output_on_module, module, &devices, pSamplingRate,
@@ -118,7 +118,7 @@ static audio_io_handle_t aps_open_input(void *service,
                                         audio_channel_mask_t *pChannelMask,
                                         audio_in_acoustics_t acoustics)
 {
-    ALOGI("%s: 0x%x, %d, %d, %x, %d", __FUNCTION__, *pDevices, *pSamplingRate,
+    ALOGV("%s: 0x%x, %d, %d, %x, %d", __FUNCTION__, *pDevices, *pSamplingRate,
           *pFormat, *pChannelMask, acoustics);
     audio_devices_t devices = convert_audio_devices(*pDevices, ICS_TO_JB);
     WRAPPED_CALL(service, open_input, &devices, pSamplingRate, pFormat,
@@ -133,7 +133,7 @@ static audio_io_handle_t aps_open_input_on_module(void *service,
                                                   audio_format_t *pFormat,
                                                   audio_channel_mask_t *pChannelMask)
 {
-    ALOGI("%s: 0x%x, %d, %d, %x", __FUNCTION__, *pDevices, *pSamplingRate, *pFormat, *pChannelMask);
+    ALOGV("%s: 0x%x, %d, %d, %x", __FUNCTION__, *pDevices, *pSamplingRate, *pFormat, *pChannelMask);
     audio_devices_t devices = convert_audio_devices(*pDevices, ICS_TO_JB);
     WRAPPED_CALL(service, open_input_on_module, module, &devices, pSamplingRate, pFormat,
                  pChannelMask);
@@ -161,7 +161,7 @@ static int aps_move_effects(void *service, int session,
 static char * aps_get_parameters(void *service, audio_io_handle_t io_handle,
                                  const char *keys)
 {
-    ALOGI("%s: io_handle: %d, keys: %s", __FUNCTION__, io_handle, keys);
+    ALOGV("%s: io_handle: %d, keys: %s", __FUNCTION__, io_handle, keys);
     aps_wrapper_service_t * waps = (aps_wrapper_service_t*) service;
     char * kv_pairs;
     char * fixed_kv_pairs;
@@ -176,7 +176,7 @@ static char * aps_get_parameters(void *service, audio_io_handle_t io_handle,
 static void aps_set_parameters(void *service, audio_io_handle_t io_handle,
                                const char *kv_pairs, int delay_ms)
 {
-    ALOGI("%s: io_handle: %d, kv_pairs: %s", __FUNCTION__, io_handle, kv_pairs);
+    ALOGV("%s: io_handle: %d, kv_pairs: %s", __FUNCTION__, io_handle, kv_pairs);
     aps_wrapper_service_t * waps = (aps_wrapper_service_t*) service;
 
     char * fixed_kv_pairs = fixup_audio_parameters(kv_pairs, ICS_TO_JB);
@@ -189,7 +189,7 @@ static int aps_set_stream_volume(void *service, audio_stream_type_t stream,
                                  float volume, audio_io_handle_t output,
                                  int delay_ms)
 {
-    ALOGI("%s: stream: %d, volume: %f, output: %d, delay_ms: %d",
+    ALOGV("%s: stream: %d, volume: %f, output: %d, delay_ms: %d",
           __FUNCTION__, stream, volume, output, delay_ms);
     WRAPPED_CALL(service, set_stream_volume, stream, volume, output, delay_ms);
 }
@@ -207,7 +207,7 @@ static int aps_stop_tone(void *service)
 
 static int aps_set_voice_volume(void *service, float volume, int delay_ms)
 {
-    ALOGI("%s: volume: %f, delay_ms: %d", __FUNCTION__, volume, delay_ms);
+    ALOGV("%s: volume: %f, delay_ms: %d", __FUNCTION__, volume, delay_ms);
     WRAPPED_CALL(service, set_voice_volume, volume, delay_ms);
 }
 

@@ -30,7 +30,7 @@ int load_vendor_module(const hw_module_t* wrapper_module, const char* name,
     const hw_module_t* module;
     char module_name[PATH_MAX];
     int ret = 0;
-    ALOGI("%s", __FUNCTION__);
+    ALOGV("%s", __FUNCTION__);
 
     // Create the module name based on the wrapper module id and inst.
     if (inst) {
@@ -134,7 +134,7 @@ static wrapper::audio_devices_t fixup_audio_devices(wrapper::audio_devices_t dev
     // instead. Also the BUILTIN_MIC bit of get_supported_devices() is not
     // set. So this seems the correct thing to do.
     if((device & wrapper::AUDIO_DEVICE_IN_BUILTIN_MIC) == wrapper::AUDIO_DEVICE_IN_BUILTIN_MIC) {
-        ALOGI("%s: BUILTIN_MIC set, setting VOICE_CALL instead", __FUNCTION__);
+        ALOGV("%s: BUILTIN_MIC set, setting VOICE_CALL instead", __FUNCTION__);
         device &= ~wrapper::AUDIO_DEVICE_IN_BUILTIN_MIC;
         device |= wrapper::AUDIO_DEVICE_IN_VOICE_CALL;
     }
@@ -152,7 +152,7 @@ uint32_t convert_audio_devices(const uint32_t devices, flags_conversion_mode_t m
 #else
         ret = devices;
 #endif
-        ALOGI("%s: ICS_TO_JB (0x%x -> 0x%x)", __FUNCTION__, devices, ret);
+        ALOGV("%s: ICS_TO_JB (0x%x -> 0x%x)", __FUNCTION__, devices, ret);
         break;
     case JB_TO_ICS:
 #ifdef CONVERT_AUDIO_DEVICES_T
@@ -161,7 +161,7 @@ uint32_t convert_audio_devices(const uint32_t devices, flags_conversion_mode_t m
         ret = devices;
 #endif
         ret = fixup_audio_devices(ret);
-        ALOGI("%s: JB_TO_ICS (0x%x -> 0x%x)", __FUNCTION__, devices, ret);
+        ALOGV("%s: JB_TO_ICS (0x%x -> 0x%x)", __FUNCTION__, devices, ret);
         break;
     default:
         ALOGE("%s: Invalid conversion mode %d", __FUNCTION__, mode);
@@ -181,7 +181,7 @@ char * fixup_audio_parameters(const char *kv_pairs, flags_conversion_mode_t mode
     android::String8 key = android::String8(android::AudioParameter::keyRouting);
 
     if (param.getInt(key, value) == android::NO_ERROR) {
-        ALOGI("%s: Fixing routing value (value: %x, mode: %d)", __FUNCTION__,
+        ALOGV("%s: Fixing routing value (value: %x, mode: %d)", __FUNCTION__,
               value, mode);
         value = convert_audio_devices(value, mode);
 
@@ -196,7 +196,7 @@ char * fixup_audio_parameters(const char *kv_pairs, flags_conversion_mode_t mode
         out = (char *) malloc(len + 1);
         strcpy(out, fixed_kv_pairs.string());
 
-        ALOGI("%s: fixed_kv_pairs: %s (%d)", __FUNCTION__, out, strlen(out));
+        ALOGV("%s: fixed_kv_pairs: %s (%d)", __FUNCTION__, out, strlen(out));
     } else {
         len = strlen(kv_pairs);
         out = (char *) malloc(len + 1);
