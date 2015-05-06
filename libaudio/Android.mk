@@ -1,3 +1,5 @@
+ifeq ($(BOARD_OPENSOURCE_AUDIOHAL),true)
+
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -17,3 +19,5 @@ LOCAL_CFLAGS += -g
 LOCAL_LDFLAGS += -ldl
 
 include $(BUILD_SHARED_LIBRARY)
+
+endif
