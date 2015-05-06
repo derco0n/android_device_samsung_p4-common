@@ -18,9 +18,11 @@
 //#define LOG_NDEBUG 0
 
 #include <errno.h>
+#include <fcntl.h>
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/ioctl.h>
 #include <sys/time.h>
 
 #include <cutils/log.h>
@@ -43,6 +45,7 @@
 #include <dlfcn.h>
 
 #include "secril-client.h"
+#include "tegra_audio.h"
 
 // RILD required
 // from system/core/include/utils/Errors.h
@@ -75,6 +78,10 @@ enum {
 
 /* from Tuna */
 #define MAX_PREPROCESSORS 3 /* maximum one AGC + one NS + one AEC per input stream */
+
+
+#define SPDIF_FD "/dev/spdif_out"
+#define SPDIFCTL_FD "/dev/spdif_out_ctl"
 
 struct effect_info_s {
     effect_handle_t effect_itfe;
@@ -164,6 +171,11 @@ struct stream_out {
     pthread_mutex_t lock; /* see note below on mutex acquisition order */
     struct pcm *pcm;
     struct pcm_config *pcm_config;
+
+    // SPDIF
+    int spdif_fd;
+    int spdif_ctl_fd;
+
     bool standby;
     uint64_t written; /* total frames written, not cleared when entering standby */
 
@@ -227,6 +239,7 @@ static void select_voice_route(struct audio_device *adev, struct mixer* mixer);
 static uint32_t out_get_sample_rate(const struct audio_stream *stream);
 static size_t out_get_buffer_size(const struct audio_stream *stream);
 static audio_format_t out_get_format(const struct audio_stream *stream);
+static int out_flush(struct audio_stream_out* stream);
 static uint32_t in_get_sample_rate(const struct audio_stream *stream);
 static size_t in_get_buffer_size(const struct audio_stream *stream);
 static audio_format_t in_get_format(const struct audio_stream *stream);
@@ -686,6 +699,13 @@ static void do_out_standby(struct stream_out *out)
             free(out->buffer);
             out->buffer = NULL;
         }
+
+        if (adev->out_device &
+                (AUDIO_DEVICE_OUT_AUX_DIGITAL |
+                AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET)) {
+            out_flush((struct audio_stream_out*)out);
+        }
+
         out->standby = true;
     } else {
         ALOGD("do_out_standby() did nothing. Called with out->standby already true.");
@@ -1329,6 +1349,35 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
         adev_unlock(adev);
         ALOGD("pcm playback is exiting standby. done.");
     }
+
+
+    if (adev->out_device &
+            (AUDIO_DEVICE_OUT_AUX_DIGITAL |
+            AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET)) {
+        size_t spdif_bytes_writn = 0;
+        int spdif_ret;
+        size_t remaining;
+
+        while (spdif_bytes_writn < bytes) {
+            remaining = bytes - spdif_bytes_writn;
+            spdif_ret = write(out->spdif_fd, buffer,
+                remaining >= 4096 ? 4096 : remaining);
+
+            if (spdif_ret < 0) {
+                ALOGE("error writing to spdif device (%d).", spdif_ret);
+                break;
+            }
+
+            spdif_bytes_writn += spdif_ret;
+            buffer += spdif_ret;
+        }
+
+        ret = 0;
+        bytes = spdif_bytes_writn;
+
+        goto exit;
+    }
+
     buffer_type = (adev->screen_off && !adev->active_in) ?
             OUT_BUFFER_TYPE_LONG : OUT_BUFFER_TYPE_SHORT;
 
@@ -1492,6 +1541,28 @@ static int out_get_next_write_timestamp(const struct audio_stream_out *stream,
                                         int64_t *timestamp)
 {
     return -EINVAL;
+}
+
+static int out_flush(struct audio_stream_out* stream)
+{
+    struct stream_out *out = (struct stream_out *)stream;
+    struct audio_device *adev = out->dev;
+
+    if (adev->out_device &
+            (AUDIO_DEVICE_OUT_AUX_DIGITAL |
+            AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET)) {
+
+        if (out->spdif_fd >= 0) {
+            if (ioctl(out->spdif_fd, TEGRA_AUDIO_OUT_FLUSH) < 0)
+                ALOGE("could not flush playback: %s", strerror(errno));
+        }
+        if (out->spdif_ctl_fd >= 0) {
+            if (ioctl(out->spdif_ctl_fd, TEGRA_AUDIO_OUT_FLUSH) < 0)
+                ALOGE("could not flush playback: %s", strerror(errno));
+        }
+    }
+
+    return 0;
 }
 
 static int out_get_presentation_position(const struct audio_stream_out *stream,
@@ -2052,7 +2123,7 @@ static int adev_open_output_stream(struct audio_hw_device *dev,
 {
     struct audio_device *adev = (struct audio_device *)dev;
     struct stream_out *out;
-    int ret;
+    int fd, ret;
 
     ALOGD("adev_open_output_stream()");
 
@@ -2084,6 +2155,7 @@ static int adev_open_output_stream(struct audio_hw_device *dev,
     out->stream.write = out_write;
     out->stream.get_render_position = out_get_render_position;
     out->stream.get_next_write_timestamp = out_get_next_write_timestamp;
+    out->stream.flush = out_flush;
     out->stream.get_presentation_position = out_get_presentation_position;
 
     out->dev = adev;
@@ -2094,6 +2166,22 @@ static int adev_open_output_stream(struct audio_hw_device *dev,
 
     out->standby = true;
     /* out->written = 0; by calloc() */
+
+    /* SPDIF */
+    fd = open(SPDIF_FD, O_RDWR);
+    if (fd < 0) {
+        ALOGE("Error opening %s", SPDIF_FD);
+        fd = -1;
+    }
+    out->spdif_fd = fd;
+
+    fd = open(SPDIFCTL_FD, O_RDWR);
+    if (fd < 0) {
+        ALOGE("Error opening %s", SPDIFCTL_FD);
+        fd = -1;
+    }
+    out->spdif_ctl_fd = fd;
+
 
     *stream_out = &out->stream;
 
@@ -2115,9 +2203,17 @@ err_open:
 static void adev_close_output_stream(struct audio_hw_device *dev,
                                      struct audio_stream_out *stream)
 {
+    struct stream_out *out = (struct stream_out *)stream;
+
     ALOGD("adev_close_output_stream()");
 
     out_standby(&stream->common);
+
+    if (out->spdif_fd >= 0)
+        close(out->spdif_fd);
+    if (out->spdif_ctl_fd >= 0)
+        close(out->spdif_ctl_fd);
+
     free(stream);
 }
 
