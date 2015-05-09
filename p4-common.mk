@@ -55,6 +55,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
     ro.sf.lcd_density=160 \
     dalvik.vm.dexopt-data-only=1 \
     dalvik.vm.debug.alloc=0 \
+    dalvik.vm.dex2oat-flags=--no-watch-dog \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
     persist.sys.isUsbOtgEnabled=true \
