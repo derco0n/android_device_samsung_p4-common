@@ -124,6 +124,10 @@ Only the three quirks included above are recognized at this point:
             <Limit name="sample-rate" ranges="16000,22050,24000,32000,44100,48000" />
             <Limit name="bitrate" range="8000-384000" />
         </MediaCodec>
+
+        <MediaCodec name="OMX.ffmpeg.vp8.decoder" type="video/x-vnd.on2.vp8" />
+        <MediaCodec name="OMX.ffmpeg.vp9.decoder" type="video/x-vnd.on2.vp9" />
+
     </Decoders>
 
     <Encoders>
