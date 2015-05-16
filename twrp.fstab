@@ -8,3 +8,4 @@
 /system                 ext4            /dev/block/mmcblk0p4
 /data                   ext4            /dev/block/mmcblk0p8
 /extra                  ext4            /dev/block/mmcblk0p10
+/usb-otg                auto            /dev/block/sda1        /dev/block/sda                    flags=display="USB-OTG";storage;wipeingui;removable
