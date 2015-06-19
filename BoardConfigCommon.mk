@@ -251,3 +251,14 @@ BOARD_SEPOLICY_UNION += \
 	ueventd.te \
 	untrusted_app.te \
 	vold.te
+
+
+# MultiROM config. MultiROM also uses parts of TWRP config
+MR_INPUT_TYPE := type_p75xx
+MR_INIT_DEVICES := device/samsung/p4-common/mr_init_devices.c
+MR_DPI := hdpi
+MR_DPI_MUL := 0.5
+MR_DPI_FONT := 160
+MR_FSTAB := device/samsung/p4-common/twrp.fstab
+MR_KEXEC_MEM_MIN := 0x1FF00000
+MR_INFOS := device/samsung/p4-common/mrom_infos
