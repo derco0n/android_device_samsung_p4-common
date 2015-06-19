@@ -248,7 +248,7 @@ TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlig
 TW_MAX_BRIGHTNESS := 255
 #TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
 TW_NO_USB_STORAGE := true
-# TW_EXCLUDE_SUPERSU := true
+TW_EXCLUDE_SUPERSU := true
 #in the ongoing battle to reduce recovery size no true type font
 # TW_DISABLE_TTF := true
 
@@ -257,7 +257,7 @@ TW_NO_USB_STORAGE := true
 # TW_INCLUDE_CRYPTO := false
 
 # TW_INCLUDE_CRYPTO := true
-TW_INCLUDE_L_CRYPTO := true
+# TW_INCLUDE_L_CRYPTO := true
 TW_CRYPTO_FS_TYPE := "ext4"
 TW_CRYPTO_REAL_BLKDEV := "/dev/block/mmcblk0p8"
 TW_CRYPTO_MNT_POINT := "/data"
@@ -269,3 +269,14 @@ TW_CRYPTO_KEY_LOC := "footer"
 
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 5583457484
 TW_EXTRA_RECOVERY_PARTITION := true
+
+
+# MultiROM config. MultiROM also uses parts of TWRP config
+MR_INPUT_TYPE := type_p75xx
+MR_INIT_DEVICES := device/samsung/p4-common/mr_init_devices.c
+MR_DPI := hdpi
+MR_DPI_MUL := 0.5
+MR_DPI_FONT := 160
+MR_FSTAB := device/samsung/p4-common/twrp.fstab
+MR_KEXEC_MEM_MIN := 0x1FF00000
+MR_INFOS := device/samsung/p4-common/mrom_infos
