@@ -15,6 +15,7 @@ const char *mr_init_devices[] =
     "/sys/devices/platform/sdhci-tegra.3/mmc_host/mmc0/mmc0:0001",
     "/sys/devices/platform/sdhci-tegra.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0",
     "/sys/devices/platform/sdhci-tegra.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0p1", //efs
+    "/sys/devices/platform/sdhci-tegra.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0p6", //misc
     "/sys/devices/platform/sdhci-tegra.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0p8", //data
     "/sys/devices/platform/sdhci-tegra.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0p10", //extra
     "/sys/bus/mmc",
