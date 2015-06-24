@@ -30,6 +30,7 @@ const char *mr_init_devices[] =
     "/sys/devices/virtual/misc/uinput",
     "/sys/devices/platform/tegra-i2c.1/i2c-1/1-004c/input/input1", // touch screen
     "/sys/devices/platform/tegra-i2c.1/i2c-1/1-004c/input/input1/event1",
+    "/sys/devices/platform/tegra-kbc/input/input0", // sec_key
 
     // for adb
     "/sys/devices/virtual/tty/ptmx",
