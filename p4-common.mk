@@ -188,4 +188,4 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/init.recovery.p4wifi.rc:root/init.recovery.p4wifi.rc
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
-$(call inherit-product, vendor/decatf/config/common.mk)
+$(call inherit-product-if-exists, vendor/decatf/config/common.mk)
