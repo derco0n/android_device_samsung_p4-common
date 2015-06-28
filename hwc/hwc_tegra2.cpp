@@ -200,7 +200,7 @@ static int tegra2_set(struct hwc_composer_device_1 *dev,
     tegra2_hwc_composer_device_1_t *pdev = (tegra2_hwc_composer_device_1_t *)dev;
 
     hwc_display_contents_1_t *contents = displays[0];
-    if (!contents)
+    if (!contents || !contents->numHwLayers)
         return 0;
 
     if (!contents->dpy || !contents->sur)
@@ -253,7 +253,7 @@ static int tegra2_prepare(hwc_composer_device_1_t *dev,
         (tegra2_hwc_composer_device_1_t *)dev;
 
     hwc_display_contents_1_t *contents = displays[0];
-    if (!contents)
+    if (!contents || !contents->numHwLayers)
         return 0;
 
     // If blanking, make gralloc handle everything to aovid crashes
