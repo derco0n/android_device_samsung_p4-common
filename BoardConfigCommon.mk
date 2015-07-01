@@ -231,7 +231,7 @@ BOARD_HAS_LARGE_FILESYSTEM := true
 # Custom graphics for recovery
 BOARD_CUSTOM_GRAPHICS := ../../../device/samsung/p4-common/recovery/graphics.c
 
-#we don't have cpu temperature only battery temperature :-(
+TW_CUSTOM_CPU_TEMP_PATH := "/sys/class/thermal/thermal_zone1/temp"
 HAVE_SELINUX := true
 DEVICE_RESOLUTION := 1280x800
 BOARD_HAS_NO_REAL_SDCARD := true
