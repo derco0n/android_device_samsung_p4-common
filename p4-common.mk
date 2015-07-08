@@ -52,7 +52,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PROPERTY_OVERRIDES := \
     wifi.interface=wlan0 \
     wifi.supplicant_scan_interval=15 \
-    media.stagefright.cache-params=6144/-1/30 \
     ro.sf.lcd_density=160 \
     dalvik.vm.dexopt-data-only=1 \
     dalvik.vm.debug.alloc=0 \
