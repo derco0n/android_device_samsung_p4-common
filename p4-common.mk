@@ -49,9 +49,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
      $(LOCAL_PATH)/gps.conf:system/etc/gps.conf
 
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/init_scripts/99power_opt:system/etc/init.d/99power_opt
-
 PRODUCT_PROPERTY_OVERRIDES := \
     wifi.interface=wlan0 \
     wifi.supplicant_scan_interval=15 \

@@ -1,0 +1,5 @@
+#!/system/bin/sh
+
+busybox echo 104857600 >  /sys/block/zram0/disksize
+busybox mkswap /dev/block/zram0
+busybox swapon /dev/block/zram0
