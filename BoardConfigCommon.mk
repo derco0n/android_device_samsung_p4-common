@@ -53,10 +53,6 @@ BOARD_CHARGER_DISABLE_INIT_BLANK := true
 # This is from CyanogenMod 12.0
 CHARGING_ENABLED_PATH :=  "/sys/class/power_supply/battery/charging_mode_booting"
 
-# USE_PREBUILT_CHROMIUM := 1
-# Force using the prebuilts
-# PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
-
 # Optimization hwui
 HWUI_COMPILE_FOR_PERF := true
 
@@ -209,18 +205,6 @@ TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlig
 TW_MAX_BRIGHTNESS := 255
 TW_NO_EXFAT := true
 TW_EXCLUDE_SUPERSU := true
-
-# Android system toolchain
-# TARGET_GCC_VERSION_EXP := 4.8
-# TARGET_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/linaro-arm-eabi-$(TARGET_GCC_VERSION)
-# TARGET_TOOLS_PREFIX := $(TARGET_TOOLCHAIN_ROOT)/bin/arm-linux-gnueabi-
-
-# Kernel toolchain
-# TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.8
-TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-cortex-linux-gnueabi-linaro_4.9.3-2015.03
-
-# Add backup-tool.sh to install script
-BACKUP_TOOL := true
 
 BOARD_SEPOLICY_DIRS += \
 	device/samsung/p4-common/sepolicy \
