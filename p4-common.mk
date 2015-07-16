@@ -153,10 +153,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/camera/nvcamera.conf:system/etc/nvcamera.conf \
     $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
-# frandom
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/prebuilt/etc/init.d/00random:system/etc/init.d/00random \
-
 PRODUCT_CHARACTERISTICS := tablet,nosdcard
 
 PRODUCT_TAGS += dalvik.gc.type-precise
