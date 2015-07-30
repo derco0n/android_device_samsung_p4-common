@@ -105,7 +105,8 @@ PRODUCT_PACKAGES += \
         charger_res_images
 
 PRODUCT_PACKAGES += \
-    hwcomposer.tegra
+    hwcomposer.tegra \
+    libstagefrighthw
 
 # Audio
 # PRODUCT_PACKAGES += \
