@@ -44,6 +44,7 @@
 #include <hardware/hardware.h>
 #include <hardware/hwcomposer.h>
 #include <hardware_legacy/uevent.h>
+#include <system/thread_defs.h>
 #include <utils/String8.h>
 #include <utils/Vector.h>
 
@@ -318,7 +319,8 @@ static void *tegra2_hwc_emulated_vsync_thread(void *data)
 
     ALOGD("VSYNC thread emulator started");
 
-    setpriority(PRIO_PROCESS, 0, HAL_PRIORITY_URGENT_DISPLAY);
+    setpriority(PRIO_PROCESS, 0, HAL_PRIORITY_URGENT_DISPLAY
+            + ANDROID_PRIORITY_MORE_FAVORABLE);
 
     // Store the time of the start of this thread as an initial timestamp
     struct timespec nexttm;
@@ -501,7 +503,8 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 
     ALOGD("NVidia VSYNC thread started");
 
-    setpriority(PRIO_PROCESS, 0, HAL_PRIORITY_URGENT_DISPLAY);
+    setpriority(PRIO_PROCESS, 0, HAL_PRIORITY_URGENT_DISPLAY
+            + ANDROID_PRIORITY_MORE_FAVORABLE);
 
     while (1) {
         int err;
