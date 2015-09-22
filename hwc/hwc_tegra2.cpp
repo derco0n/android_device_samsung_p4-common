@@ -46,6 +46,7 @@
 #include <hardware/hwcomposer.h>
 #include <hardware_legacy/uevent.h>
 #include <system/thread_defs.h>
+#include <utils/AndroidThreads.h>
 #include <utils/String8.h>
 #include <utils/Vector.h>
 
@@ -320,7 +321,7 @@ static void *tegra2_hwc_emulated_vsync_thread(void *data)
 
     ALOGD("VSYNC thread emulator started");
 
-    setpriority(PRIO_PROCESS, 0, HAL_PRIORITY_URGENT_DISPLAY
+    androidSetThreadPriority(0, HAL_PRIORITY_URGENT_DISPLAY
             + ANDROID_PRIORITY_MORE_FAVORABLE);
     android_set_rt_ioprio(0, 1);
 
@@ -505,7 +506,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 
     ALOGD("NVidia VSYNC thread started");
 
-    setpriority(PRIO_PROCESS, 0, HAL_PRIORITY_URGENT_DISPLAY
+    androidSetThreadPriority(0, HAL_PRIORITY_URGENT_DISPLAY
             + ANDROID_PRIORITY_MORE_FAVORABLE);
     android_set_rt_ioprio(0, 1);
 
