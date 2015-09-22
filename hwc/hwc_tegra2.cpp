@@ -52,6 +52,9 @@
 
 #include "hwcomposer_v0.h"
 
+#define likely(x)       __builtin_expect(!!(x), 1)
+#define unlikely(x)     __builtin_expect(!!(x), 0)
+
 // Get the original hw composer
 static hwc_module_t* get_hwc(void)
 {
@@ -335,13 +338,12 @@ static void *tegra2_hwc_emulated_vsync_thread(void *data)
 
         // Wait while display is blanked
         pthread_mutex_lock(&pdev->vsync_mutex);
-        while (pdev->fbblanked && pdev->vsync_running) {
+        if (unlikely(pdev->fbblanked && pdev->vsync_running)) {
 
             // When framebuffer is blanked, there must be no interrupts, so we can't wait on it
             pthread_cond_wait(&pdev->vsync_cond, &pdev->vsync_mutex);
-
-        };
-        if (!pdev->vsync_running)
+        }
+        if (unlikely(!pdev->vsync_running))
             break;
         pthread_mutex_unlock(&pdev->vsync_mutex);
 
@@ -380,7 +382,7 @@ static void *tegra2_hwc_emulated_vsync_thread(void *data)
         }
 
         // Do the VSYNC call
-        if (pdev->enabled_vsync && pdev->procs && !pdev->fbblanked) {
+        if (likely(pdev->enabled_vsync && !pdev->fbblanked)) {
 
             // Get current time in exactly the same timebase as Choreographer
             struct timespec now;
@@ -515,13 +517,12 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 
         // Wait while display is blanked
         pthread_mutex_lock(&pdev->vsync_mutex);
-        while (pdev->fbblanked && pdev->vsync_running) {
+        if (unlikely(pdev->fbblanked && pdev->vsync_running)) {
 
             // When framebuffer is blanked, there must be no interrupts, so we can't wait on it
             pthread_cond_wait(&pdev->vsync_cond, &pdev->vsync_mutex);
-
-        };
-        if (!pdev->vsync_running)
+        }
+        if (unlikely(!pdev->vsync_running))
             break;
         pthread_mutex_unlock(&pdev->vsync_mutex);
 
@@ -529,7 +530,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
         tegra2_wait_vsync(pdev);
 
         // Do the VSYNC call
-        if (pdev->enabled_vsync && pdev->procs && !pdev->fbblanked) {
+        if (likely(pdev->enabled_vsync && !pdev->fbblanked)) {
 
             // Get current time in exactly the same timebase as Choreographer
             struct timespec now;
