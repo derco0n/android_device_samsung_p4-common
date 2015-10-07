@@ -226,7 +226,6 @@ BOARD_SEPOLICY_UNION += \
 	mediaserver.te \
 	netd.te \
 	rild.te \
-	service_contexts \
 	servicemanager.te \
 	surfaceflinger.te \
 	system_app.te \
