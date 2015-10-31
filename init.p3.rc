@@ -324,7 +324,7 @@ on boot
     chown system system /data/gps
 
 on property:sys.boot_completed=1
-    write /sys/block/mmcblk0/queue/scheduler fiops
+    write /sys/block/mmcblk0/queue/scheduler bfq
 
 service wpa_supplicant /system/bin/wpa_supplicant \
     -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf -O/data/misc/wifi/sockets \
