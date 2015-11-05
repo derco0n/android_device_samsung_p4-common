@@ -169,6 +169,11 @@ PRODUCT_PACKAGES += \
     mkfs.f2fs \
     fsck.f2fs
 
+# Preload compability symbols
+PRODUCT_PACKAGES += \
+    libdgv1
+
+
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
 
