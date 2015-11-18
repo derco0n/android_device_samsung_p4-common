@@ -11,3 +11,5 @@ allow init tmpfs_mmcblk0p6:blk_file rw_file_perms;
 
 # daemonsu (SuperSU)
 # allow init fuse:dir mounton;
+
+allow init sysfs_voodoo_sound:file rw_file_perms;
