@@ -1,6 +1,6 @@
 
 # GPS Daemon
-# allow init self:process execmem;
+allow init self:process execmem;
 # allow init gpsd:process execmem;
 
 # allow init properties_device:file execute;
