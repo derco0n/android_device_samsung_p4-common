@@ -25,24 +25,11 @@ USE_CAMERA_STUB := false
 # KitKat flags
 BOARD_USE_MHEAP_SCREENSHOT := true
 # TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
-ICS_CAMERA_BLOB := true
-BOARD_CAMERA_HAVE_ISO := true
-# BOARD_USES_PROPRIETARY_OMX := TF101
-BOARD_NEEDS_OLD_HWC_API := true
-#BOARD_NEED_OMX_COMPAT := true
-#BOARD_EGL_NEEDS_FNW := true
-#NEED_WORKAROUND_CORTEX_A9_745320 := true
-#BOARD_USES_PROPRIETARY_LIBCAMERA := true
-#BOARD_SECOND_CAMERA_DEVICE := true
-#USE_CAMERA_STUB := true
-#BOARD_VENDOR_USE_NV_CAMERA := true
 
 # Lollipop
 TARGET_32_BIT_SURFACEFLINGER := true
 MALLOC_IMPL := dlmalloc
-BOARD_USES_LEGACY_MMAP := true
 BOARD_HAVE_SAMSUNG_T20_HWCOMPOSER := true
-COMMON_GLOBAL_CFLAGS += -DADD_LEGACY_ACQUIRE_BUFFER_SYMBOL
 TARGET_ENABLE_NON_PIE_SUPPORT := true
 
 OTA_EXTRA_OPTIONS := -r
@@ -50,14 +37,9 @@ OTA_EXTRA_OPTIONS := -r
 # Lollipop charger mode
 BOARD_CHARGER_ENABLE_SUSPEND := true
 BOARD_CHARGER_DISABLE_INIT_BLANK := true
-# This is from CyanogenMod 12.0
-CHARGING_ENABLED_PATH :=  "/sys/class/power_supply/battery/charging_mode_booting"
 
 # Optimization hwui
 HWUI_COMPILE_FOR_PERF := true
-
-# Flash compatibility
-COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
 
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
@@ -74,10 +56,7 @@ TARGET_ARCH_VARIANT := armv7-a
 TARGET_ARCH_VARIANT_CPU := cortex-a9
 TARGET_ARCH_VARIANT_FPU := vfpv3-d16
 TARGET_CPU_SMP := true
-#TARGET_HAVE_TEGRA_ERRATA_657451 := true
 ARCH_ARM_HAVE_TLS_REGISTER := true
-ARCH_ARM_USE_NON_NEON_MEMCPY := true
-ARCH_ARM_HIGH_OPTIMIZATION := true
 
 BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_CMDLINE := 
@@ -89,23 +68,13 @@ TARGET_TEGRA_VERSION := t20
 TARGET_BOOTLOADER_BOARD_NAME := p3
 #TARGET_BOARD_INFO_FILE := device/samsung/p4-common/board-info.txt
 
-# BOARD_EGL_NEEDS_LEGACY_FB := true
-# MAX_EGL_CACHE_KEY_SIZE := 4096
-# MAX_EGL_CACHE_SIZE := 2146304
 NUM_FRAMEBUFFER_SURFACE_BUFFERS := 3
 # TARGET_DISABLE_TRIPLE_BUFFERING := false
 BOARD_EGL_CFG := device/samsung/p4-common/egl.cfg
 BOARD_EGL_WORKAROUND_BUG_10194508 := true
 BOARD_EGL_SKIP_FIRST_DEQUEUE := true
-# https://android.googlesource.com/platform/frameworks/native/+/201f3b2da572eb27b9d4b3131e6d8c3c92a13de8
-# BOARD_ALLOW_EGL_HIBERNATION := true
 
-#BOARD_USES_HGL := true
-BOARD_USES_OVERLAY := true
-BOARD_USES_HWCOMPOSER := true
 USE_OPENGL_RENDERER := true
-# Enable WEBGL in WebKit
-ENABLE_WEBGL := true
 
 ### Audio ###
 BOARD_HAVE_PRE_KITKAT_AUDIO_BLOB := true
@@ -115,9 +84,6 @@ USE_LEGACY_AUDIO_POLICY := 1
 # AUDIO_WRAPPER_CONFIG := $(ANDROID_BUILD_TOP)/device/samsung/p4-common/audio/config.mk
 ## Open source audio
 BOARD_OPENSOURCE_AUDIOHAL := true
-
-# skia SIGILL bootloop fix
-COMMON_GLOBAL_CFLAGS += -DOLD_TEGRA
 
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 #TARGET_RECOVERY_UI_LIB := librecovery_ui_ventana
@@ -132,9 +98,6 @@ TARGET_RECOVERY_INITRC := device/samsung/p4-common/recovery/init.rc
 
 RECOVERY_FSTAB_VERSION := 2
 TARGET_RECOVERY_FSTAB := device/samsung/p4-common/fstab.p3
-
-# Indicate that the board has an Internal SD Card
-BOARD_HAS_SDCARD_INTERNAL := true
 
 # device-specific extensions to the updater binary
 #TARGET_RECOVERY_UPDATER_LIBS += librecovery_updater_ventana
@@ -166,14 +129,6 @@ WIFI_DRIVER_MODULE_AP_ARG   := "firmware_path=/system/etc/wifi/bcmdhd_apsta.bin 
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
 
-#BOARD_LIB_DUMPSTATE := libdumpstate.ventana
-
-# Use nicer font rendering
-BOARD_USE_SKIA_LCDTEXT := true
-
-# Charging Mode (LPM)
-BOARD_CHARGING_MODE_BOOTING_LPM := "/sys/class/power_supply/battery/charging_mode_booting"
-
 # Custom graphics for recovery
 BOARD_CUSTOM_GRAPHICS := ../../../device/samsung/p4-common/recovery/graphics.c
 
@@ -185,9 +140,6 @@ TARGET_BOOTANIMATION_USE_RGB565 := true
 
 # Suppress EMMC WIPE
 BOARD_SUPPRESS_EMMC_WIPE := true
-
-# Skip SELinux metadata
-# SKIP_SET_METADATA := true
 
 #TWRP Flags
 DEVICE_RESOLUTION := 1280x800
