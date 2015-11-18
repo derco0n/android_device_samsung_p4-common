@@ -32,3 +32,19 @@
 /sys/devices/virtual/misc/voodoo_sound/(.*) u:object_r:sysfs_voodoo_sound:s0
 
 /data/misc/radio(/.*)?             u:object_r:radio_data_misc_file:s0
+
+# AP -> /dev/block/mmcblk0p4
+# CC -> /dev/block/mmcblk0p5
+# ES -> /dev/block/mmcblk0p1
+# HD -> /dev/block/mmcblk0p10
+# LX -> /dev/block/mmcblk0p3
+# MC -> /dev/block/mmcblk0p6
+# MM -> /dev/block/mmcblk0p7
+# OA -> /dev/block/mmcblk0p9
+# SS -> /dev/block/mmcblk0p2
+# UA -> /dev/block/mmcblk0p8
+/dev/block/platform/sdhci-tegra.3/by-name/AP u:object_r:system_block_device:s0
+/dev/block/platform/sdhci-tegra.3/by-name/UA u:object_r:userdata_block_device:s0
+/dev/block/platform/sdhci-tegra.3/by-name/CC u:object_r:cache_block_device:s0
+/dev/block/platform/sdhci-tegra.3/by-name/SS u:object_r:recovery_block_device:s0
+/dev/block/platform/sdhci-tegra.3/by-name/LX u:object_r:boot_block_device:s0
