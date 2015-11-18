@@ -1,0 +1,2 @@
+allow kernel efs_file:dir rw_dir_perms;
+allow kernel efs_file:file rw_file_perms;
