@@ -64,6 +64,7 @@ DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 TARGET_NO_BOOTLOADER := true
 
 # Architecture
+TARGET_ARCH := arm
 # TARGET_CPU_VARIANT := generic
 TARGET_CPU_VARIANT := cortex-a9
 # TARGET_CPU_VARIANT := tegra2
@@ -109,11 +110,11 @@ ENABLE_WEBGL := true
 ### Audio ###
 BOARD_HAVE_PRE_KITKAT_AUDIO_BLOB := true
 BOARD_HAVE_PRE_KITKAT_AUDIO_POLICY_BLOB := true
-# ICS audio
-# COMMON_GLOBAL_CFLAGS += -DICS_AUDIO_BLOB
-# COMMON_GLOBAL_CFLAGS += -DAUDIO_LEGACY_HACK
 USE_LEGACY_AUDIO_POLICY := 1
-AUDIO_WRAPPER_CONFIG := $(ANDROID_BUILD_TOP)/device/samsung/p4-common/audio/config.mk
+## Audio Wrapper
+# AUDIO_WRAPPER_CONFIG := $(ANDROID_BUILD_TOP)/device/samsung/p4-common/audio/config.mk
+## Open source audio
+BOARD_OPENSOURCE_AUDIOHAL := true
 
 # skia SIGILL bootloop fix
 COMMON_GLOBAL_CFLAGS += -DOLD_TEGRA
@@ -208,34 +209,6 @@ TW_EXCLUDE_SUPERSU := true
 
 BOARD_SEPOLICY_DIRS += \
 	device/samsung/p4-common/sepolicy \
-
-BOARD_SEPOLICY_UNION += \
-	bluetooth.te \
-	device.te \
-	debuggerd.te \
-	drmserver.te \
-	gpsd.te \
-	file.te \
-	file_contexts \
-	healthd.te \
-	hostapd.te \
-	init.te \
-	init_shell.te \
-	keystore.te \
-	macloader.te \
-	mediaserver.te \
-	netd.te \
-	rild.te \
-	service_contexts \
-	servicemanager.te \
-	surfaceflinger.te \
-	system_app.te \
-	system_server.te \
-	wpa.te \
-	ueventd.te \
-	untrusted_app.te \
-	vold.te
-
 
 # MultiROM config. MultiROM also uses parts of TWRP config
 MR_INPUT_TYPE := type_p75xx
