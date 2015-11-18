@@ -14,3 +14,4 @@ allow surfaceflinger block_device:dir r_dir_perms;
 allow bootanim self:process execmem;
 
 allow surfaceflinger tmpfs_mmcblk0p6:blk_file rw_file_perms;
+allow surfaceflinger system_file:file execmod;
