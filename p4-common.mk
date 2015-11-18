@@ -54,29 +54,18 @@ PRODUCT_PROPERTY_OVERRIDES := \
     dalvik.vm.dex2oat-flags=--no-watch-dog \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
-    persist.sys.isUsbOtgEnabled=true \
-    persist.sys.media.legacy-drm=true \
-    persist.sys.media.use-awesome=true
+    persist.sys.media.legacy-drm=true
 
 # Prompt for USB debugging authentication
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.adb.secure=1 \
     ro.secure=1
 
-# Disable SELinux
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.boot.selinux=permissive \
-    ro.build.selinux=1
-
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.root_access=1
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.usb.config=mtp
-
-# USB OTG interface
-PRODUCT_PROPERTY_OVERRIDES += \
-    persist.sys.isUsbOtgEnabled=1
 
 PRODUCT_PACKAGES := \
     libwpa_client \
