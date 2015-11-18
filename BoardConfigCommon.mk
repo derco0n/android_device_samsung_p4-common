@@ -189,32 +189,6 @@ BACKUP_TOOL := true
 BOARD_SEPOLICY_DIRS += \
 	device/samsung/p4-common/sepolicy \
 
-BOARD_SEPOLICY_UNION += \
-	bluetooth.te \
-	device.te \
-	debuggerd.te \
-	drmserver.te \
-	gpsd.te \
-	file.te \
-	file_contexts \
-	healthd.te \
-	init.te \
-	init_shell.te \
-	keystore.te \
-	macloader.te \
-	mediaserver.te \
-	rild.te \
-	service_contexts \
-	servicemanager.te \
-	surfaceflinger.te \
-	system_app.te \
-	system_server.te \
-	wpa.te \
-	ueventd.te \
-	untrusted_app.te \
-	vold.te
-
-
 ### Recovery
 TARGET_RECOVERY_FSTAB := device/samsung/p4-common/recovery/fstab.p3
 
