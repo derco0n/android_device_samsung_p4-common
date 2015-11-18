@@ -16,6 +16,11 @@
 
 #include "NVOMXPlugin.h"
 
+#define LOG_TAG "NVOMXPlugin"
+
+#include <utils/Log.h>
+
+
 #include <dlfcn.h>
 #include <string.h>
 
@@ -28,13 +33,14 @@ OMXPluginBase *createOMXPlugin() {
 }
 
 NVOMXPlugin::NVOMXPlugin()
-    : mLibHandle(dlopen("libnvomx.so", RTLD_NOW)),
+    : mLibHandle(dlopen("/system/lib/libnvomx.so", RTLD_NOW)),
       mInit(NULL),
       mDeinit(NULL),
       mComponentNameEnum(NULL),
       mGetHandle(NULL),
       mFreeHandle(NULL),
       mGetRolesOfComponentHandle(NULL) {
+
     if (mLibHandle != NULL) {
         mInit = (InitFunc)dlsym(mLibHandle, "OMX_Init");
         mDeinit = (DeinitFunc)dlsym(mLibHandle, "OMX_Deinit");
@@ -49,7 +55,15 @@ NVOMXPlugin::NVOMXPlugin()
             (GetRolesOfComponentFunc)dlsym(
                     mLibHandle, "OMX_GetRolesOfComponent");
 
+        if (!mInit || !mDeinit || !mComponentNameEnum || !mGetHandle ||
+             !mFreeHandle || !mGetRolesOfComponentHandle) {
+            ALOGE("Error with dlsym()");
+            dlclose(mLibHandle);
+            mLibHandle = NULL;
+        } else
         (*mInit)();
+    } else {
+        ALOGE(dlerror());
     }
 }
 
