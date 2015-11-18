@@ -1,8 +1,4 @@
 
-# GPS Daemon
-allow init self:process execmem;
-# allow init gpsd:process execmem;
-
 # allow init properties_device:file execute;
 # allow init self:tcp_socket { create_socket_perms name_connect };
 

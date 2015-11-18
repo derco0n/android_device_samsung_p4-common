@@ -25,7 +25,7 @@
 /efs/wifi/.mac.info                 u:object_r:wifi_efs_file:s0
 
 # Should be in /vendor/bin ?
-/system/bin/gpsd                    u:object_r:gpsd_exec:s0
+/system/bin/gps_daemon.sh           u:object_r:gpsd_exec:s0
 /system/etc/gps.xml                 u:object_r:gps_data_file:s0
 /system/bin/macloader               u:object_r:macloader_exec:s0
 
