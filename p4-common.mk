@@ -61,6 +61,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.adb.secure=1 \
     ro.secure=1
 
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.build.selinux=1
+
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.root_access=1
 
