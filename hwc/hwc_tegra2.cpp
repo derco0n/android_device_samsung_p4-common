@@ -39,6 +39,7 @@
 
 #include <cutils/compiler.h>
 #include <cutils/log.h>
+#include <cutils/iosched_policy.h>
 #include <cutils/properties.h>
 #include <hardware/gralloc.h>
 #include <hardware/hardware.h>
@@ -325,6 +326,7 @@ static void *tegra2_hwc_emulated_vsync_thread(void *data)
 
     androidSetThreadPriority(0, HAL_PRIORITY_URGENT_DISPLAY
             + ANDROID_PRIORITY_MORE_FAVORABLE);
+    android_set_rt_ioprio(0, 1);
 
     // Store the time of the start of this thread as an initial timestamp
     struct timespec nexttm;
@@ -508,6 +510,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 
     androidSetThreadPriority(0, HAL_PRIORITY_URGENT_DISPLAY
             + ANDROID_PRIORITY_MORE_FAVORABLE);
+    android_set_rt_ioprio(0, 1);
 
     while (1) {
         int err;
