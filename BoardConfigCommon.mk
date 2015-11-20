@@ -194,6 +194,8 @@ TARGET_RECOVERY_FSTAB := device/samsung/p4-common/recovery/fstab.p3
 
 ### TWRP
 
+BOARD_CUSTOM_BOOTIMG_MK := device/samsung/p4-common/recovery/mkbootimg.mk
+
 # custom recovery ui
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 #TARGET_RECOVERY_UI_LIB := librecovery_ui_ventana
