@@ -59,7 +59,7 @@ define build-recoveryramdisk
   $(hide) ln -sf /extra/supersu -t $(TARGET_RECOVERY_ROOT_OUT)
 
   $(hide) mkdir -p $(TARGET_RECOVERY_ROOT_OUT)/system/bin
-  $(hide) ln -sf /system/bin/sh $(TARGET_RECOVERY_ROOT_OUT)/sbin/busybox
+  $(hide) ln -sf /sbin/busybox $(TARGET_RECOVERY_ROOT_OUT)/system/bin/sh
 endef
 
 define clean-extras
