@@ -57,6 +57,11 @@ PRODUCT_PROPERTY_OVERRIDES := \
     persist.sys.media.legacy-drm=true \
     persist.sys.debug.multi_window=true
 
+# Nvidia hardcoded this to 2k in ICS frameworks/base
+# Google has provided this system prop to set the max texture size
+PRODUCT_PROPERTY_OVERRIDES += \
+    sys.max_texture_size=2048
+
 # Prompt for USB debugging authentication
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.adb.secure=1 \
