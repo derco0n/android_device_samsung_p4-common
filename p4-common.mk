@@ -54,7 +54,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
     dalvik.vm.dex2oat-flags=--no-watch-dog \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
-    persist.sys.media.legacy-drm=true
+    persist.sys.media.legacy-drm=true \
+    persist.sys.debug.multi_window=true
 
 # Prompt for USB debugging authentication
 PRODUCT_PROPERTY_OVERRIDES += \
