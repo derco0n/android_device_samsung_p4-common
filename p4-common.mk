@@ -52,6 +52,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
     wifi.supplicant_scan_interval=15 \
     ro.sf.lcd_density=160 \
     dalvik.vm.dex2oat-flags=--no-watch-dog \
+    dalvik.vm.compiler-backend=Quick \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
     persist.sys.media.legacy-drm=true \
