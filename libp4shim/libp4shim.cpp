@@ -45,3 +45,10 @@ extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl8Ev() { }
 // Conjure up a new function to replace the original:
 //     _ZN7android7RefBase14moveReferencesEPvPKvjRKNS_22ReferenceConverterBaseE
 extern "C" void _ZNK7android7RefBase9moveReferencesNoopEPKv() { }
+
+// FUNCTION: android::Parcel::writeString16(unsigned short const*, unsigned int)
+// USED BY:  libsec-ril-apalone.so
+extern "C" int _ZN7android6Parcel13writeString16EPKDsj();
+extern "C" int _ZN7android6Parcel13writeString16EPKtj() {
+    return _ZN7android6Parcel13writeString16EPKDsj();
+}
