@@ -14,9 +14,6 @@
 # limitations under the License.
 #
 
-# Default value, if not overridden else where.
-BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR ?= device/samsung/p4-common/bluetooth
-
 # This variable is set first, so it can be overridden
 # by BoardConfigVendor.mk
 BOARD_USES_GENERIC_AUDIO := false
@@ -107,15 +104,14 @@ TARGET_USERIMAGES_USE_F2FS := true
 BOARD_FLASH_BLOCK_SIZE := 4096
 
 # Wifi related defines
-WPA_SUPPLICANT_VERSION := VER_0_8_X
-BOARD_WPA_SUPPLICANT_DRIVER := NL80211
-BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_bcmdhd
-BOARD_HOSTAPD_DRIVER := NL80211
-BOARD_HOSTAPD_PRIVATE_LIB := lib_driver_cmd_bcmdhd
-BOARD_WLAN_DEVICE := bcmdhd
-BOARD_LEGACY_NL80211_STA_EVENTS := true
-BOARD_HAVE_SAMSUNG_WIFI     := true
-BOARD_NO_WIFI_HAL           := true
+BOARD_WLAN_DEVICE                   := bcmdhd
+WPA_SUPPLICANT_VERSION              := VER_0_8_X
+BOARD_WPA_SUPPLICANT_DRIVER         := NL80211
+BOARD_WPA_SUPPLICANT_PRIVATE_LIB    := lib_driver_cmd_bcmdhd
+BOARD_HOSTAPD_DRIVER                := NL80211
+BOARD_HOSTAPD_PRIVATE_LIB           := lib_driver_cmd_bcmdhd
+BOARD_HAVE_SAMSUNG_WIFI             := true
+BOARD_NO_WIFI_HAL                   := true
 
 WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/dhd.ko"
 WIFI_DRIVER_FW_PATH_PARAM   := "/sys/module/dhd/parameters/firmware_path"
@@ -128,6 +124,8 @@ WIFI_DRIVER_MODULE_AP_ARG   := "firmware_path=/system/etc/wifi/bcmdhd_apsta.bin 
 
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
+# Default value, if not overridden else where.
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR ?= device/samsung/p4-common/bluetooth
 
 # Custom graphics for recovery
 BOARD_CUSTOM_GRAPHICS := ../../../device/samsung/p4-common/recovery/graphics.c
