@@ -79,7 +79,8 @@ PRODUCT_PACKAGES := \
     hostapd \
     dhcpcd.conf \
     wpa_supplicant \
-    wpa_supplicant.conf
+    wpa_supplicant.conf \
+    macloader
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/bcmdhd_apsta.bin:system/etc/wifi/bcmdhd_apsta.bin \
