@@ -78,6 +78,28 @@ int get_alt_mac(const char* path, const char* buf, int len) {
     return ret;
 }
 
+int generate_mac(const char* buf, int len) {
+
+    unsigned int rand_bytes[3];
+    int i = 0;
+    int n = sizeof(rand_bytes) / sizeof(rand_bytes[0]);
+
+    srand48(time(NULL));
+    while (i < n) {
+        rand_bytes[i] = (unsigned int) (lrand48() % 0x100);
+        i++;
+    }
+
+    unsigned int a = rand_bytes[0];
+    unsigned int b = rand_bytes[1];
+    unsigned int c = rand_bytes[2];
+
+    sprintf((char *)buf, "00:12:34:%02X:%02X:%02X", a, b, c);
+    ALOGV("Random bytes are %02x.%02x.%02x", a, b, c);
+
+    return 0;
+}
+
 int main() {
     int res;
     FILE* file;
@@ -123,8 +145,19 @@ int main() {
     }
 
     if (res < 0) {
-        ALOGE("No alternate mac address files.");
-        return 1;
+        res = generate_mac(mac, sizeof(mac));
+        if (res != 0) {
+            ALOGE("Failed to generate a mac address.");
+            return 1;
+        }
+
+        res = validate_mac(mac);
+        if (res != 0) {
+            ALOGE("Could not validate randomly generate mac address.");
+            return 1;
+        }
+
+        ALOGI("Generated a mac address.");
     }
 
     if (res == 0) {
