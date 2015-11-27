@@ -136,12 +136,12 @@ int main() {
 
     res = get_alt_mac(MACCOB_EFS, mac, sizeof(mac));
     if (!res)
-        ALOGI("Got a validate mac from %s\n", MACCOB_EFS);
+        ALOGI("Got a valid mac address from %s\n", MACCOB_EFS);
 
     if (res < 0) {
         res = get_alt_mac(NVMACINFO_EFS, mac, sizeof(mac));
         if (!res)
-            ALOGI("Got a validate mac from %s\n", NVMACINFO_EFS);
+            ALOGI("Got a valid mac address from %s\n", NVMACINFO_EFS);
     }
 
     if (res < 0) {
