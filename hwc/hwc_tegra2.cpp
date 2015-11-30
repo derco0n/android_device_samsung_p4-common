@@ -725,10 +725,10 @@ static int tegra2_open(const struct hw_module_t *module, const char *name,
     // Get framebuffer info
     if (dev->fb_fd >= 0 && ioctl(dev->fb_fd, FBIOGET_VSCREENINFO, &info) != -1) {
 
-        unsigned long long refreshRate = 1000000000000LLU /
+        uint64_t refreshRate = 1000000000000LLU /
             (
-             uint64_t( info.upper_margin + info.lower_margin + info.yres )
-             * ( info.left_margin  + info.right_margin + info.xres )
+             uint64_t( info.upper_margin + info.lower_margin + info.vsync_len + info.yres )
+             * ( info.left_margin  + info.right_margin + info.hsync_len + info.xres )
              * info.pixclock
             );
 
@@ -755,34 +755,32 @@ static int tegra2_open(const struct hw_module_t *module, const char *name,
     }
 
     // Try to query the original hw composer for the time between frames...
-    int value = 0;
+    uint64_t value = 0;
 #if 0
     if (dev->org->query && dev->org->query(dev->org,HWC_VSYNC_PERIOD,&value) == 0 && value != 0) {
         ALOGD("Got time between frames from original hwcomposer: time in ns = %d",value);
 
     } else {
+#endif
         // Try to get the time from the framebuffer device...
-
         if (dev->fb_fd >= 0) {
-
             value = (
-                 uint64_t( info.upper_margin + info.lower_margin + info.yres )
-                 * ( info.left_margin  + info.right_margin + info.xres )
+                 uint64_t( info.upper_margin + info.lower_margin + info.vsync_len + info.yres )
+                 * ( info.left_margin  + info.right_margin + info.hsync_len + info.xres )
                  * info.pixclock
                 ) / 1000ULL;
-
-            ALOGD("Got time between frames from framebuffer: time in ns = %d",value);
+            ALOGD("Got time between frames from framebuffer: time in ns = %llu",value);
         }
+#if 0
     }
 #endif
 
-    value = 16672550;
-    ALOGD("Using DispSync refresh rate: time in ns = %d",value);
-
     if (!value) {
-        ALOGD("Unable to get time between frames. Assuming 60 hz rate");
-        value = 50000000 / 3;
+        ALOGD("Unable to get time between frames."
+            "Using DispSync refresh rate: time in ns = %llu", value);
+        value = 16672550400 / 1000ULL;
     }
+
     dev->time_between_frames_ns = value;
     dev->time_between_frames_us = (unsigned long)(value / 1000ULL);
 
