@@ -218,6 +218,6 @@
 
     <!-- Control whether a desk dock event should override the default bluetooth
          audio routing, FORCE_BT_DESK_DOCK, with an analog dock, FORCE_ANALOG_DOCK. -->
-    <bool name="config_forceAnalogDeskDock">false</bool>
+    <bool name="config_forceAnalogDeskDock">true</bool>
 
 </resources>
