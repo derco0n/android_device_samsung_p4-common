@@ -34,4 +34,8 @@
 
     <!-- Use hardware layers in recents -->
     <bool name="config_recents_use_hardware_layers">true</bool>
+
+    <!-- The number of app icons we keep in memory -->
+    <integer name="config_recents_max_icon_count">10</integer>
+
 </resources>
