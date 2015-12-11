@@ -1,0 +1,33 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE		:= fstab.p3
+LOCAL_MODULE_TAGS	:= optional eng
+LOCAL_MODULE_CLASS	:= BOOT
+LOCAL_SRC_FILES		:= etc/fstab.p3
+LOCAL_MODULE_PATH	:= $(TARGET_ROOT_OUT)
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE		:= init.p3.rc
+LOCAL_MODULE_TAGS	:= optional eng
+LOCAL_MODULE_CLASS	:= BOOT
+LOCAL_SRC_FILES		:= etc/init.p3.rc
+LOCAL_MODULE_PATH	:= $(TARGET_ROOT_OUT)
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE		:= init.p3.usb.rc
+LOCAL_MODULE_TAGS	:= optional eng
+LOCAL_MODULE_CLASS	:= BOOT
+LOCAL_SRC_FILES		:= etc/init.p3.usb.rc
+LOCAL_MODULE_PATH	:= $(TARGET_ROOT_OUT)
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE		:= ueventd.p3.rc
+LOCAL_MODULE_TAGS	:= optional eng
+LOCAL_MODULE_CLASS	:= BOOT
+LOCAL_SRC_FILES		:= etc/ueventd.p3.rc
+LOCAL_MODULE_PATH	:= $(TARGET_ROOT_OUT)
+include $(BUILD_PREBUILT)

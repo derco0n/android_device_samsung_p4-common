@@ -22,13 +22,11 @@ PRODUCT_AAPT_PREF_CONFIG := mdpi
 TARGET_SCREEN_WIDTH := 1280
 TARGET_SCREEN_HEIGHT := 800
 
-PRODUCT_COPY_FILES := \
-    $(LOCAL_PATH)/init.p3.rc:root/init.p3.rc \
-    $(LOCAL_PATH)/ueventd.p3.rc:root/ueventd.p3.rc \
-    $(LOCAL_PATH)/init.p3.usb.rc:root/init.p3.usb.rc \
-
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/fstab.p3:root/fstab.p3
+PRODUCT_PACKAGES := \
+    fstab.p3 \
+    init.p3.rc \
+    init.p3.usb.rc \
+    ueventd.p3.rc
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/media/media_profiles.xml:system/etc/media_profiles.xml \
@@ -75,7 +73,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.root_access=1
 
-PRODUCT_PACKAGES := \
+PRODUCT_PACKAGES += \
     libwpa_client \
     hostapd \
     dhcpcd.conf \

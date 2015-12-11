@@ -1,4 +1,5 @@
 import init.p3.usb.rc
+import init.modem.rc
 import init.custom.rc
 
 on early-init
@@ -20,7 +21,7 @@ on init
     symlink /storage/usbdrive0 /mnt/usbdrive
 
     mkdir /efs 0771 system system
-    
+
     write /sys/block/mmcblk0/queue/iosched/slice_idle 0
 
 # Vibetonz
@@ -422,12 +423,6 @@ service bugreport /system/bin/dumpstate -d -v -o /data/storage/bugreports/bugrep
     disabled
     oneshot
     keycodes 115 114
-
-# For 3g tabs
-service cpboot-daemon /sbin/cbd -d -o t -p 7
-    class main
-    user root
-    group radio cache inet misc audio sdcard_rw log
 
 service charger /sbin/healthd -c
     class charger

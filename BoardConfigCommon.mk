@@ -93,7 +93,7 @@ BOARD_HAS_LARGE_FILESYSTEM := true
 TARGET_RECOVERY_INITRC := device/samsung/p4-common/recovery/init.rc
 
 RECOVERY_FSTAB_VERSION := 2
-TARGET_RECOVERY_FSTAB := device/samsung/p4-common/fstab.p3
+TARGET_RECOVERY_FSTAB := device/samsung/p4-common/rootdir/etc/fstab.p3
 
 # device-specific extensions to the updater binary
 #TARGET_RECOVERY_UPDATER_LIBS += librecovery_updater_ventana
