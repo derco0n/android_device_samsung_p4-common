@@ -165,7 +165,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libdgv1 \
     libnvshim \
-    libp4shim
+    libp4shim \
+    libp4utl
 
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
