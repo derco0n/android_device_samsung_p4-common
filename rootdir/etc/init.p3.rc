@@ -8,8 +8,6 @@ on early-init
 
 on init
 
-    export LD_SHIM_LIBS /system/lib/hw/audio.primary_vendor.tegra.so|libp4shim.so
-
     # Support legacy paths
     symlink /sdcard /mnt/sdcard
     symlink /sdcard /storage/sdcard0
