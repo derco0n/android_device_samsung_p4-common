@@ -481,8 +481,8 @@ static int nvhost_syncpt_wait(int ctrl_fd, int id, int thresh, unsigned int time
 static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev)
 {
     unsigned int syncpt = 0;
-    unsigned long max_wait_us = pdev->time_between_frames_us; // NVHOST_NO_TIMEOUT
-    // unsigned long max_wait_us = 1000000000;
+    // unsigned long max_wait_us = pdev->time_between_frames_us; // NVHOST_NO_TIMEOUT
+    unsigned long max_wait_us = 1000000000;
 
     /* get syncpt threshold */
     if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &syncpt)) {
