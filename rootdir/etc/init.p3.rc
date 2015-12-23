@@ -8,6 +8,8 @@ on early-init
 
 on init
 
+    export LD_SHIM_LIBS /system/lib/libnvomxadaptor.so|libnvshim.so:/system/lib/libnvomxadaptor.so|libnvwinsys.so
+
     # Support legacy paths
     symlink /sdcard /mnt/sdcard
     symlink /sdcard /storage/sdcard0
