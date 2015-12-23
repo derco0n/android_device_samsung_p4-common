@@ -317,6 +317,13 @@ private:
 #endif
 };
 
+class ReferenceConverterBase {
+public:
+    virtual size_t getReferenceTypeSize() const = 0;
+    virtual void* getReferenceBase(void const*) const = 0;
+    inline virtual ~ReferenceConverterBase() { }
+};
+
 // ---------------------------------------------------------------------------
 
 void RefBase::incStrong(const void* id) const
@@ -625,6 +632,11 @@ bool RefBase::onIncStrongAttempted(uint32_t flags, const void* /*id*/)
 }
 
 void RefBase::onLastWeakRef(const void* /*id*/)
+{
+}
+
+extern "C" void _ZN7android7RefBase14moveReferencesEPvPKvjRKNS_22ReferenceConverterBaseE(void* /*dst*/, void const* /*src*/, size_t /*n*/,
+        const ReferenceConverterBase& /*caster*/)
 {
 }
 
