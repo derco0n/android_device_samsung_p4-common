@@ -98,6 +98,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     hwcomposer.tegra \
     libstagefrighthw \
+    libcamera_p4clnt \
     camera.tegra
 
 # Audio
