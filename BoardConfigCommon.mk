@@ -77,9 +77,9 @@ BOARD_HAVE_PRE_KITKAT_AUDIO_BLOB := true
 BOARD_HAVE_PRE_KITKAT_AUDIO_POLICY_BLOB := true
 USE_LEGACY_AUDIO_POLICY := 1
 ## Audio Wrapper
-# AUDIO_WRAPPER_CONFIG := $(ANDROID_BUILD_TOP)/device/samsung/p4-common/audio/config.mk
+AUDIO_WRAPPER_CONFIG := $(ANDROID_BUILD_TOP)/device/samsung/p4-common/audio/config.mk
 ## Open source audio
-BOARD_OPENSOURCE_AUDIOHAL := true
+# BOARD_OPENSOURCE_AUDIOHAL := true
 
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 #TARGET_RECOVERY_UI_LIB := librecovery_ui_ventana
