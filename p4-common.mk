@@ -26,6 +26,7 @@ PRODUCT_PACKAGES := \
     fstab.p3 \
     init.p3.rc \
     init.p3.usb.rc \
+    init.modem.rc \
     ueventd.p3.rc
 
 PRODUCT_COPY_FILES += \
