@@ -248,6 +248,7 @@ TW_EXTRA_RECOVERY_PARTITION := true
 
 
 # MultiROM config. MultiROM also uses parts of TWRP config
+TARGET_RECOVERY_IS_MULTIROM := true
 MR_INPUT_TYPE := type_p75xx
 MR_INIT_DEVICES := device/samsung/p4-common/mr_init_devices.c
 MR_DPI := hdpi
