@@ -104,6 +104,19 @@ static char *camera_fixup_getparams(int id, const char *settings)
     params.unflatten(android::String8(settings));
 
     // fix params here
+    const char* supportedPreviewSizes = params.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_SIZES);
+    const char* previewSize = params.get(android::CameraParameters::KEY_PREVIEW_SIZE);
+    ALOGD("%s: previewSizes [%s] [%s]", __FUNCTION__, supportedPreviewSizes, previewSize);
+    if (!strncmp(previewSize, "640x480", 7)) {
+        params.set(android::CameraParameters::KEY_PREVIEW_SIZE, "1280x720");
+    }
+
+    const char* videoSize = params.get(android::CameraParameters::KEY_VIDEO_SIZE);
+    ALOGD("%s: videoSize [%s]", __FUNCTION__, videoSize);
+    if (!strncmp(videoSize, "640x480", 7)) {
+        params.set(android::CameraParameters::KEY_VIDEO_SIZE, "1280x720");
+    }    
+
 
     android::String8 strParams = params.flatten();
     char *ret = strdup(strParams.string());
@@ -118,6 +131,18 @@ static char *camera_fixup_setparams(int id, const char *settings, struct camera_
     params.unflatten(android::String8(settings));
 
     // fix params here
+    const char* supportedPreviewSizes = params.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_SIZES);
+    const char* previewSize = params.get(android::CameraParameters::KEY_PREVIEW_SIZE);
+    ALOGD("%s: previewSizes [%s] [%s]", __FUNCTION__, supportedPreviewSizes, previewSize);
+    if (!strncmp(previewSize, "640x480", 7)) {
+        params.set(android::CameraParameters::KEY_PREVIEW_SIZE, "1280x720");
+    }
+
+    const char* videoSize = params.get(android::CameraParameters::KEY_VIDEO_SIZE);
+    ALOGD("%s: videoSize [%s]", __FUNCTION__, videoSize);
+    if (!strncmp(videoSize, "640x480", 7)) {
+        params.set(android::CameraParameters::KEY_VIDEO_SIZE, "1280x720");
+    }   
 
     android::String8 strParams = params.flatten();
     char *ret = strdup(strParams.string());
