@@ -194,7 +194,7 @@ TARGET_RECOVERY_FSTAB := device/samsung/p4-common/recovery/fstab.p3
 
 ### TWRP
 
-BOARD_CUSTOM_BOOTIMG_MK := device/samsung/p4-common/recovery/mkbootimg.mk
+# BOARD_CUSTOM_BOOTIMG_MK := device/samsung/p4-common/recovery/mkbootimg.mk
 
 # custom recovery ui
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
@@ -209,7 +209,8 @@ BOARD_CUSTOM_GRAPHICS := ../../../device/samsung/p4-common/recovery/graphics.c
 
 TW_CUSTOM_CPU_TEMP_PATH := "/sys/class/thermal/thermal_zone1/temp"
 HAVE_SELINUX := true
-DEVICE_RESOLUTION := 1280x800
+# DEVICE_RESOLUTION := 1280x800
+DEVICE_RESOLUTION := 800x1280
 BOARD_HAS_NO_REAL_SDCARD := true
 RECOVERY_SDCARD_ON_DATA := true
 TW_NO_REBOOT_BOOTLOADER := true
@@ -224,7 +225,7 @@ TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlig
 TW_MAX_BRIGHTNESS := 255
 #TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
 TW_NO_USB_STORAGE := true
-TW_EXCLUDE_SUPERSU := true
+# TW_EXCLUDE_SUPERSU := true
 #in the ongoing battle to reduce recovery size no true type font
 # TW_DISABLE_TTF := true
 
