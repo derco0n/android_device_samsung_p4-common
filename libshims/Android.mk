@@ -14,7 +14,9 @@
 
 LOCAL_PATH := $(call my-dir)
 
-# VectorImpl
+#
+# Shim for camera and audio
+#     Shims VectorImpl symbols
 
 include $(CLEAR_VARS)
 
@@ -49,5 +51,22 @@ LOCAL_MODULE := libp4utl
 LOCAL_MODULE_TAGS := optional
 LOCAL_C_INCLUDES += external/safe-iop/include
 LOCAL_SHARED_LIBRARIES := libbacktrace libcutils libdl liblog
+
+include $(BUILD_SHARED_LIBRARY)
+
+
+#
+# Shim for libsec-ril-apalone.so
+#
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := \
+    libp4shim.cpp
+
+LOCAL_SHARED_LIBRARIES := libbinder libcutils libstdc++
+
+LOCAL_MODULE := libp4shim
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 
 include $(BUILD_SHARED_LIBRARY)
