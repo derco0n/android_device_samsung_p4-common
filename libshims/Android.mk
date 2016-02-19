@@ -20,32 +20,9 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := BasicHashtable.cpp \
-                   CallStack.cpp \
-                   FileMap.cpp \
-                   JenkinsHash.cpp \
-                   LinearTransform.cpp \
-                   Log.cpp \
-                   NativeHandle.cpp \
-                   Printer.cpp \
-                   ProcessCallStack.cpp \
-                   PropertyMap.cpp \
-                   RefBase.cpp \
+LOCAL_SRC_FILES := RefBase.cpp \
                    SharedBuffer.cpp \
-                   Static.cpp \
-                   StopWatch.cpp \
-                   String8.cpp \
-                   String16.cpp \
-                   SystemClock.cpp \
-                   Threads.cpp \
-                   Timers.cpp \
-                   Tokenizer.cpp \
-                   Unicode.cpp \
-                   P4VectorImpl.cpp \
-                   misc.cpp \
-                   BlobCache.cpp \
-                   Looper.cpp \
-                   Trace.cpp
+                   VectorImpl.cpp \
 
 LOCAL_MODULE := libp4utl
 LOCAL_MODULE_TAGS := optional

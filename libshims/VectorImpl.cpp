@@ -25,7 +25,7 @@
 
 #include <utils/Errors.h>
 #include <utils/SharedBuffer.h>
-#include "P4VectorImpl.h"
+#include "VectorImpl.h"
 
 /*****************************************************************************/
 
