@@ -166,6 +166,6 @@ MR_DPI := hdpi
 MR_DPI_MUL := 0.5
 MR_DPI_FONT := 160
 MR_FSTAB := device/samsung/p4-common/twrp.fstab
-MR_KEXEC_MEM_MIN := 0x1FF00000
+MR_KEXEC_MEM_MIN := 0x01000000
 MR_INFOS := device/samsung/p4-common/mrom_infos
 TARGET_RECOVERY_IS_MULTIROM := true
