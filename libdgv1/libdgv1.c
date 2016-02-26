@@ -62,7 +62,7 @@ NvError dmitrygr_libldr(const char *name, struct NvOsLibraryHandle *library)
     sprintf(path, "%s%s", prepend, name);
     err = NvOsLibraryLoad(path, library);
     if (!err)
-        ALOGI("Just saved you by loading '%s' instead of '%s'", path, name);
+        ALOGV("Just saved you by loading '%s' instead of '%s'", path, name);
     free(path);
 
     return err;
@@ -72,7 +72,7 @@ NvError dmitrygr_libldr(const char *name, struct NvOsLibraryHandle *library)
 void libEvtLoading(void) __attribute__((constructor));
 void libEvtLoading(void)
 {
-    ALOGI("Loaded to help save your day\n");
+    ALOGV("Loaded to help save your day\n");
 
 }
 
