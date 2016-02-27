@@ -1,0 +1,14 @@
+<resources>
+
+<!-- Miscellaneous -->
+    <bool name="is_tablet">true</bool>
+    <bool name="is_large_tablet">true</bool>
+    <bool name="allow_rotation">true</bool>
+
+    <!-- Fade/zoom in/out duration & scale in a Launcher overlay transition.
+         Note: This should be less than the config_overlayTransitionTime as they happen together. -->
+    <integer name="config_overlayRevealTime">120</integer>
+    <integer name="config_overlayTransitionTime">200</integer>
+    <integer name="config_overlayItemsAlphaStagger">60</integer>
+
+</resources>
