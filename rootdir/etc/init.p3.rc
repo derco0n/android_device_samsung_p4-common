@@ -8,7 +8,7 @@ on early-init
 
 on init
 
-    export LD_SHIM_LIBS /system/lib/libnvomxadaptor.so|libnvshim.so:/system/lib/libnvwinsys.so|libnvshim.so :/system/lib/libaudioflinger.so
+    export LD_SHIM_LIBS /system/lib/libnvomxadaptor.so|libnvshim.so:/system/lib/libnvwinsys.so|libnvshim.so:/system/lib/hw/audio.primary_vendor.tegra.so|libp4utl.so
 
     # Support legacy paths
     symlink /sdcard /mnt/sdcard
