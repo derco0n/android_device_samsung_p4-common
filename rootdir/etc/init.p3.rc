@@ -14,12 +14,6 @@ on init
     symlink /sdcard /mnt/sdcard
     symlink /sdcard /storage/sdcard0
 
-    # create directory for mounting usb drives
-    mkdir /storage/usbdrive0 0664 system system
-    # for backwards compatibility
-    symlink /storage/usbdrive0 /usbdrive
-    symlink /storage/usbdrive0 /mnt/usbdrive
-
     mkdir /efs 0771 system system
 
     write /sys/block/mmcblk0/queue/iosched/slice_idle 0

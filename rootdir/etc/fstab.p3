@@ -12,11 +12,9 @@
 
 # vold-managed volumes ("block device" is actually a sysfs devpath)
 # USB storage
-/devices/platform/tegra-ehci.0               /storage/usbdrive0 auto    defaults                                                                  voldmanaged=usbdrive0:auto
+/devices/platform/tegra-ehci.2/usb*          auto               auto    defaults                                                                  voldmanaged=usb:auto
 
 # recovery
 /dev/block/platform/sdhci-tegra.3/by-num/p2  /recovery          emmc    defaults                                                                  recoveryonly
 /dev/block/platform/sdhci-tegra.3/by-num/p3  /boot              emmc    defaults                                                                  recoveryonly
 /dev/block/platform/sdhci-tegra.3/by-num/p7  /modem             emmc    defaults                                                                  recoveryonly
-
-/sys/devices/platform/tegra-ehci.2/usb*      auto               auto    defaults                                                                  voldmanaged=usb:auto
