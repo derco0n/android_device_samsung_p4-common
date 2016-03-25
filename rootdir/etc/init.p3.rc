@@ -270,8 +270,8 @@ on boot
     write /sys/class/power_supply/battery/force_usb_charging 1
 
 # Enable KSM
-     write /sys/kernel/mm/ksm/sleep_millisecs 1400
-     write /sys/kernel/mm/ksm/pages_to_scan 200
+     write /sys/kernel/mm/ksm/sleep_millisecs 500
+     write /sys/kernel/mm/ksm/pages_to_scan 100
      write /sys/kernel/mm/ksm/run 1
 
      # defer KSM in favor of power saving
