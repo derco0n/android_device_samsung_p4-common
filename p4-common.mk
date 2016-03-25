@@ -50,10 +50,10 @@ PRODUCT_PROPERTY_OVERRIDES := \
     wifi.interface=wlan0 \
     wifi.supplicant_scan_interval=15 \
     ro.sf.lcd_density=160 \
-    config.dex2oat-compiler-backend=Quick \
+    dalvik.vm.dex2oat-flags=--compiler-backend=Quick \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
-    persist.sys.media.legacy-drm=true \
+    persist.sys.media.legacy-drm=true
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.debug.multi_window=true
