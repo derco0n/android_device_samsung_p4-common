@@ -34,6 +34,8 @@
 #include <camera/Camera.h>
 #include <camera/CameraParameters.h>
 
+#define CAMERA_FLASH "/sys/devices/virtual/sec/sec_s5k5ccgx/cameraflash"
+
 static android::Mutex gCameraWrapperLock;
 static camera_module_t *gVendorModule = 0;
 
@@ -143,6 +145,16 @@ static char *camera_fixup_setparams(int id, const char *settings, struct camera_
     if (!strncmp(videoSize, "640x480", 7)) {
         params.set(android::CameraParameters::KEY_VIDEO_SIZE, "1280x720");
     }   
+
+    // Toggle flashlight based on flash-mode
+    if (params.get("flash-mode")) {
+        const char* flashMode = params.get(android::CameraParameters::KEY_FLASH_MODE);
+        if (strcmp(flashMode, "torch") == 0 || strcmp(flashMode, "on") == 0) {
+              system("echo 1 > " CAMERA_FLASH);
+        } else if (strcmp(flashMode, "off") == 0) {
+              system("echo 0 > " CAMERA_FLASH);
+        }
+    }
 
     android::String8 strParams = params.flatten();
     char *ret = strdup(strParams.string());
