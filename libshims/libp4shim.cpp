@@ -16,25 +16,25 @@
 
 // FUNCTION: void VectorImpl::reservedVectorImpl
 // USED BY: audio.*.tegra.so
-extern "C" void _ZN7android10VectorImpl19reservedVectorImpl1Ev() { }
-extern "C" void _ZN7android10VectorImpl19reservedVectorImpl2Ev() { }
-extern "C" void _ZN7android10VectorImpl19reservedVectorImpl3Ev() { }
-extern "C" void _ZN7android10VectorImpl19reservedVectorImpl4Ev() { }
-extern "C" void _ZN7android10VectorImpl19reservedVectorImpl5Ev() { }
-extern "C" void _ZN7android10VectorImpl19reservedVectorImpl6Ev() { }
-extern "C" void _ZN7android10VectorImpl19reservedVectorImpl7Ev() { }
-extern "C" void _ZN7android10VectorImpl19reservedVectorImpl8Ev() { }
+extern "C" void _ZN7android10VectorImpl19reservedVectorImpl1Ev();
+extern "C" void _ZN7android10VectorImpl19reservedVectorImpl2Ev();
+extern "C" void _ZN7android10VectorImpl19reservedVectorImpl3Ev();
+extern "C" void _ZN7android10VectorImpl19reservedVectorImpl4Ev();
+extern "C" void _ZN7android10VectorImpl19reservedVectorImpl5Ev();
+extern "C" void _ZN7android10VectorImpl19reservedVectorImpl6Ev();
+extern "C" void _ZN7android10VectorImpl19reservedVectorImpl7Ev();
+extern "C" void _ZN7android10VectorImpl19reservedVectorImpl8Ev();
 
 // FUNCTION: void SortedVectorImpl::reservedSortedVectorImpl
 // USED BY: audio.*.tegra.so
-extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl1Ev() { }
-extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl2Ev() { }
-extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl3Ev() { }
-extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl4Ev() { }
-extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl5Ev() { }
-extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl6Ev() { }
-extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl7Ev() { }
-extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl8Ev() { }
+extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl1Ev();
+extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl2Ev();
+extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl3Ev();
+extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl4Ev();
+extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl5Ev();
+extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl6Ev();
+extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl7Ev();
+extern "C" void _ZN7android16SortedVectorImpl25reservedSortedVectorImpl8Ev();
 
 // FUNCTION: android::Parcel::writeString16(unsigned short const*, unsigned int)
 // USED BY:  libsec-ril-apalone.so
