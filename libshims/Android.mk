@@ -28,7 +28,6 @@ LOCAL_MODULE := libp4utl
 LOCAL_MODULE_TAGS := optional
 LOCAL_C_INCLUDES += external/safe-iop/include
 LOCAL_SHARED_LIBRARIES := libbacktrace libcutils libdl liblog
-LOCAL_CLANG := false
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -46,7 +45,5 @@ LOCAL_SHARED_LIBRARIES := libbinder libcutils libstdc++
 LOCAL_MODULE := libp4shim
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := SHARED_LIBRARIES
-LOCAL_SHARED_LIBRARIES := libp4utl libbinder libcutils
-LOCAL_CLANG := false
 
 include $(BUILD_SHARED_LIBRARY)
