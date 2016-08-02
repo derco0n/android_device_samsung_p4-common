@@ -59,6 +59,10 @@ PRODUCT_PROPERTY_OVERRIDES := \
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.debug.multi_window=true
 
+# Storage
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.sdcardfs.enable=true
+
 # Nvidia hardcoded this to 2k in ICS frameworks/base
 # Google has provided this system prop to set the max texture size
 PRODUCT_PROPERTY_OVERRIDES += \
