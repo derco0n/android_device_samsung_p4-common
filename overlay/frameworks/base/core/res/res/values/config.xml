@@ -218,7 +218,7 @@
 
     <!-- Control whether a desk dock event should override the default bluetooth
          audio routing, FORCE_BT_DESK_DOCK, with an analog dock, FORCE_ANALOG_DOCK. -->
-    <bool name="config_forceAnalogDeskDock">true</bool>
+    <!-- <bool name="config_forceAnalogDeskDock">true</bool> -->
 
     <!-- Configure wifi tcp buffersizes in the form:
          rmem_min,rmem_def,rmem_max,wmem_min,wmem_def,wmem_max -->
