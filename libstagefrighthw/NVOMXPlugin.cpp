@@ -16,8 +16,6 @@
 
 #include "NVOMXPlugin.h"
 
-#define LOG_TAG "NVOMXPlugin"
-
 #include <utils/Log.h>
 
 
@@ -63,7 +61,7 @@ NVOMXPlugin::NVOMXPlugin()
         } else
         (*mInit)();
     } else {
-        ALOGE(dlerror());
+        ALOGE("%s", dlerror());
     }
 }
 
