@@ -1583,13 +1583,13 @@ static int out_get_presentation_position(const struct audio_stream_out *stream,
     out->sleep_req = false;
 
     if (out->standby) {
-        ALOGE("out_get_presentation_position() out stream is in standby.");
+        ALOGV("out_get_presentation_position() out stream is in standby.");
         out_unlock(out);
         return -ENOSYS;
     }
 
     if (out->pcm == NULL) {
-        ALOGE("out_get_presentation_position() out->pcm is NULL");
+        ALOGV("out_get_presentation_position() out->pcm is NULL");
         out_unlock(out);
         return -ENOSYS;
     }
