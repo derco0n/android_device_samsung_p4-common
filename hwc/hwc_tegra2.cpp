@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <time.h>
-#if HAVE_ANDROID_OS
+#if defined(__ANDROID__)
 #include <linux/fb.h>
 #endif
 
