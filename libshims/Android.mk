@@ -21,13 +21,12 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := RefBase.cpp \
-                   SharedBuffer.cpp \
                    VectorImpl.cpp \
 
 LOCAL_MODULE := libp4utl
 LOCAL_MODULE_TAGS := optional
 LOCAL_C_INCLUDES += external/safe-iop/include
-LOCAL_SHARED_LIBRARIES := libbacktrace libcutils libdl liblog
+LOCAL_SHARED_LIBRARIES := libbacktrace libutils libcutils libdl liblog
 
 include $(BUILD_SHARED_LIBRARY)
 
