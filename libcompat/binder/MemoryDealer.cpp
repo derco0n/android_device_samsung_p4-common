@@ -16,7 +16,7 @@
 
 #define LOG_TAG "MemoryDealer"
 
-#include <binder/MemoryDealer.h>
+#include "MemoryDealer.h"
 #include <binder/IPCThreadState.h>
 #include <binder/MemoryBase.h>
 
@@ -224,6 +224,13 @@ Allocation::~Allocation()
 }
 
 // ----------------------------------------------------------------------------
+
+MemoryDealer::MemoryDealer(size_t size, const char* name)
+    : mHeap(new MemoryHeapBase(size, 0, name)),
+    mAllocator(new SimpleBestFitAllocator(size))
+{
+
+}
 
 MemoryDealer::MemoryDealer(size_t size, const char* name, uint32_t flags)
     : mHeap(new MemoryHeapBase(size, flags, name)),

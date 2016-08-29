@@ -32,7 +32,7 @@
 #include <ui/PixelFormat.h>
 
 #include <gui/CpuConsumer.h>
-#include <gui/SurfaceControl.h>
+#include "SurfaceControl.h"
 
 namespace android {
 
@@ -46,6 +46,8 @@ class IMemoryHeap;
 class ISurfaceComposerClient;
 class IGraphicBufferProducer;
 class Region;
+
+typedef int32_t    DisplayID;
 
 // ---------------------------------------------------------------------------
 
@@ -77,6 +79,9 @@ public:
     static status_t getDisplayInfo(const sp<IBinder>& display,
             DisplayInfo* info);
 
+    // Get the DisplayInfo for the currently-active configuration
+    static status_t getDisplayInfo(DisplayID dpy, DisplayInfo* info);
+
     // Get the index of the current active configuration (relative to the list
     // returned by getDisplayInfo)
     static int getActiveConfig(const sp<IBinder>& display);
@@ -98,6 +103,14 @@ public:
             uint32_t h,         // height in pixel
             PixelFormat format, // pixel-format desired
             uint32_t flags = 0  // usage flags
+    );
+
+    sp<SurfaceControl> createSurface(
+        DisplayID display,
+        uint32_t w,
+        uint32_t h,
+        PixelFormat format,
+        uint32_t flags
     );
 
     //! Create a virtual display
@@ -125,6 +138,9 @@ public:
 
     //! Flag the currently open transaction as an animation transaction.
     static void setAnimationTransaction();
+
+    //! Set the orientation of the given display
+    static int setOrientation(DisplayID dpy, int orientation, uint32_t flags);
 
     status_t    hide(const sp<IBinder>& id);
     status_t    show(const sp<IBinder>& id);

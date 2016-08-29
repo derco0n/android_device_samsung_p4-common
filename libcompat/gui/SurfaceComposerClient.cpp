@@ -29,13 +29,14 @@
 #include <binder/IMemory.h>
 #include <binder/IServiceManager.h>
 
+#include "SurfaceComposerClient.h"
+
 #include <ui/DisplayInfo.h>
 
 #include <gui/CpuConsumer.h>
 #include <gui/IGraphicBufferProducer.h>
 #include <gui/ISurfaceComposer.h>
 #include <gui/ISurfaceComposerClient.h>
-#include <gui/SurfaceComposerClient.h>
 
 #include <private/gui/ComposerService.h>
 #include <private/gui/LayerState.h>
@@ -372,6 +373,21 @@ status_t Composer::setMatrix(const sp<SurfaceComposerClient>& client,
     return NO_ERROR;
 }
 
+status_t Composer::setOrientation(int orientation) {
+    Mutex::Autolock _l(mLock);
+
+    sp<ISurfaceComposer> sm(ComposerService::getComposerService());
+    sp<IBinder> token(sm->getBuiltInDisplay(ISurfaceComposer::eDisplayIdMain));
+    DisplayState& s(getDisplayStateLocked(token));
+    s.orientation = static_cast<uint32_t>(orientation);
+    s.what |= DisplayState::eDisplayProjectionChanged;
+
+    // Changing the orientation makes the transaction synchronous.
+    mForceSynchronous = true;
+
+    return NO_ERROR;
+}
+
 status_t Composer::setCrop(const sp<SurfaceComposerClient>& client,
         const sp<IBinder>& id, const Rect& crop) {
     Mutex::Autolock _l(mLock);
@@ -503,6 +519,24 @@ sp<SurfaceControl> SurfaceComposerClient::createSurface(
     return sur;
 }
 
+sp<SurfaceControl> SurfaceComposerClient::createSurface(
+    DisplayID display,
+    uint32_t w,
+    uint32_t h,
+    PixelFormat format,
+    uint32_t flags)
+{
+    (void) display;
+
+    String8 name;
+    const size_t SIZE = 128;
+    char buffer[SIZE];
+    snprintf(buffer, SIZE, "<pid_%d>", getpid());
+    name.append(buffer);
+
+    return createSurface(name, w, h, format, flags);
+}
+
 sp<IBinder> SurfaceComposerClient::createDisplay(const String8& displayName,
         bool secure) {
     return Composer::getInstance().createDisplay(displayName, secure);
@@ -629,6 +663,14 @@ void SurfaceComposerClient::setDisplayProjection(const sp<IBinder>& token,
             layerStackRect, displayRect);
 }
 
+status_t SurfaceComposerClient::setOrientation(DisplayID dpy,
+        int orientation, uint32_t flags)
+{
+    (void) dpy;
+    (void) flags;
+    return Composer::getInstance().setOrientation(orientation);
+}
+
 void SurfaceComposerClient::setDisplaySize(const sp<IBinder>& token,
         uint32_t width, uint32_t height) {
     Composer::getInstance().setDisplaySize(token, width, height);
@@ -658,6 +700,13 @@ status_t SurfaceComposerClient::getDisplayInfo(const sp<IBinder>& display,
 
     *info = configs[static_cast<size_t>(activeId)];
     return NO_ERROR;
+}
+
+status_t SurfaceComposerClient::getDisplayInfo(
+        DisplayID dpy, DisplayInfo* info)
+{
+    int32_t id = reinterpret_cast<int32_t>(dpy);
+    return getDisplayInfo(ComposerService::getComposerService()->getBuiltInDisplay(id), info);
 }
 
 int SurfaceComposerClient::getActiveConfig(const sp<IBinder>& display) {

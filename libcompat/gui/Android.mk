@@ -37,41 +37,11 @@ LOCAL_CPPFLAGS += -Wno-gnu-zero-variadic-macro-arguments
 LOCAL_CPPFLAGS += -Wno-padded
 
 LOCAL_SRC_FILES := \
-	IGraphicBufferConsumer.cpp \
-	IConsumerListener.cpp \
-	BitTube.cpp \
-	BufferItem.cpp \
-	BufferItemConsumer.cpp \
-	BufferQueue.cpp \
-	BufferQueueConsumer.cpp \
-	BufferQueueCore.cpp \
-	BufferQueueProducer.cpp \
-	BufferSlot.cpp \
-	ConsumerBase.cpp \
-	CpuConsumer.cpp \
-	DisplayEventReceiver.cpp \
-	GLConsumer.cpp \
-	GraphicBufferAlloc.cpp \
-	GuiConfig.cpp \
-	IDisplayEventConnection.cpp \
-	IGraphicBufferAlloc.cpp \
-	IGraphicBufferProducer.cpp \
-	IProducerListener.cpp \
-	ISensorEventConnection.cpp \
-	ISensorServer.cpp \
-	ISurfaceComposer.cpp \
-	ISurfaceComposerClient.cpp \
-	LayerState.cpp \
-	Sensor.cpp \
-	SensorEventQueue.cpp \
-	SensorManager.cpp \
-	StreamSplitter.cpp \
-	Surface.cpp \
 	SurfaceControl.cpp \
 	SurfaceComposerClient.cpp \
-	SyncFeatures.cpp \
 
 LOCAL_SHARED_LIBRARIES := \
+	libgui \
 	libbinder \
 	libcutils \
 	libEGL \
@@ -89,7 +59,7 @@ ifeq ($(BOARD_USE_MHEAP_SCREENSHOT),true)
     LOCAL_CFLAGS += -DUSE_MHEAP_SCREENSHOT
 endif
 
-LOCAL_MODULE := libgui
+LOCAL_MODULE := libcompatgui
 
 ifeq ($(TARGET_BOARD_PLATFORM), tegra)
 	LOCAL_CFLAGS += -DDONT_USE_FENCE_SYNC
