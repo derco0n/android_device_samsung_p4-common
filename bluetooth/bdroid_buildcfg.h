@@ -19,9 +19,6 @@
 
 #define BTM_DEF_LOCAL_NAME "Galaxy Tab 10.1"
 
-/* kernel does not have support for CLOCK_BOOTTIME_ALARM */
-#define KERNEL_MISSING_CLOCK_BOOTTIME_ALARM TRUE
-
 #define BLE_INCLUDED TRUE
 #define BTA_GATT_INCLUDED TRUE
 #define SMP_INCLUDED TRUE
