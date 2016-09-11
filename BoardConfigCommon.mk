@@ -224,7 +224,7 @@ TW_BRIGHTNESS_PATH := "/sys/devices/platform/cmc623_pwm_bl/backlight/pwm-backlig
 TW_MAX_BRIGHTNESS := 255
 #TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
 TW_NO_USB_STORAGE := true
-# TW_EXCLUDE_SUPERSU := true
+TW_EXCLUDE_SUPERSU := true
 #in the ongoing battle to reduce recovery size no true type font
 # TW_DISABLE_TTF := true
 
