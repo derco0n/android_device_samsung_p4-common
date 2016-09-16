@@ -50,6 +50,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
     wifi.interface=wlan0 \
     wifi.supplicant_scan_interval=15 \
     ro.sf.lcd_density=160 \
+    dalvik.vm.image-dex2oat-flags=--compiler-backend=Quick \
     dalvik.vm.dex2oat-flags=--compiler-backend=Quick \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
