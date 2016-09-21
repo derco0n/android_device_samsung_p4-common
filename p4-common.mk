@@ -171,11 +171,9 @@ PRODUCT_PACKAGES += \
 # Preload compability symbols
 PRODUCT_PACKAGES += \
     libdgv1 \
-    libnvshim \
-    libp4shim \
-    libp4utl \
-    libcompatgui \
-    libcompatbinder
+    libgui_shim \
+    libbinder_shim \
+    libutils_shim
 
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
