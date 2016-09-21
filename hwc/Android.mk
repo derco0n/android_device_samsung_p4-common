@@ -22,6 +22,8 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 LOCAL_SHARED_LIBRARIES := liblog libcutils libhardware \
     libhardware_legacy libutils libdl
 
+LOCAL_CFLAGS += -Werror -Wall
+
 LOCAL_SRC_FILES := hwc_tegra2.cpp
 
 ifeq ($(BOARD_TEGRA2_HWC_SET_RT_IOPRIO),true)

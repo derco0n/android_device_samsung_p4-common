@@ -558,6 +558,8 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 static int tegra2_eventControl(struct hwc_composer_device_1 *dev, int dpy,
         int event, int enabled)
 {
+    (void) dpy;
+
     struct tegra2_hwc_composer_device_1_t *pdev =
             (struct tegra2_hwc_composer_device_1_t *)dev;
 
@@ -576,6 +578,8 @@ static int tegra2_eventControl(struct hwc_composer_device_1 *dev, int dpy,
 
 static int tegra2_blank(struct hwc_composer_device_1 *dev, int disp, int blank)
 {
+    (void) disp;
+
     struct tegra2_hwc_composer_device_1_t *pdev =
             (struct tegra2_hwc_composer_device_1_t *)dev;
 
@@ -754,9 +758,9 @@ static int tegra2_open(const struct hw_module_t *module, const char *name,
             "yres         = %d px\n"
             "width        = %d mm (%f dpi)\n"
             "height       = %d mm (%f dpi)\n"
-            "refresh rate = %d Hz\n",
+            "refresh rate = %llu Hz\n",
             dev->xres, dev->yres, info.width, dev->xdpi / 1000.0,
-            info.height, dev->ydpi / 1000.0, refreshRate);
+            info.height, dev->ydpi / 1000.0, (unsigned long long) refreshRate);
 
     }
 
@@ -823,18 +827,18 @@ static int tegra2_open(const struct hw_module_t *module, const char *name,
 }
 
 static struct hw_module_methods_t tegra2_hwc_module_methods = {
-    open: tegra2_open,
+    .open = tegra2_open,
 };
 
 hwc_module_t HAL_MODULE_INFO_SYM = {
-    common: {
-        tag: HARDWARE_MODULE_TAG,
-        module_api_version: HWC_MODULE_API_VERSION_0_1,
-        hal_api_version: HARDWARE_HAL_API_VERSION,
-        id: HWC_HARDWARE_MODULE_ID,
-        name: "NVIDIA Tegra2 HWC v0 Module Wrapper v0.2",
-        author: "ejtagle@tutopia.com",
-        methods: &tegra2_hwc_module_methods,
+    .common = {
+        .tag = HARDWARE_MODULE_TAG,
+        .module_api_version = HWC_MODULE_API_VERSION_0_1,
+        .hal_api_version = HARDWARE_HAL_API_VERSION,
+        .id = HWC_HARDWARE_MODULE_ID,
+        .name = "NVIDIA Tegra2 HWC v0 Module Wrapper v0.2",
+        .author = "ejtagle@tutopia.com",
+        .methods = &tegra2_hwc_module_methods,
     }
 };
 
