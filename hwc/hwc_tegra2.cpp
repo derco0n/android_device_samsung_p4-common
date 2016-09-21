@@ -519,8 +519,6 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 #endif
 
     while (1) {
-        int err;
-
         // Wait while display is blanked
         pthread_mutex_lock(&pdev->vsync_mutex);
         if (unlikely(pdev->fbblanked && pdev->vsync_running)) {
