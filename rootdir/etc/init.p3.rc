@@ -341,8 +341,9 @@ service gps-daemon /system/bin/gps_daemon.sh
     seclabel u:r:gpsd:s0
 
 # bugreport is triggered by the VOLUME-DOWN and VOLUME-UP keys
-service bugreport /system/bin/dumpstate -d -v -o /data/storage/bugreports/bugreport
-    class main
+service bugreport /system/bin/dumpstate -d -p -B -z \
+        -o /data/user_de/0/com.android.shell/files/bugreports/bugreport
+    class late_start
     disabled
     oneshot
     keycodes 115 114
