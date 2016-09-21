@@ -34,4 +34,7 @@
     <!-- The number of app icons we keep in memory -->
     <integer name="config_recents_max_icon_count">10</integer>
 
+    <!-- Svelte specific logic, see RecentsConfiguration.SVELTE_* constants. -->
+    <integer name="recents_svelte_level">2</integer>
+
 </resources>
