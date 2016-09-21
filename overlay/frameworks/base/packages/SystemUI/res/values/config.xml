@@ -26,7 +26,7 @@
     <bool name="config_recents_interface_for_tablets">true</bool>
 
     <!-- Disable expensive shadows -->
-    <bool name="config_recents_fake_shadows">true</bool>
+    <bool name="config_recents_fake_shadows">false</bool>
 
     <!-- Use hardware layers in recents -->
     <bool name="config_recents_use_hardware_layers">true</bool>
