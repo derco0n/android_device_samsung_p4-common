@@ -15,7 +15,7 @@
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := libcompatbinder
+LOCAL_MODULE := libbinder_shim
 LOCAL_SHARED_LIBRARIES := libbinder liblog libcutils libutils
 
 LOCAL_CLANG := false
