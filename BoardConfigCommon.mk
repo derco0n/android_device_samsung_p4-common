@@ -19,25 +19,12 @@
 BOARD_USES_GENERIC_AUDIO := false
 USE_CAMERA_STUB := false
 
-# KitKat flags
-BOARD_USE_MHEAP_SCREENSHOT := true
-# TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
-
-# Lollipop
-TARGET_32_BIT_SURFACEFLINGER := true
-MALLOC_SVELTE := true
-BOARD_HAVE_SAMSUNG_T20_HWCOMPOSER := true
-BOARD_TEGRA2_HWC_SET_RT_IOPRIO := true
-
-OTA_EXTRA_OPTIONS := -r
-
-# Lollipop charger mode
-BOARD_CHARGER_ENABLE_SUSPEND := true
-BOARD_CHARGER_DISABLE_INIT_BLANK := true
-
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
-TARGET_NO_BOOTLOADER := true
+# USE_CLANG_PLATFORM_BUILD := false
+WITH_DEXPREOPT := false
+INSTALLED_RECOVERYIMAGE_TARGET :=
+# ART_TEST_DEBUG_GC := true
 
 # Architecture
 TARGET_ARCH := arm
@@ -46,6 +33,7 @@ TARGET_ARCH_VARIANT := armv7-a
 TARGET_CPU_VARIANT := cortex-a9
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
+TARGET_NO_BOOTLOADER := true
 
 BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_CMDLINE := 
@@ -55,24 +43,37 @@ TARGET_NO_RADIOIMAGE := true
 TARGET_BOARD_PLATFORM := tegra
 TARGET_TEGRA_VERSION := t20
 TARGET_BOOTLOADER_BOARD_NAME := p3
-#TARGET_BOARD_INFO_FILE := device/samsung/p4-common/board-info.txt
 
+MALLOC_SVELTE := true
+# BOARD_DISABLE_ASHMEM_TRACKING := true
+
+BOARD_EGL_SKIP_FIRST_DEQUEUE := true
 NUM_FRAMEBUFFER_SURFACE_BUFFERS := 3
 # TARGET_DISABLE_TRIPLE_BUFFERING := false
 BOARD_EGL_CFG := device/samsung/p4-common/egl.cfg
-# BOARD_EGL_WORKAROUND_BUG_10194508 := true
-BOARD_EGL_SKIP_FIRST_DEQUEUE := true
+
+BOARD_USE_MHEAP_SCREENSHOT := true
+TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
+BOARD_CANT_REALLOCATE_OMX_BUFFERS := true
+BOARD_HAVE_SAMSUNG_T20_HWCOMPOSER := true
+# BOARD_TEGRA2_HWC_SET_RT_IOPRIO := true
+
+TARGET_ICS_SENSOR_BLOB := true
+
+# Charger
+BOARD_CHARGER_ENABLE_SUSPEND := true
+BOARD_CHARGER_DISABLE_INIT_BLANK := true
 
 USE_OPENGL_RENDERER := true
 
 ### Audio ###
 BOARD_HAVE_PRE_KITKAT_AUDIO_BLOB := true
 BOARD_HAVE_PRE_KITKAT_AUDIO_POLICY_BLOB := true
-USE_LEGACY_AUDIO_POLICY := 1
+USE_LEGACY_AUDIO_POLICY := 0
 ## Audio Wrapper
 AUDIO_WRAPPER_CONFIG := $(ANDROID_BUILD_TOP)/device/samsung/p4-common/audio/config.mk
 ## Open source audio
-# BOARD_OPENSOURCE_AUDIOHAL := true
+BOARD_OPENSOURCE_AUDIOHAL := true
 
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 #TARGET_RECOVERY_UI_LIB := librecovery_ui_ventana
@@ -105,14 +106,14 @@ BOARD_HOSTAPD_PRIVATE_LIB           := lib_driver_cmd_bcmdhd
 BOARD_HAVE_SAMSUNG_WIFI             := true
 BOARD_NO_WIFI_HAL                   := true
 
-WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/dhd.ko"
+# WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/dhd.ko"
 WIFI_DRIVER_FW_PATH_PARAM   := "/sys/module/dhd/parameters/firmware_path"
 WIFI_DRIVER_FW_PATH_AP      := "/system/etc/wifi/bcmdhd_apsta.bin"
 WIFI_DRIVER_FW_PATH_STA     := "/system/etc/wifi/bcmdhd_sta.bin"
 WIFI_DRIVER_FW_PATH_P2P     := "/system/etc/wifi/bcmdhd_p2p.bin"
 WIFI_DRIVER_MODULE_NAME     := "dhd"
-WIFI_DRIVER_MODULE_ARG      := "firmware_path=/system/etc/wifi/bcmdhd_sta.bin nvram_path=/system/etc/wifi/nvram_net.txt"
-WIFI_DRIVER_MODULE_AP_ARG   := "firmware_path=/system/etc/wifi/bcmdhd_apsta.bin nvram_path=/system/etc/wifi/nvram_net.txt"
+# WIFI_DRIVER_MODULE_ARG      := "firmware_path=/system/etc/wifi/bcmdhd_sta.bin nvram_path=/system/etc/wifi/nvram_net.txt"
+# WIFI_DRIVER_MODULE_AP_ARG   := "firmware_path=/system/etc/wifi/bcmdhd_apsta.bin nvram_path=/system/etc/wifi/nvram_net.txt"
 
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
