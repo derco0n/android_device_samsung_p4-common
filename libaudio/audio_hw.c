@@ -914,8 +914,8 @@ static ssize_t read_frames(struct stream_in *in, void *buffer, ssize_t frames)
                     &frames_rd);
         } else {
             struct resampler_buffer buf = {
-                    { raw : NULL, },
-                    frame_count : frames_rd,
+                    { .raw = NULL, },
+                    .frame_count = frames_rd,
             };
             get_next_buffer(&in->buf_provider, &buf);
             if (buf.raw != NULL) {
@@ -934,134 +934,6 @@ static ssize_t read_frames(struct stream_in *in, void *buffer, ssize_t frames)
 
         frames_wr += frames_rd;
     }
-    return frames_wr;
-}
-
-/* process_frames() reads frames from kernel driver (via read_frames()),
- * calls the active audio pre processings and output the number of frames requested
- * to the buffer specified */
-static ssize_t process_frames(struct stream_in *in, void* buffer, ssize_t frames)
-{
-    ssize_t frames_wr = 0;
-    audio_buffer_t in_buf;
-    audio_buffer_t out_buf;
-    int i;
-    // bool has_aux_channels = (~in->main_channels & in->aux_channels);
-    void *proc_buf_out;
-
-    // if (has_aux_channels)
-    //     proc_buf_out = in->proc_buf_out;
-    // else
-        proc_buf_out = buffer;
-
-    /* since all the processing below is done in frames and using the config.channels
-     * as the number of channels, no changes is required in case aux_channels are present */
-    while (frames_wr < frames) {
-        /* first reload enough frames at the end of process input buffer */
-        if (in->proc_buf_frames < (size_t)frames) {
-            ssize_t frames_rd;
-
-            if (in->proc_buf_size < (size_t)frames) {
-                size_t size_in_bytes = pcm_frames_to_bytes(in->pcm, frames);
-
-                in->proc_buf_size = (size_t)frames;
-                in->proc_buf_in = (int16_t *)realloc(in->proc_buf_in, size_in_bytes);
-                ALOG_ASSERT((in->proc_buf_in != NULL),
-                            "process_frames() failed to reallocate proc_buf_in");
-                // if (has_aux_channels) {
-                //     in->proc_buf_out = (int16_t *)realloc(in->proc_buf_out, size_in_bytes);
-                //     ALOG_ASSERT((in->proc_buf_out != NULL),
-                //                 "process_frames() failed to reallocate proc_buf_out");
-                //     proc_buf_out = in->proc_buf_out;
-                // }
-                ALOGV("process_frames(): proc_buf_in %p extended to %d bytes",
-                     in->proc_buf_in, size_in_bytes);
-            }
-            frames_rd = read_frames(in,
-                                    in->proc_buf_in +
-                                        in->proc_buf_frames * in->pcm_config->channels,
-                                    frames - in->proc_buf_frames);
-            if (frames_rd < 0) {
-                frames_wr = frames_rd;
-                break;
-            }
-            in->proc_buf_frames += frames_rd;
-        }
-
-        // if (in->echo_reference != NULL)
-        //     push_echo_reference(in, in->proc_buf_frames);
-
-         /* in_buf.frameCount and out_buf.frameCount indicate respectively
-          * the maximum number of frames to be consumed and produced by process() */
-        in_buf.frameCount = in->proc_buf_frames;
-        in_buf.s16 = in->proc_buf_in;
-        out_buf.frameCount = frames - frames_wr;
-        out_buf.s16 = (int16_t *)proc_buf_out + frames_wr * in->pcm_config->channels;
-
-        /* FIXME: this works because of current pre processing library implementation that
-         * does the actual process only when the last enabled effect process is called.
-         * The generic solution is to have an output buffer for each effect and pass it as
-         * input to the next.
-         */
-        for (i = 0; i < in->num_preprocessors; i++) {
-            (*in->preprocessors[i].effect_itfe)->process(in->preprocessors[i].effect_itfe,
-                                               &in_buf,
-                                               &out_buf);
-        }
-
-        /* process() has updated the number of frames consumed and produced in
-         * in_buf.frameCount and out_buf.frameCount respectively
-         * move remaining frames to the beginning of in->proc_buf_in */
-        in->proc_buf_frames -= in_buf.frameCount;
-
-        if (in->proc_buf_frames) {
-            memcpy(in->proc_buf_in,
-                   in->proc_buf_in + in_buf.frameCount * in->pcm_config->channels,
-                   in->proc_buf_frames * in->pcm_config->channels * sizeof(int16_t));
-        }
-
-        /* if not enough frames were passed to process(), read more and retry. */
-        if (out_buf.frameCount == 0) {
-            ALOGW("No frames produced by preproc");
-            continue;
-        }
-
-        if ((frames_wr + (ssize_t)out_buf.frameCount) <= frames) {
-            frames_wr += out_buf.frameCount;
-        } else {
-            /* The effect does not comply to the API. In theory, we should never end up here! */
-            ALOGE("preprocessing produced too many frames: %d + %d  > %d !",
-                  (unsigned int)frames_wr, out_buf.frameCount, (unsigned int)frames);
-            frames_wr = frames;
-        }
-    }
-
-    /* Remove aux_channels that have been added on top of main_channels
-     * Assumption is made that the channels are interleaved and that the main
-     * channels are first. */
-    // if (has_aux_channels)
-    // {
-    //     size_t src_channels = in->pcm_config->channels;
-    //     size_t dst_channels = popcount(in->main_channels);
-    //     int16_t* src_buffer = (int16_t *)proc_buf_out;
-    //     int16_t* dst_buffer = (int16_t *)buffer;
-
-    //     if (dst_channels == 1) {
-    //         for (i = frames_wr; i > 0; i--)
-    //         {
-    //             *dst_buffer++ = *src_buffer;
-    //             src_buffer += src_channels;
-    //         }
-    //     } else {
-    //         for (i = frames_wr; i > 0; i--)
-    //         {
-    //             memcpy(dst_buffer, src_buffer, dst_channels*sizeof(int16_t));
-    //             dst_buffer += dst_channels;
-    //             src_buffer += src_channels;
-    //         }
-    //     }
-    // }
-
     return frames_wr;
 }
 
@@ -1214,8 +1086,6 @@ static char * out_get_parameters(const struct audio_stream *stream, const char *
 
 static uint32_t out_get_latency(const struct audio_stream_out *stream)
 {
-    struct stream_out *out = (struct stream_out *)stream;
-    struct audio_device *adev = out->dev;
     size_t period_count;
 
     period_count = OUT_LONG_PERIOD_COUNT;
@@ -1270,7 +1140,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
      */
     out_lock(out);
     if (out->standby) {
-        ALOGD("out_write(): pcm playback is exiting standby %x.", out);
+        ALOGD("out_write(): pcm playback is exiting standby %x.", (unsigned int)out);
         adev_lock(adev);
 
         struct stream_in* in = adev->active_in;
@@ -1407,7 +1277,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
 
     /* Reduce number of channels, if necessary */
     if (audio_channel_count_from_out_mask(out_get_channels(&stream->common)) >
-                 (int)out->pcm_config->channels) {
+                out->pcm_config->channels) {
         unsigned int i;
 
         /* Discard right channel */
@@ -1509,7 +1379,7 @@ exit:
     out_unlock(out);
 
     if (ret != 0) {
-        usleep(bytes * 1000000 / audio_stream_out_frame_size(&stream->common) /
+        usleep(bytes * 1000000 / audio_stream_out_frame_size(stream) /
                out_get_sample_rate(&stream->common));
     }
 
@@ -1848,9 +1718,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
     if (ret < 0)
         goto exit;
 
-    /*if (in->num_preprocessors != 0) {
-        ret = process_frames(in, buffer, frames_rq);
-    } else */if (in->resampler != NULL) {
+    if (in->resampler != NULL) {
         ret = read_frames(in, buffer, frames_rq);
     } else if (in->pcm_config->channels == 2) {
         /*
@@ -2136,7 +2004,8 @@ static int adev_open_output_stream(struct audio_hw_device *dev,
         config->channel_mask = AUDIO_CHANNEL_OUT_STEREO;
         config->sample_rate = 44100;
         ALOGE("adev_open_output_stream(): Error invalid channel mask. Requesting stereo output.");
-        return -EINVAL;
+        ret = -EINVAL;
+        goto err_open;
     }
 
     out->stream.common.get_sample_rate = out_get_sample_rate;
@@ -2222,7 +2091,6 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
 {
     struct audio_device *adev = (struct audio_device *)dev;
     struct str_parms *parms;
-    char *str;
     char value[32];
     int ret;
 
@@ -2311,7 +2179,6 @@ static int adev_set_master_volume(struct audio_hw_device *dev, float volume)
     return -1;
 }
 
-#ifndef ICS_AUDIO_BLOB
 static int adev_get_master_volume(struct audio_hw_device *dev, float *volume)
 {
     return -ENOSYS;
@@ -2326,8 +2193,6 @@ static int adev_get_master_mute(struct audio_hw_device *dev, bool *muted)
 {
     return -ENOSYS;
 }
-
-#endif
 
 static int adev_set_mode(struct audio_hw_device *dev, audio_mode_t mode)
 {
@@ -2515,7 +2380,6 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
 {
     struct audio_device *adev = (struct audio_device *)dev;
     struct stream_in *in;
-    int ret;
 
     ALOGD("adev_open_input_stream()");
 
@@ -2567,7 +2431,6 @@ static void adev_close_input_stream(struct audio_hw_device *dev,
                                    struct audio_stream_in *stream)
 {
     struct audio_device *adev = (struct audio_device *)dev;
-    struct stream_in *in = (struct stream_in *)stream;
 
     ALOGD("adev_close_input_stream()");
 
@@ -2575,7 +2438,7 @@ static void adev_close_input_stream(struct audio_hw_device *dev,
 
     adev_lock(adev);
     free(stream);
-    ALOGD("adev_close_input_stream() done %x", adev->active_in);
+    ALOGD("adev_close_input_stream() done %x", (unsigned int)adev->active_in);
     adev->active_in = NULL;
     adev_unlock(adev);
 }
@@ -2588,8 +2451,6 @@ static int adev_dump(const audio_hw_device_t *device, int fd)
 
 static int adev_close(hw_device_t *device)
 {
-    struct audio_device *adev = (struct audio_device *)device;
-
     ALOGD("adev_close()");
 
     // audio_route_free(adev->ar);
@@ -2603,7 +2464,6 @@ static int adev_open(const hw_module_t* module, const char* name,
                      hw_device_t** device)
 {
     struct audio_device *adev;
-    int ret;
 
     if (strcmp(name, AUDIO_HARDWARE_INTERFACE) != 0)
         return -EINVAL;
@@ -2620,6 +2480,9 @@ static int adev_open(const hw_module_t* module, const char* name,
     adev->hw_device.init_check = adev_init_check;
     adev->hw_device.set_voice_volume = adev_set_voice_volume;
     adev->hw_device.set_master_volume = adev_set_master_volume;
+    adev->hw_device.get_master_volume = adev_get_master_volume;
+    adev->hw_device.set_master_mute = adev_set_master_mute;
+    adev->hw_device.get_master_mute = adev_get_master_mute;
     adev->hw_device.set_mode = adev_set_mode;
     adev->hw_device.set_mic_mute = adev_set_mic_mute;
     adev->hw_device.get_mic_mute = adev_get_mic_mute;

@@ -14,9 +14,11 @@ LOCAL_C_INCLUDES += \
 	$(call include-path-for, audio-effects)
 LOCAL_SHARED_LIBRARIES := liblog libcutils libtinyalsa libaudioutils libaudioroute
 LOCAL_MODULE_TAGS := optional
+LOCAL_CFLAGS += -Werror -Wall
 LOCAL_CFLAGS += -Wno-unused-parameter
-LOCAL_CFLAGS += -g
 LOCAL_LDFLAGS += -ldl
+
+LOCAL_CLANG := true
 
 include $(BUILD_SHARED_LIBRARY)
 
