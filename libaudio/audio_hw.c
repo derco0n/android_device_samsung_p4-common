@@ -1582,16 +1582,10 @@ static int out_get_presentation_position(const struct audio_stream_out *stream,
     out_lock(out);
     out->sleep_req = false;
 
-    if (out->standby) {
-        ALOGV("out_get_presentation_position() out stream is in standby.");
-        out_unlock(out);
-        return -ENOSYS;
-    }
-
     if (out->pcm == NULL) {
         ALOGV("out_get_presentation_position() out->pcm is NULL");
         out_unlock(out);
-        return -ENOSYS;
+        return ret;
     }
 
     size_t avail;
