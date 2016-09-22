@@ -106,11 +106,6 @@ PRODUCT_PACKAGES += \
     camera.tegra
 
 # Audio
-# PRODUCT_PACKAGES += \
-#    audio.a2dp.default \
-#    audio.usb.default \
-#    libaudioutils \
-#    libtinyalsa
 PRODUCT_PACKAGES += \
     audio.primary.tegra \
     audio.a2dp.default \
