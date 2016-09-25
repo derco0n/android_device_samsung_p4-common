@@ -18,8 +18,8 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libbinder_shim
 LOCAL_SHARED_LIBRARIES := libbinder liblog libcutils libutils
 
-LOCAL_CLANG := false
-# LOCAL_SANITIZE := integer
+LOCAL_CLANG := true
+LOCAL_SANITIZE := integer
 LOCAL_SRC_FILES := \
     MemoryDealer.cpp \
 
