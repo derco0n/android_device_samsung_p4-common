@@ -2464,6 +2464,7 @@ static int adev_open(const hw_module_t* module, const char* name,
                      hw_device_t** device)
 {
     struct audio_device *adev;
+    struct mixer* mixer;
 
     if (strcmp(name, AUDIO_HARDWARE_INTERFACE) != 0)
         return -EINVAL;
@@ -2508,6 +2509,10 @@ static int adev_open(const hw_module_t* module, const char* name,
     /* RIL */
     loadRILD();
     adev->voice_volume = 1.0f;
+
+    mixer = open_mixer();
+    select_devices(adev, mixer);
+    close_mixer(mixer);
 
     ALOGD("adev_open: done");
 
