@@ -31,7 +31,7 @@ OMXPluginBase *createOMXPlugin() {
 }
 
 NVOMXPlugin::NVOMXPlugin()
-    : mLibHandle(dlopen("/system/lib/libnvomx.so", RTLD_NOW)),
+    : mLibHandle(dlopen("libnvomx.so", RTLD_NOW)),
       mInit(NULL),
       mDeinit(NULL),
       mComponentNameEnum(NULL),
