@@ -2,6 +2,7 @@
 /dev/tegra_camera                 u:object_r:camera_device:s0
 /dev/s5k5ccgx                     u:object_r:camera_device:s0
 /dev/s5k5bbgx                     u:object_r:camera_device:s0
+/dev/nvhost-vi                    u:object_r:camera_device:s0
 /dev/nvhost.*                     u:object_r:nvhost_device:s0
 /dev/nvhost-ctrl                  u:object_r:gpu_device:s0
 /dev/nvhost-gr2d                  u:object_r:gpu_device:s0
@@ -20,6 +21,9 @@
 
 /sys/devices/tegradc\.0(/.*)?                u:object_r:sysfs_devices_tegradc:s0
 /sys/devices/tegradc\.1(/.*)?                u:object_r:sysfs_devices_tegradc:s0
+/sys/devices/host1x/syncpt/22/max            u:object_r:sysfs_devices_tegradc:s0
+/sys/module/fuse/parameters/tegra_chip_id    u:object_r:sysfs_devices_tegradc:s0
+/sys/module/fuse/parameters/tegra_chip_rev   u:object_r:sysfs_devices_tegradc:s0
 /sys/devices/platform/tegra-i2c.1/i2c-1/1-0010/update_fw    u:object_r:sysfs_firmware_writable:s0
 
 /efs/wifi/.mac.info                 u:object_r:wifi_efs_file:s0

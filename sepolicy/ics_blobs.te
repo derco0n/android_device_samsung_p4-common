@@ -1,0 +1,35 @@
+allow {
+	system_server
+	system_app
+	platform_app
+	priv_app
+	untrusted_app
+	bootanim
+	cameraserver
+	debuggerd
+	mediacodec
+	mediaserver
+	surfaceflinger
+} ics_blob_file:file { getattr open read execute execmod };
+
+allow {
+	audioserver
+} ics_audio_blob_file:file { getattr open read execute execmod };
+
+allow {
+	cameraserver
+} ics_camera_blob_file:file { getattr open read execute execmod };
+
+allow {
+	system_app
+	platform_app
+	priv_app
+	untrusted_app
+	bootanim
+	cameraserver
+	mediacodec
+	mediaserver
+	system_server
+} sysfs_devices_tegradc:file { getattr open read };
+
+allow { cameraserver } { camera_device gpu_device nvhost_device }:chr_file { open read write ioctl };
