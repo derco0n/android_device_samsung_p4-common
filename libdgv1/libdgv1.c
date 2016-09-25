@@ -46,7 +46,7 @@ NvError NvOsLibraryLoad(const char *name, struct NvOsLibraryHandle *library);
 
 NvError dmitrygr_libldr(const char *name, struct NvOsLibraryHandle *library)
 {
-    static const char *prepend = "/system/lib/";
+    static const char *prepend = "/system/vendor/lib/";
     char *path;
     NvError err;
 
