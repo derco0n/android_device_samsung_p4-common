@@ -8,7 +8,7 @@ on early-init
 
 on init
 
-    export LD_SHIM_LIBS /system/vendor/lib/libnvomxadaptor.so|libgui_shim.so:/system/vendor/lib/libnvomxadaptor.so|libbinder_shim.so:/system/vendor/lib/libnvwinsys.so|libgui_shim.so:/system/vendor/lib/hw/audio.primary_vendor.tegra.so|libutils_shim.so::/system/vendor/lib/hw/camera.vendor.tegra.so|libutils_shim.so
+    export LD_SHIM_LIBS /system/vendor/lib/libnvwinsys.so|libgui_shim.so:/system/vendor/lib/hw/audio.primary_vendor.tegra.so|libutils_shim.so::/system/vendor/lib/hw/camera.vendor.tegra.so|libutils_shim.so
 
     # Support legacy paths
     symlink /sdcard /storage/sdcard0
