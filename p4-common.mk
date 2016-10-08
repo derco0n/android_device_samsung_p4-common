@@ -166,7 +166,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libdgv1 \
     libgui_shim \
-    libbinder_shim \
     libutils_shim
 
 DEVICE_PACKAGE_OVERLAYS := \
