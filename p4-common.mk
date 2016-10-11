@@ -54,7 +54,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
     dalvik.vm.dex2oat-flags=--compiler-backend=Quick \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
-    persist.sys.media.legacy-drm=true
+    persist.sys.media.legacy-drm=true \
+    media.stagefright.legacyencoder=true
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.debug.multi_window=true
