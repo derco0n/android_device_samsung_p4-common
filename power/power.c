@@ -67,6 +67,9 @@ int sysfs_read(const char *path, char *buf, size_t size)
 
 	close(fd);
 
+    if (len >= 0 && len < size)
+        memset(buf+len, 0, size - len);
+
 	return len;
 }
 
