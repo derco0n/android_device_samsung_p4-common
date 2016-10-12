@@ -114,6 +114,10 @@ static void store_max_freq(char* max_freq)
 
 static void p3_power_init( __attribute__((unused)) struct power_module *module)
 {
+
+    store_max_freq(scaling_max_freq);
+    ALOGI("%s: stored scaling_max_freq = %s", __FUNCTION__, scaling_max_freq);
+
     /*
      * cpufreq interactive governor: timer 20ms, min sample 30ms.
      */
