@@ -34,18 +34,32 @@
 #include <camera/Camera.h>
 #include <camera/CameraParameters.h>
 
+// Back facing camera
+#define CAM_ID_S5K5CCGX 0
+
+// Front facing camera
+#define CAM_ID_S5K5BBGX 1
+
 #define CAMERA_FLASH "/sys/devices/virtual/sec/sec_s5k5ccgx/cameraflash"
 
 static android::Mutex gCameraWrapperLock;
 static camera_module_t *gVendorModule = 0;
 
 static char *currentVideoSize = NULL;
+static int frameworkWidth = -1;
+static int frameworkHeight = -1;
+
+static int front_preview_fps = -1;
+
 
 static int camera_device_open(const hw_module_t *module, const char *name,
                 hw_device_t **device);
 static int camera_get_number_of_cameras(void);
 static int camera_get_camera_info(int camera_id, struct camera_info *info);
 static int camera_preview_enabled(struct camera_device *device);
+
+static int camera_start_preview(struct camera_device *device);
+static void camera_stop_preview(struct camera_device *device);
 
 static struct hw_module_methods_t camera_module_methods = {
     open: camera_device_open
@@ -106,6 +120,43 @@ static char *camera_fixup_getparams(int id, const char *settings)
     params.unflatten(android::String8(settings));
 
     // fix params here
+    const char* supportedPreviewSizes = params.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_SIZES);
+    const char* previewSize = params.get(android::CameraParameters::KEY_PREVIEW_SIZE);
+    const char* supportedVideoSizes = params.get(android::CameraParameters::KEY_SUPPORTED_VIDEO_SIZES);
+    const char* videoSize = params.get(android::CameraParameters::KEY_VIDEO_SIZE);
+
+    ALOGD("%s: supportedPreviewSizes [%s]", __FUNCTION__, supportedPreviewSizes);
+    ALOGD("%s: previewSizes [%s]", __FUNCTION__, previewSize);
+    ALOGD("%s: supportedVideoSizes [%s]", __FUNCTION__, supportedVideoSizes);
+    ALOGD("%s: videoSize [%s]", __FUNCTION__, videoSize);
+
+    if (id == CAM_ID_S5K5CCGX) {
+        if (frameworkWidth != -1 && frameworkHeight != -1) {
+            params.setVideoSize(frameworkWidth, frameworkHeight);
+
+            videoSize = params.get(android::CameraParameters::KEY_VIDEO_SIZE);
+            ALOGD("%s: Returning framework requested videoSize [%s]", __FUNCTION__, videoSize);
+        }
+    }
+
+    if (id == CAM_ID_S5K5BBGX) {
+        // Fix supported frame rates
+        const char* supportedFrameRates =
+                params.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES);
+        ALOGD("%s: supportedFrameRates [%s]", __FUNCTION__, supportedFrameRates);
+
+        // Fix supported video sizees
+        params.set(android::CameraParameters::KEY_SUPPORTED_VIDEO_SIZES, "640x480,800x600");
+        supportedVideoSizes =
+                params.get(android::CameraParameters::KEY_SUPPORTED_VIDEO_SIZES);
+        ALOGD("%s: Fixed up: supportedVideoSizes [%s]", __FUNCTION__, supportedVideoSizes);
+    }
+
+    if (id == CAM_ID_S5K5BBGX && front_preview_fps != -1) {
+        params.setPreviewFrameRate(front_preview_fps);
+        ALOGD("%s: Returning framework requested PreviewFrameRate [%d]",
+            __FUNCTION__, front_preview_fps);
+    }
 
     android::String8 strParams = params.flatten();
     char *ret = strdup(strParams.string());
@@ -120,6 +171,27 @@ static char *camera_fixup_setparams(int id, const char *settings, struct camera_
     params.unflatten(android::String8(settings));
 
     // fix params here
+    const char* supportedPreviewSizes = params.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_SIZES);
+    const char* previewSize = params.get(android::CameraParameters::KEY_PREVIEW_SIZE);
+    const char* supportedVideoSizes = params.get(android::CameraParameters::KEY_SUPPORTED_VIDEO_SIZES);
+    const char* videoSize = params.get(android::CameraParameters::KEY_VIDEO_SIZE);
+
+    ALOGD("%s: supportedPreviewSizes [%s]", __FUNCTION__, supportedPreviewSizes);
+    ALOGD("%s: previewSizes [%s]", __FUNCTION__, previewSize);
+    ALOGD("%s: supportedVideoSizes [%s]", __FUNCTION__, supportedVideoSizes);
+    ALOGD("%s: videoSize [%s]", __FUNCTION__, videoSize);
+
+    if (id == CAM_ID_S5K5CCGX) {
+        params.getVideoSize(&frameworkWidth, &frameworkHeight);
+        ALOGD("%s: Save framework configured videoSize [%dx%d]",
+            __FUNCTION__, frameworkWidth, frameworkHeight);
+    }
+
+    if (id == CAM_ID_S5K5BBGX) {
+        front_preview_fps = params.getPreviewFrameRate();
+        ALOGD("%s: Save framework configured PreviewFrameRate [%d]",
+            __FUNCTION__, front_preview_fps);
+    }
 
     // Toggle flashlight based on flash-mode
     if (params.get("flash-mode")) {
@@ -270,7 +342,6 @@ static void camera_stop_recording(struct camera_device *device)
 
     if (!device)
         return;
-
     VENDOR_CALL(device, stop_recording);
 }
 
