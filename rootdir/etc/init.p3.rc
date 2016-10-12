@@ -224,8 +224,14 @@ on boot
     write /sys/module/cpuidle/parameters/lp2_in_idle 1
 
 # Interactive governor settings
+    chown system system /sys/devices/system/cpu/cpufreq/interactive/timer_rate
+    chown system system /sys/devices/system/cpu/cpufreq/interactive/min_sample_time
     chown system system /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load
+    chown system system /sys/devices/system/cpu/cpufreq/interactive/boostpulse
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/timer_rate
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/min_sample_time
     chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load
+    chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/boostpulse
 
 # Interactive (initial) setup
     write /sys/devices/system/cpu/cpufreq/interactive/boost_factor 2
