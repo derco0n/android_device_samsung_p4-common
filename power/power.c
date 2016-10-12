@@ -20,7 +20,7 @@
 #include <fcntl.h>
 #include <stdbool.h>
 
-#define LOG_TAG "P3 PowerHAL"
+#define LOG_TAG "P3PowerHAL"
 #include <utils/Log.h>
 
 #include <hardware/hardware.h>
