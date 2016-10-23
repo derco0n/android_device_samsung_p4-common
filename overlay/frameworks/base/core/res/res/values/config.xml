@@ -220,4 +220,6 @@
          audio routing, FORCE_BT_DESK_DOCK, with an analog dock, FORCE_ANALOG_DOCK. -->
     <!-- <bool name="config_forceAnalogDeskDock">true</bool> -->
 
+    <bool name="config_freeformWindowManagement">true</bool>
+
 </resources>
