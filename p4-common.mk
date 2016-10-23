@@ -57,9 +57,6 @@ PRODUCT_PROPERTY_OVERRIDES := \
     persist.sys.media.legacy-drm=true \
     media.stagefright.legacyencoder=true
 
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.debug.multi_window=true
-
 # Storage
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.sys.sdcardfs=true
