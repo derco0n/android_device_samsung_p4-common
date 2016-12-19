@@ -1,19 +1,39 @@
 
 EXTRA_FILES := \
 	adbd \
-	e2fsck \
-	mke2fs \
-	pigz \
-	tune2fs \
-	recovery \
-	mkfs.f2fs \
+	bu \
 	busybox \
-	linker \
+	e2fsck \
+	fatlabel \
 	fsck.f2fs \
+	fsck.fat \
+	linker \
+	libbase.so \
+	libblkid.so \
 	libcrypto.so \
+	libext2_e2p.so \
+	libext2fs.so \
+	libext4_utils.so \
+	libf2fs.so \
 	libft2.so \
+	libm.so \
+	libminuitwrp.so \
+	libminzip.so \
+	libmtdutils.so \
 	libpng.so \
-	libminuitwrp.so
+	libsparse.so \
+	libtar.so \
+	libtwrpmtp.so \
+	make_ext4fs \
+	mke2fs \
+	mkfs.f2fs \
+	mkfs.fat \
+	pigz \
+	recovery \
+	resize2fs \
+	simg2img \
+	tune2fs \
+	unpigz \
 
 EXTRA_TMP := extra_tmp
 # Needs to be actual working path on the device
