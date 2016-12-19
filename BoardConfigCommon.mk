@@ -40,9 +40,9 @@ BOARD_NEEDS_OLD_HWC_API := true
 # Lollipop
 TARGET_32_BIT_SURFACEFLINGER := true
 MALLOC_IMPL := dlmalloc
+MALLOC_SVELTE := true
 BOARD_USES_LEGACY_MMAP := true
 BOARD_HAVE_SAMSUNG_T20_HWCOMPOSER := true
-COMMON_GLOBAL_CFLAGS += -DADD_LEGACY_ACQUIRE_BUFFER_SYMBOL
 TARGET_ENABLE_NON_PIE_SUPPORT := true
 
 OTA_EXTRA_OPTIONS := -r
@@ -59,9 +59,6 @@ CHARGING_ENABLED_PATH :=  "/sys/class/power_supply/battery/charging_mode_booting
 
 # Optimization hwui
 HWUI_COMPILE_FOR_PERF := true
-
-# Flash compatibility
-COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
 
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
@@ -114,13 +111,7 @@ ENABLE_WEBGL := true
 BOARD_HAVE_PRE_KITKAT_AUDIO_BLOB := true
 BOARD_HAVE_PRE_KITKAT_AUDIO_POLICY_BLOB := true
 # ICS audio
-# COMMON_GLOBAL_CFLAGS += -DICS_AUDIO_BLOB
-# COMMON_GLOBAL_CFLAGS += -DAUDIO_LEGACY_HACK
 # USE_LEGACY_AUDIO_POLICY := 1
-
-# skia SIGILL bootloop fix
-COMMON_GLOBAL_CFLAGS += -DOLD_TEGRA
-
 
 # Indicate that the board has an Internal SD Card
 BOARD_HAS_SDCARD_INTERNAL := true
@@ -180,8 +171,10 @@ BOARD_SUPPRESS_EMMC_WIPE := true
 # TARGET_TOOLS_PREFIX := $(TARGET_TOOLCHAIN_ROOT)/bin/arm-linux-gnueabi-
 
 # Kernel toolchain
-TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.7
+# TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.6
 # TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-cortex-linux-gnueabi-linaro_4.9.3-2015.03
+
+KERNEL_TOOLCHAIN := /home/r/twrp/prebuilts/gcc/linux-x86/arm/arm-eabi-4.6/bin
 
 # Add backup-tool.sh to install script
 BACKUP_TOOL := true
