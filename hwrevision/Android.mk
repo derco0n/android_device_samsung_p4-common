@@ -26,6 +26,5 @@ LOCAL_STATIC_LIBRARIES := libinit
 
 LOCAL_MODULE := hwrevision
 LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT)/sbin
 
 include $(BUILD_EXECUTABLE)
