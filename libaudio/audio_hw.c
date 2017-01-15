@@ -227,6 +227,8 @@ struct stream_in {
     bool sleep_req;
     int lock_cnt;
 
+    int64_t frames_read; /* total frames read, not cleared when entering standby */
+
     struct audio_device *dev;
 
     int64_t last_read_time_us;
@@ -806,7 +808,7 @@ static int start_input_stream(struct stream_in *in)
 
     ALOGD("start_input_stream()");
 
-    in->pcm = pcm_open(PCM_CARD, PCM_DEVICE, PCM_IN, in->pcm_config);
+    in->pcm = pcm_open(PCM_CARD, PCM_DEVICE, PCM_IN | PCM_MONOTONIC, in->pcm_config);
 
     if (in->pcm && !pcm_is_ready(in->pcm)) {
         ALOGE("pcm_open(in) failed: %s", pcm_get_error(in->pcm));
@@ -1800,6 +1802,8 @@ exit:
         // On the subsequent in_read(), we measure the elapsed time spent in
         // the recording thread. This is subtracted from the sleep estimate based on frames,
         // thereby accounting for fill in the alsa buffer during the interim.
+    } else {
+        in->frames_read += bytes / audio_stream_in_frame_size(stream);
     }
 
 
@@ -1965,6 +1969,29 @@ exit:
     adev_unlock(in->dev);
     in_unlock(in);
     return status;
+}
+
+static int in_get_capture_position(const struct audio_stream_in *stream,
+                                   int64_t *frames, int64_t *time)
+{
+    if (stream == NULL || frames == NULL || time == NULL) {
+        return -EINVAL;
+    }
+    struct stream_in *in = (struct stream_in *)stream;
+    int ret = -ENOSYS;
+
+    in_lock(in);
+    if (in->pcm) {
+        struct timespec timestamp;
+        unsigned int avail;
+        if (pcm_get_htimestamp(in->pcm, &avail, &timestamp) == 0) {
+            *frames = in->frames_read + avail;
+            *time = timestamp.tv_sec * 1000000000LL + timestamp.tv_nsec;
+            ret = 0;
+        }
+    }
+    in_unlock(in);
+    return ret;
 }
 
 static int in_remove_audio_effect(const struct audio_stream *stream, effect_handle_t effect)
@@ -2464,6 +2491,7 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
     in->stream.set_gain = in_set_gain;
     in->stream.read = in_read;
     in->stream.get_input_frames_lost = in_get_input_frames_lost;
+    in->stream.get_capture_position = in_get_capture_position;
 
     in->dev = adev;
     in->standby = true;
@@ -2471,6 +2499,7 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
     /* default PCM config */
     in->pcm_config = (config->sample_rate == IN_SAMPLING_RATE) && (flags & AUDIO_INPUT_FLAG_FAST) ?
             &pcm_config_in_low_latency : &pcm_config_in;
+    // in->frames_read = 0;
 
     ALOGD("adev_open_input_stream() done");
 
