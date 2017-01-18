@@ -57,6 +57,9 @@
 #define likely(x)       __builtin_expect(!!(x), 1)
 #define unlikely(x)     __builtin_expect(!!(x), 0)
 
+#define SYSTEM_HAL_PATH "/system/lib/hw/hwcomposer.tegra_v0.so"
+#define VENDOR_HAL_PATH "/system/vendor/lib/hw/hwcomposer.tegra_v0.so"
+
 // Get the original hw composer
 static hwc_module_t* get_hwc(void)
 {
@@ -67,10 +70,16 @@ static hwc_module_t* get_hwc(void)
         void* handle;
         ALOGI("Resolving original HWC module...");
 
-        handle = dlopen("/system/lib/hw/hwcomposer.tegra_v0.so",RTLD_LAZY);
+        handle = dlopen(SYSTEM_HAL_PATH,RTLD_LAZY);
         if(!handle) {
-            ALOGE("Unable to load original hwc module");
-            return NULL;
+            ALOGW("Unable to load original hwc module @ " SYSTEM_HAL_PATH);
+            ALOGW("Fallback to " VENDOR_HAL_PATH);
+
+            handle = dlopen(VENDOR_HAL_PATH,RTLD_LAZY);
+            if(!handle) {
+                ALOGE("Unable to load original hwc module @ " VENDOR_HAL_PATH);
+                return NULL;
+            }
         }
 
         orghwc = (hwc_module_t*) dlsym(handle,HAL_MODULE_INFO_SYM_AS_STR);
