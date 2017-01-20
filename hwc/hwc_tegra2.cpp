@@ -52,6 +52,8 @@
 #include <utils/String8.h>
 #include <utils/Vector.h>
 
+#include <EGL/egl.h>
+
 #include "hwcomposer_v0.h"
 
 #define likely(x)       __builtin_expect(!!(x), 1)
@@ -220,7 +222,7 @@ static int tegra2_set(struct hwc_composer_device_1 *dev,
     if (!contents || !contents->numHwLayers)
         return 0;
 
-    if (!contents->dpy || !contents->sur)
+    if (contents->dpy == EGL_NO_DISPLAY || contents->sur == EGL_NO_SURFACE)
         return 0;
 
     // If blanking, make gralloc handle everything to aovid crashes
