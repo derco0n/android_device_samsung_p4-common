@@ -194,6 +194,8 @@ TARGET_RECOVERY_FSTAB := device/samsung/p4-common/recovery/fstab.p3
 
 ### TWRP
 
+TW_DEVICE_VERSION := 20170120-BIGPART
+
 BOARD_CUSTOM_BOOTIMG_MK := device/samsung/p4-common/recovery/mkbootimg.mk
 
 # custom recovery ui
