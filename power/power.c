@@ -198,11 +198,11 @@ static void boost_on(struct p3_power_module *p3, void *data)
     }
 
     boost_req_on = data != NULL;
-    ALOGD("%s: boost_req_on = %d\n", __FUNCTION__, boost_req_on);
+    ALOGV("%s: boost_req_on = %d\n", __FUNCTION__, boost_req_on);
 
     ret = strtol(buf, &endptr, 10);
     boost_mode = ret != 0;
-    ALOGD("%s: boost_mode = %d\n", __FUNCTION__, boost_mode);
+    ALOGV("%s: boost_mode = %d\n", __FUNCTION__, boost_mode);
 
     if (boost_req_on && !boost_mode)
         res = write(p3->boost_fd, "1", 1);
@@ -303,7 +303,7 @@ static void p3_power_hint(struct power_module *module, power_hint_t hint,
         break;
 
     case POWER_HINT_LAUNCH:
-        ALOGD("POWER_HINT_LAUNCH\n");
+        ALOGV("POWER_HINT_LAUNCH\n");
         boost_on(p3, data);
         break;
     default:
