@@ -37,7 +37,7 @@
 #define LOW_POWER_MIN_FREQ "150000"
 #define NORMAL_MAX_FREQ "1000000"
 
-#define MAX_BUF_SZ	10
+#define MAX_BUF_SZ  10
 
 /* initialize to something safe */
 static char screen_off_max_freq[MAX_BUF_SZ] = "456000";
@@ -55,22 +55,22 @@ struct p3_power_module {
 
 int sysfs_read(const char *path, char *buf, size_t size)
 {
-	int fd, len;
+    int fd, len;
 
-	fd = open(path, O_RDONLY);
-	if (fd < 0)
-		return -1;
+    fd = open(path, O_RDONLY);
+    if (fd < 0)
+        return -1;
 
-	do {
-		len = read(fd, buf, size);
-	} while (len < 0 && errno == EINTR);
+    do {
+        len = read(fd, buf, size);
+    } while (len < 0 && errno == EINTR);
 
-	close(fd);
+    close(fd);
 
     if (len >= 0 && len < size)
         memset(buf+len, 0, size - len);
 
-	return len;
+    return len;
 }
 
 static int sysfs_write(char *path, char *s)
