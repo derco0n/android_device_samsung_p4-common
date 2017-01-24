@@ -164,6 +164,16 @@ static int boost_open(struct p3_power_module *p3)
     return p3->boost_fd;
 }
 
+static void boost_close(struct p3_power_module *p3)
+{
+    pthread_mutex_lock(&p3->lock);
+    if (p3->boost_fd >= 0) {
+        close(p3->boost_fd);
+        p3->boost_fd = -1;
+    }
+    pthread_mutex_unlock(&p3->lock);
+}
+
 static void boost_on(struct p3_power_module *p3, void *data)
 {
     int boost_req_on;
@@ -174,7 +184,8 @@ static void boost_on(struct p3_power_module *p3, void *data)
     long ret;
 
     if (boost_open(p3) < 0){
-        ALOGE("%s: Error opening %s\n", __FUNCTION__, BOOST_PATH);
+        if (!p3->boost_warned)
+            ALOGE("%s: Error opening %s\n", __FUNCTION__, BOOST_PATH);
         return;
     }
 
@@ -182,6 +193,7 @@ static void boost_on(struct p3_power_module *p3, void *data)
     if (res == -1) {
         strerror_r(errno, buf, sizeof(buf));
         ALOGE("%s: Error reading %s: %s\n", __FUNCTION__, BOOST_PATH, buf);
+        boost_close(p3);
         return;
     }
 
@@ -199,7 +211,8 @@ static void boost_on(struct p3_power_module *p3, void *data)
 
     if (res < 0) {
         strerror_r(errno, buf, sizeof(buf));
-        ALOGE("%s: Error writing to %s: %s\n", __FUNCTION__, BOOSTPULSE_PATH, buf);
+        ALOGE("%s: Error writing to %s: %s\n", __FUNCTION__, BOOST_PATH, buf);
+        boost_close(p3);
         return;
     }
 
