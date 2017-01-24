@@ -33,6 +33,7 @@
 #define CPUFREQ_INTERACTIVE "/sys/devices/system/cpu/cpufreq/interactive/"
 #define BOOST_PATH      "/sys/devices/system/cpu/cpufreq/interactive/boost"
 #define BOOSTPULSE_PATH "/sys/devices/system/cpu/cpufreq/interactive/boostpulse"
+#define BOOST_DURATION_PATH "/sys/devices/system/cpu/cpufreq/interactive/boostpulse_duration"
 // #define HISPEED_FREQ "/sys/devices/system/cpu/cpufreq/interactive/hispeed_freq"
 
 #define LOW_POWER_MAX_FREQ "456000"
@@ -55,6 +56,8 @@ struct p3_power_module {
     int boost_warned;
     int boostpulse_fd;
     int boostpulse_warned;
+    uint32_t pulse_duration;
+    struct timespec last_boost_time; /* latest POWER_HINT_INTERACTION boost */
 };
 
 int sysfs_read(const char *path, char *buf, ssize_t size)
@@ -142,6 +145,16 @@ static int boostpulse_open(struct p3_power_module *p3)
     return p3->boostpulse_fd;
 }
 
+static void boostpulse_close(struct p3_power_module *p3)
+{
+    pthread_mutex_lock(&p3->lock);
+    if (p3->boostpulse_fd >= 0) {
+        close(p3->boostpulse_fd);
+        p3->boostpulse_fd = -1;
+    }
+    pthread_mutex_unlock(&p3->lock);
+}
+
 static int boost_open(struct p3_power_module *p3)
 {
     char buf[80];
@@ -220,8 +233,59 @@ static void boost_on(struct p3_power_module *p3, void *data)
     // ALOGD("%s: boost = %s\n", __FUNCTION__, buf);
 }
 
+static void timespec_diff(struct timespec *result, struct timespec *start, struct timespec *stop)
+{
+    if ((stop->tv_nsec - start->tv_nsec) < 0) {
+        result->tv_sec = stop->tv_sec - start->tv_sec - 1;
+        result->tv_nsec = stop->tv_nsec - start->tv_nsec + 1000000000;
+    } else {
+        result->tv_sec = stop->tv_sec - start->tv_sec;
+        result->tv_nsec = stop->tv_nsec - start->tv_nsec;
+    }
+
+    return;
+}
+
+static unsigned long timespec_to_us(struct timespec *t) {
+    unsigned long time_in_micros = (1000 * t->tv_sec) + (t->tv_nsec / 1000);
+    return time_in_micros;
+}
+
+static void boostpulse(struct p3_power_module *p3)
+{
+    char buf[80];
+    struct timespec curr_time;
+    struct timespec diff_time;
+    uint64_t diff;
+    int len = 0;
+
+    if (boostpulse_open(p3) < 0) {
+        return;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &curr_time);
+    timespec_diff(&diff_time, &curr_time, &p3->last_boost_time);
+    diff = timespec_to_us(&diff_time);
+
+    if (diff > p3->pulse_duration) {
+        len = write(p3->boostpulse_fd, "1", 1);
+        p3->last_boost_time = curr_time;
+    }
+
+    if (len < 0) {
+        strerror_r(errno, buf, sizeof(buf));
+        if (!p3->boostpulse_warned)
+            ALOGE("Error writing to %s: %s\n", BOOSTPULSE_PATH, buf);
+
+        boostpulse_close(p3);
+    }
+}
+
 static void p3_power_init( __attribute__((unused)) struct power_module *module)
 {
+    struct p3_power_module *p3 =
+            (struct p3_power_module *) module;
+    char boostpulse_duration[32];
 
     store_max_freq(scaling_max_freq);
     ALOGI("%s: stored scaling_max_freq = %s", __FUNCTION__, scaling_max_freq);
@@ -233,6 +297,14 @@ static void p3_power_init( __attribute__((unused)) struct power_module *module)
     sysfs_write(CPUFREQ_INTERACTIVE "timer_rate", "30000");
     sysfs_write(CPUFREQ_INTERACTIVE "min_sample_time", "40000");
     sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
+
+    if (sysfs_read(BOOST_DURATION_PATH, boostpulse_duration, 32) < 0) {
+        /* above should not fail but just in case it does use an arbitrary 80ms value */
+        snprintf(boostpulse_duration, 32, "%d", 80000);
+    }
+    p3->pulse_duration = atoi(boostpulse_duration);
+    /* initialize last_boost_time */
+    clock_gettime(CLOCK_MONOTONIC, &p3->last_boost_time);
 }
 
 static void p3_power_set_interactive( __attribute__((unused)) struct power_module *module, int on)
@@ -265,25 +337,15 @@ static void p3_power_hint(struct power_module *module, power_hint_t hint,
 {
     struct p3_power_module *p3 =
             (struct p3_power_module *) module;
-    char buf[80];
-    int len, cpu, ret;
 
     switch (hint) {
     case POWER_HINT_VSYNC:
         break;
 
-#if 0
     case POWER_HINT_INTERACTION:
-        if (boostpulse_open(p3) >= 0) {
-            len = write(p3->boostpulse_fd, "1", 1);
-
-            if (len < 0) {
-                strerror_r(errno, buf, sizeof(buf));
-                ALOGE("Error writing to %s: %s\n", BOOSTPULSE_PATH, buf);
-            }
-        }
+        boostpulse(p3);
         break;
-#endif
+
     case POWER_HINT_LOW_POWER:
         pthread_mutex_lock(&p3->lock);
         if (data) {
