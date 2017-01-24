@@ -57,9 +57,10 @@ struct p3_power_module {
     int boostpulse_warned;
 };
 
-int sysfs_read(const char *path, char *buf, size_t size)
+int sysfs_read(const char *path, char *buf, ssize_t size)
 {
-    int fd, len;
+    int fd;
+    ssize_t len;
 
     fd = open(path, O_RDONLY);
     if (fd < 0)
@@ -302,24 +303,24 @@ static struct hw_module_methods_t power_module_methods = {
 };
 
 struct p3_power_module HAL_MODULE_INFO_SYM = {
-    base: {
-        common: {
-            tag: HARDWARE_MODULE_TAG,
-            module_api_version: POWER_MODULE_API_VERSION_0_2,
-            hal_api_version: HARDWARE_HAL_API_VERSION,
-            id: POWER_HARDWARE_MODULE_ID,
-            name: "P3 Power HAL",
-            author: "The Android Open Source Project",
-            methods: &power_module_methods,
+    .base = {
+        .common = {
+            .tag = HARDWARE_MODULE_TAG,
+            .module_api_version = POWER_MODULE_API_VERSION_0_2,
+            .hal_api_version = HARDWARE_HAL_API_VERSION,
+            .id = POWER_HARDWARE_MODULE_ID,
+            .name = "P3 Power HAL",
+            .author = "The Android Open Source Project",
+            .methods = &power_module_methods,
         },
-        init: p3_power_init,
-        setInteractive: p3_power_set_interactive,
-        powerHint: p3_power_hint,
+        .init = p3_power_init,
+        .setInteractive = p3_power_set_interactive,
+        .powerHint = p3_power_hint,
     },
 
-    lock: PTHREAD_MUTEX_INITIALIZER,
-    boost_fd: -1,
-    boost_warned: 0,
-    boostpulse_fd: -1,
-    boostpulse_warned: 0,
+    .lock = PTHREAD_MUTEX_INITIALIZER,
+    .boost_fd = -1,
+    .boost_warned = 0,
+    .boostpulse_fd = -1,
+    .boostpulse_warned = 0,
 };
