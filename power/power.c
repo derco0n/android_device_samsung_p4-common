@@ -341,11 +341,11 @@ static void p3_power_hint(struct power_module *module, power_hint_t hint,
     switch (hint) {
     case POWER_HINT_VSYNC:
         break;
-
+#if 0
     case POWER_HINT_INTERACTION:
         boostpulse(p3);
         break;
-
+#endif
     case POWER_HINT_LOW_POWER:
         pthread_mutex_lock(&p3->lock);
         if (data) {
