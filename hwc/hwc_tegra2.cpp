@@ -473,7 +473,7 @@ static int nvhost_get_version(int ctrl_fd)
 }
 #endif
 
-static int nvhost_syncpt_read(int ctrl_fd, int id, unsigned int *syncpt)
+static inline int nvhost_syncpt_read(int ctrl_fd, int id, unsigned int *syncpt)
 {
     struct nvhost_ctrl_syncpt_read_args ra;
     ra.id = id;
@@ -483,7 +483,7 @@ static int nvhost_syncpt_read(int ctrl_fd, int id, unsigned int *syncpt)
     return 0;
 }
 
-static int nvhost_syncpt_wait(int ctrl_fd, int id, int thresh, unsigned int timeout)
+static inline int nvhost_syncpt_wait(int ctrl_fd, int id, int thresh, unsigned int timeout)
 {
     struct nvhost_ctrl_syncpt_wait_args wa;
     wa.id = id;
@@ -493,11 +493,11 @@ static int nvhost_syncpt_wait(int ctrl_fd, int id, int thresh, unsigned int time
 }
 
 /* Wait VSync using NVidia SyncPoints */
-static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev)
+static inline int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev)
 {
     unsigned int syncpt = 0;
-    unsigned long max_wait_us = pdev->time_between_frames_us; // NVHOST_NO_TIMEOUT
-    // unsigned long max_wait_us = 1000000000;
+    // unsigned long max_wait_us = pdev->time_between_frames_us; // NVHOST_NO_TIMEOUT
+    unsigned long max_wait_us = ULONG_MAX;
 
     /* get syncpt threshold */
     if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &syncpt)) {
@@ -545,7 +545,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
         tegra2_wait_vsync(pdev);
 
         // Do the VSYNC call
-        if (likely(pdev->enabled_vsync && !pdev->fbblanked)) {
+        if (pdev->enabled_vsync && likely(!pdev->fbblanked)) {
 
             // Get current time in exactly the same timebase as Choreographer
             struct timespec now;
