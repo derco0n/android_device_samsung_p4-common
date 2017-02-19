@@ -167,7 +167,8 @@ PRODUCT_PACKAGES += \
     libdgv1 \
     libgui_shim \
     libutils_shim \
-    libp4shim
+    libp4shim \
+    libshims_wvm
 
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
