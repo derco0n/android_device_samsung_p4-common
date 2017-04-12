@@ -289,9 +289,9 @@ on boot
     chown gps system /dev/ttyHS0
     chmod 0664 /dev/ttyHS0
     chown gps system /sys/class/sec/gps/pwr_en
-    chmod 0666 /sys/class/sec/gps/pwr_en
+    chmod 0664 /sys/class/sec/gps/pwr_en
     chown gps system /sys/class/sec/gps/nrst
-    chmod 0666 /sys/class/sec/gps/nrst
+    chmod 0664 /sys/class/sec/gps/nrst
 
 on property:sys.boot_completed=1
     write /sys/block/mmcblk0/queue/scheduler bfq
