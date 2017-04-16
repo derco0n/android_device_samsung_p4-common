@@ -77,6 +77,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.root_access=1
 
+# Drop dex2oat pressure after boot at runtime
+PRODUCT_PROPERTY_OVERRIDES += \
+    dalvik.vm.dex2oat-threads=1
+
 PRODUCT_PACKAGES += \
     libwpa_client \
     hostapd \
