@@ -499,8 +499,7 @@ static int nvhost_syncpt_waitex(int ctrl_fd, int id, int thresh, unsigned int ti
 static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev, unsigned int *value)
 {
     unsigned int syncpt = 0;
-    // unsigned long max_wait_us = pdev->time_between_frames_us; // NVHOST_NO_TIMEOUT
-    unsigned long max_wait_us = ULONG_MAX;
+    unsigned long max_wait_us = NVHOST_NO_TIMEOUT;
     int res;
 
     /* wait for the next value with timeout*/
