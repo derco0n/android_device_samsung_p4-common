@@ -483,30 +483,41 @@ static inline int nvhost_syncpt_read(int ctrl_fd, int id, unsigned int *syncpt)
     return 0;
 }
 
-static inline int nvhost_syncpt_wait(int ctrl_fd, int id, int thresh, unsigned int timeout)
+static int nvhost_syncpt_waitex(int ctrl_fd, int id, int thresh, unsigned int timeout, unsigned int *value)
 {
-    struct nvhost_ctrl_syncpt_wait_args wa;
-    wa.id = id;
+    struct nvhost_ctrl_syncpt_waitex_args wa;
+    int res;    wa.id = id;
     wa.thresh = thresh;
     wa.timeout = timeout;
-    return ioctl(ctrl_fd, NVHOST_IOCTL_CTRL_SYNCPT_WAIT, &wa);
+    res = ioctl(ctrl_fd, NVHOST_IOCTL_CTRL_SYNCPT_WAITEX, &wa);
+    if (value)
+       *value = wa.value;
+    return res;
 }
 
 /* Wait VSync using NVidia SyncPoints */
-static inline int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev)
+static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev, unsigned int *value)
 {
     unsigned int syncpt = 0;
     // unsigned long max_wait_us = pdev->time_between_frames_us; // NVHOST_NO_TIMEOUT
     unsigned long max_wait_us = ULONG_MAX;
-
-    /* get syncpt threshold */
-    if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &syncpt)) {
-        ALOGE("Failed to read VBLANK syncpoint value!");
-        return -1;
-    }
+    int res;
 
     /* wait for the next value with timeout*/
-    if (nvhost_syncpt_wait(pdev->nvhost_fd, pdev->vblank_syncpt_id, syncpt + 1, max_wait_us) < 0) {
+    if (value) {
+	    syncpt = (*value) + 1;
+	} else {
+	    /* get syncpt threshold */
+	    if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &syncpt)) {
+	        ALOGE("Failed to read VBLANK syncpoint value!");
+	        return NULL;
+	    }
+
+	    syncpt += 1;
+	}
+
+    res = nvhost_syncpt_waitex(pdev->nvhost_fd, pdev->vblank_syncpt_id, syncpt, max_wait_us, value);
+    if (res < 0) {
         ALOGE("Failed to wait for VBLANK!");
         return -1;
     }
@@ -520,6 +531,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 {
      struct tegra2_hwc_composer_device_1_t *pdev =
             (struct tegra2_hwc_composer_device_1_t *) data;
+    unsigned int value = 0;
 
     ALOGD("NVidia VSYNC thread started");
 
@@ -528,6 +540,12 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 #ifdef SET_RT_IOPRIO
     android_set_rt_ioprio(0, 1);
 #endif
+
+    /* get syncpt threshold */
+    if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &value)) {
+        ALOGE("Failed to read VBLANK syncpoint value!");
+        return NULL;
+    }
 
     while (1) {
         // Wait while display is blanked
@@ -542,7 +560,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
         pthread_mutex_unlock(&pdev->vsync_mutex);
 
         // Wait for the next vsync
-        tegra2_wait_vsync(pdev);
+        tegra2_wait_vsync(pdev, &value);
 
         // Do the VSYNC call
         if (pdev->enabled_vsync && likely(!pdev->fbblanked)) {
