@@ -483,20 +483,26 @@ static inline int nvhost_syncpt_read(int ctrl_fd, int id, unsigned int *syncpt)
     return 0;
 }
 
-static int nvhost_syncpt_waitex(int ctrl_fd, int id, int thresh, unsigned int timeout, unsigned int *value)
+static int nvhost_syncpt_waitmex(int ctrl_fd, int id, int thresh, unsigned int timeout,
+    unsigned int *value, struct timespec *ts)
 {
-    struct nvhost_ctrl_syncpt_waitex_args wa;
+    struct nvhost_ctrl_syncpt_waitmex_args wa;
     int res;    wa.id = id;
     wa.thresh = thresh;
     wa.timeout = timeout;
-    res = ioctl(ctrl_fd, NVHOST_IOCTL_CTRL_SYNCPT_WAITEX, &wa);
+    res = ioctl(ctrl_fd, NVHOST_IOCTL_CTRL_SYNCPT_WAITMEX, &wa);
     if (value)
        *value = wa.value;
+    if (ts) {
+        ts->tv_sec = wa.tv_sec;
+        ts->tv_nsec = wa.tv_nsec;
+    }
     return res;
 }
 
 /* Wait VSync using NVidia SyncPoints */
-static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev, unsigned int *value)
+static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev,
+    unsigned int *value, struct timespec *ts)
 {
     unsigned int syncpt = 0;
     unsigned long max_wait_us = NVHOST_NO_TIMEOUT;
@@ -515,12 +521,11 @@ static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev, unsign
 	    syncpt += 1;
 	}
 
-    res = nvhost_syncpt_waitex(pdev->nvhost_fd, pdev->vblank_syncpt_id, syncpt, max_wait_us, value);
+    res = nvhost_syncpt_waitmex(pdev->nvhost_fd, pdev->vblank_syncpt_id, syncpt, max_wait_us, value, ts);
     if (res < 0) {
         ALOGE("Failed to wait for VBLANK!");
         return -1;
     }
-
     /* Done waiting ! */
     return 0;
 }
@@ -531,6 +536,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
      struct tegra2_hwc_composer_device_1_t *pdev =
             (struct tegra2_hwc_composer_device_1_t *) data;
     unsigned int value = 0;
+    struct timespec now;
 
     ALOGD("NVidia VSYNC thread started");
 
@@ -559,17 +565,11 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
         pthread_mutex_unlock(&pdev->vsync_mutex);
 
         // Wait for the next vsync
-        tegra2_wait_vsync(pdev, &value);
+        tegra2_wait_vsync(pdev, &value, &now);
 
         // Do the VSYNC call
         if (pdev->enabled_vsync && likely(!pdev->fbblanked)) {
-
-            // Get current time in exactly the same timebase as Choreographer
-            struct timespec now;
-            clock_gettime(CLOCK_MONOTONIC,&now);
-
             unsigned long long now_ns = (now.tv_sec) * 1000000000ULL + (now.tv_nsec);
-
             pdev->procs->vsync(pdev->procs, 0, now_ns);
         }
     };
