@@ -24,6 +24,7 @@
 #include <math.h>
 #include <poll.h>
 #include <pthread.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
@@ -403,8 +404,7 @@ static void *tegra2_hwc_emulated_vsync_thread(void *data)
             struct timespec now;
             clock_gettime(CLOCK_MONOTONIC,&now);
 
-            unsigned long long now_ns = (now.tv_sec) * 1000000000ULL + (now.tv_nsec);
-
+            int64_t now_ns = (int64_t)(now.tv_sec * 1000000000ULL) + (int64_t)now.tv_nsec;
             pdev->procs->vsync(pdev->procs, 0, now_ns);
         }
 
@@ -483,7 +483,7 @@ static inline int nvhost_syncpt_read(int ctrl_fd, int id, unsigned int *syncpt)
     return 0;
 }
 
-static int nvhost_syncpt_waitmex(int ctrl_fd, int id, int thresh, unsigned int timeout,
+static int nvhost_syncpt_waitmex(int ctrl_fd, int id, int thresh, int32_t timeout,
     unsigned int *value, struct timespec *ts)
 {
     struct nvhost_ctrl_syncpt_waitmex_args wa;
@@ -505,7 +505,7 @@ static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev,
     unsigned int *value, struct timespec *ts)
 {
     unsigned int syncpt = 0;
-    unsigned long max_wait_us = NVHOST_NO_TIMEOUT;
+    int32_t max_wait_us = NVHOST_NO_TIMEOUT;
     int res;
 
     /* wait for the next value with timeout*/
@@ -569,7 +569,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 
         // Do the VSYNC call
         if (pdev->enabled_vsync && likely(!pdev->fbblanked)) {
-            unsigned long long now_ns = (now.tv_sec) * 1000000000ULL + (now.tv_nsec);
+            int64_t now_ns = (int64_t)(now.tv_sec * 1000000000ULL) + (int64_t)now.tv_nsec;
             pdev->procs->vsync(pdev->procs, 0, now_ns);
         }
     };
