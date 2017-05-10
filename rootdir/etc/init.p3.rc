@@ -15,8 +15,6 @@ on init
 
     mkdir /efs 0771 system system
 
-    write /sys/block/mmcblk0/queue/iosched/slice_idle 0
-
 # Vibetonz
     export VIBE_PIPE_PATH /dev/pipes
     mkdir /dev/pipes 0771 shell shell
@@ -295,6 +293,7 @@ on boot
 
 on property:sys.boot_completed=1
     write /sys/block/mmcblk0/queue/scheduler bfq
+    write /sys/block/mmcblk0/queue/iosched/slice_idle 0
 
 
 # Wifi
