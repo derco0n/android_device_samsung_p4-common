@@ -594,10 +594,10 @@ static int tegra2_eventControl(struct hwc_composer_device_1 *dev, int dpy,
 
     struct tegra2_hwc_composer_device_1_t *pdev =
             (struct tegra2_hwc_composer_device_1_t *)dev;
+    int ret = -EINVAL;
 
-    int ret = (!pdev->org->methods || !pdev->org->methods->eventControl)
-            ? -EINVAL
-            : pdev->org->methods->eventControl(pdev->org,event,enabled);
+    if (pdev->org->methods && pdev->org->methods->eventControl)
+        ret = pdev->org->methods->eventControl(pdev->org,event,enabled);
 
     if (ret != 0 && event == HWC_EVENT_VSYNC) {
         // ALOGD("Emulated VSYNC ints are %s", enabled ? "On" : "Off" );
