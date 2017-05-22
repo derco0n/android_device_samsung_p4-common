@@ -354,7 +354,7 @@ static void *tegra2_hwc_emulated_vsync_thread(void *data)
 
         // Wait while display is blanked
         pthread_mutex_lock(&pdev->vsync_mutex);
-        if (unlikely(pdev->fbblanked && pdev->vsync_running)) {
+        if (pdev->fbblanked || !pdev->enabled_vsync) {
 
             // When framebuffer is blanked, there must be no interrupts, so we can't wait on it
             pthread_cond_wait(&pdev->vsync_cond, &pdev->vsync_mutex);
@@ -555,7 +555,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
     while (1) {
         // Wait while display is blanked
         pthread_mutex_lock(&pdev->vsync_mutex);
-        if (unlikely(pdev->fbblanked && pdev->vsync_running)) {
+        if (pdev->fbblanked || !pdev->enabled_vsync) {
 
             // When framebuffer is blanked, there must be no interrupts, so we can't wait on it
             pthread_cond_wait(&pdev->vsync_cond, &pdev->vsync_mutex);
@@ -574,7 +574,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
         tegra2_wait_vsync(pdev, &value, &now);
 
         // Do the VSYNC call
-        if (pdev->enabled_vsync && likely(!pdev->fbblanked)) {
+        if (pdev->enabled_vsync && !pdev->fbblanked) {
             int64_t now_ns = (int64_t)(now.tv_sec * 1000000000ULL) + (int64_t)now.tv_nsec;
             pdev->procs->vsync(pdev->procs, 0, now_ns);
         }
@@ -602,7 +602,11 @@ static int tegra2_eventControl(struct hwc_composer_device_1 *dev, int dpy,
     if (ret != 0 && event == HWC_EVENT_VSYNC) {
         // ALOGD("Emulated VSYNC ints are %s", enabled ? "On" : "Off" );
 
+        pthread_mutex_lock(&pdev->vsync_mutex);
         pdev->enabled_vsync = (enabled) ? true : false;
+        if (pdev->enabled_vsync)
+            pthread_cond_signal(&pdev->vsync_cond);
+        pthread_mutex_unlock(&pdev->vsync_mutex);
         ret = 0;
     }
     return ret;
