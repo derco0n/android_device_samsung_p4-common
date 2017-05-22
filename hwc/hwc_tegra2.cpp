@@ -559,6 +559,12 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
 
             // When framebuffer is blanked, there must be no interrupts, so we can't wait on it
             pthread_cond_wait(&pdev->vsync_cond, &pdev->vsync_mutex);
+
+            /* get syncpt threshold */
+            if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &value)) {
+                ALOGE("Failed to read VBLANK syncpoint value!");
+                break;
+            }
         }
         if (unlikely(!pdev->vsync_running))
             break;
