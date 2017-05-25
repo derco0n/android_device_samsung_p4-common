@@ -104,8 +104,7 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
     hwcomposer.tegra \
-    libstagefrighthw \
-    camera.tegra
+    libstagefrighthw
 
 # Audio
 PRODUCT_PACKAGES += \
