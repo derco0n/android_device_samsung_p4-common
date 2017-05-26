@@ -600,11 +600,13 @@ static int tegra2_eventControl(struct hwc_composer_device_1 *dev, int dpy,
         ret = pdev->org->methods->eventControl(pdev->org,event,enabled);
 
     if (ret != 0 && event == HWC_EVENT_VSYNC) {
+        bool prev_state = false;
         // ALOGD("Emulated VSYNC ints are %s", enabled ? "On" : "Off" );
 
         pthread_mutex_lock(&pdev->vsync_mutex);
+        prev_state = pdev->enabled_vsync;
         pdev->enabled_vsync = (enabled) ? true : false;
-        if (pdev->enabled_vsync)
+        if (prev_state == false && pdev->enabled_vsync == true)
             pthread_cond_signal(&pdev->vsync_cond);
         pthread_mutex_unlock(&pdev->vsync_mutex);
         ret = 0;
