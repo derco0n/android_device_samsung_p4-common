@@ -114,6 +114,7 @@ struct tegra2_hwc_composer_device_1_t {
 
     // NVidia implementation
     int         nvhost_fd;
+    unsigned int nvhost_wait_type;
     unsigned int vblank_syncpt_id;
 
     // Buffer to do translations to speed them up
@@ -463,6 +464,37 @@ static void nvhost_close(int ctrl_fd)
     }
 }
 
+static int nvhost_init_ioctl(int fd)
+{
+    int res;
+
+    {
+        struct nvhost_ctrl_syncpt_waitmex_args wa;
+        wa.id = NVSYNCPT_VBLANK0;
+        wa.thresh = 1;
+        wa.timeout = 0;
+        res = ioctl(fd, NVHOST_IOCTL_CTRL_SYNCPT_WAITMEX, &wa);
+        if (res == 0) {
+            ALOGI("Using NVHOST_IOCTL_CTRL_SYNCPT_WAITMEX");
+            return NVHOST_IOCTL_CTRL_SYNCPT_WAITMEX;
+        }
+    }
+    {
+        struct nvhost_ctrl_syncpt_waitex_args wa;
+        wa.id = NVSYNCPT_VBLANK0;
+        wa.thresh = 1;
+        wa.timeout = 0;
+        res = ioctl(fd, NVHOST_IOCTL_CTRL_SYNCPT_WAITEX, &wa);
+        if (res == 0) {
+            ALOGI("Using NVHOST_IOCTL_CTRL_SYNCPT_WAITEX");
+            return NVHOST_IOCTL_CTRL_SYNCPT_WAITEX;
+        }
+    }
+
+    ALOGE("No nvhost wait ioctl found.");
+    return 0;
+}
+
 #if 0
 static int nvhost_get_version(int ctrl_fd)
 {
@@ -481,6 +513,20 @@ static inline int nvhost_syncpt_read(int ctrl_fd, int id, unsigned int *syncpt)
         return -1;
     *syncpt = ra.value;
     return 0;
+}
+
+static int nvhost_syncpt_waitex(int ctrl_fd, int id, int thresh, int32_t timeout,
+    unsigned int *value)
+{
+    struct nvhost_ctrl_syncpt_waitex_args wa;
+    int res;    wa.id = id;
+    wa.thresh = thresh;
+    wa.timeout = timeout;
+    res = ioctl(ctrl_fd, NVHOST_IOCTL_CTRL_SYNCPT_WAITEX, &wa);
+    if (value)
+       *value = wa.value;
+
+    return res;
 }
 
 static int nvhost_syncpt_waitmex(int ctrl_fd, int id, int thresh, int32_t timeout,
@@ -506,22 +552,29 @@ static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev,
 {
     unsigned int syncpt = 0;
     int32_t max_wait_us = NVHOST_NO_TIMEOUT;
-    int res;
+    int res = -1;
 
     /* wait for the next value with timeout*/
     if (value) {
-	    syncpt = (*value) + 1;
-	} else {
-	    /* get syncpt threshold */
-	    if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &syncpt)) {
-	        ALOGE("Failed to read VBLANK syncpoint value!");
-	        return NULL;
-	    }
+        syncpt = (*value) + 1;
+    } else {
+        /* get syncpt threshold */
+        if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &syncpt)) {
+            ALOGE("Failed to read VBLANK syncpoint value!");
+            return NULL;
+        }
 
-	    syncpt += 1;
-	}
+        syncpt += 1;
+    }
 
-    res = nvhost_syncpt_waitmex(pdev->nvhost_fd, pdev->vblank_syncpt_id, syncpt, max_wait_us, value, ts);
+    if (pdev->nvhost_wait_type == NVHOST_IOCTL_CTRL_SYNCPT_WAITMEX) {
+        res = nvhost_syncpt_waitmex(pdev->nvhost_fd, pdev->vblank_syncpt_id, syncpt, max_wait_us, value, ts);    
+    } else if (pdev->nvhost_wait_type == NVHOST_IOCTL_CTRL_SYNCPT_WAITEX) {
+        res = nvhost_syncpt_waitex(pdev->nvhost_fd, pdev->vblank_syncpt_id, syncpt, max_wait_us, value);
+        if (ts)
+            clock_gettime(CLOCK_MONOTONIC,ts);
+    }
+
     if (res < 0) {
         ALOGE("Failed to wait for VBLANK!");
         return -1;
@@ -838,7 +891,10 @@ static int tegra2_open(const struct hw_module_t *module, const char *name,
     // Find out if we can use the NVidia VBLANK0 syncpoint to get VSYNC
     //  interrupts, or we must completely emulate them...
     dev->nvhost_fd = nvhost_open();
-    if (dev->nvhost_fd >= 0) {
+    if (dev->nvhost_fd >= 0)
+        dev->nvhost_wait_type = nvhost_init_ioctl(dev->nvhost_fd);
+
+    if (dev->nvhost_fd >= 0 && dev->nvhost_wait_type > 0) {
         ALOGD("Using NVidia VBLANK0 syncpoint as VSYNC");
 
         // Get the syncpoint id for VBLANK0
