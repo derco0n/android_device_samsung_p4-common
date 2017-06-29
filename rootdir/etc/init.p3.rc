@@ -281,7 +281,7 @@ on boot
     write /sys/block/mmcblk0boot1/queue/add_random 0
 
     # restrict dmesg access to root
-    write /proc/sys/kernel/dmesg_restrict 1
+    write /proc/sys/kernel/dmesg_restrict 0
 
     # GPS perms
     chown gps system /dev/ttyHS0
