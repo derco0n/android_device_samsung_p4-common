@@ -669,6 +669,8 @@ static int tegra2_eventControl(struct hwc_composer_device_1 *dev, int dpy,
 
 static int tegra2_blank(struct hwc_composer_device_1 *dev, int disp, int blank)
 {
+    int value;
+
     (void) disp;
 
     struct tegra2_hwc_composer_device_1_t *pdev =
@@ -681,6 +683,17 @@ static int tegra2_blank(struct hwc_composer_device_1 *dev, int disp, int blank)
     pdev->fbblanked = blank;
     pthread_cond_signal(&pdev->vsync_cond);
     pthread_mutex_unlock(&pdev->vsync_mutex);
+
+    if (blank) {
+        value = FB_BLANK_POWERDOWN;
+    } else {
+        value = FB_BLANK_UNBLANK;
+    }
+
+    if (ioctl(pdev->fb_fd, FBIOBLANK, value)) {
+        ALOGE("%s: ioctl FBIOBLANK failed with error %s", __func__,
+            strerror(errno));
+    }
 
     /* Blanking is handled by other means, no need to blank screen here */
     return 0;
