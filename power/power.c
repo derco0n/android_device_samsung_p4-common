@@ -36,6 +36,9 @@
 #define BOOST_DURATION_PATH "/sys/devices/system/cpu/cpufreq/interactive/boostpulse_duration"
 // #define HISPEED_FREQ "/sys/devices/system/cpu/cpufreq/interactive/hispeed_freq"
 
+#define TOUCH_SUSPEND_PATH "/sys/bus/i2c/drivers/sec_touch/4-004c/mxt1386/suspended"
+#define MPU3050_SUSPEND_PATH "/sys/bus/i2c/drivers/mpu3050/0-0068/mpu3050/suspended"
+
 #define LOW_POWER_MAX_FREQ "456000"
 #define LOW_POWER_MIN_FREQ "150000"
 #define NORMAL_MAX_FREQ "1000000"
@@ -319,6 +322,9 @@ static void p3_power_set_interactive( __attribute__((unused)) struct power_modul
         sysfs_write(CPU0_SCALINGMAXFREQ_PATH, screen_off_max_freq);
         sysfs_write(CPU1_SCALINGMAXFREQ_PATH, screen_off_max_freq);
         sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "99");
+
+        sysfs_write(TOUCH_SUSPEND_PATH, "1");
+        sysfs_write(MPU3050_SUSPEND_PATH, "1");
     } else if (low_power_mode) {
         store_max_freq(scaling_max_freq);
 
@@ -329,6 +335,9 @@ static void p3_power_set_interactive( __attribute__((unused)) struct power_modul
         sysfs_write(CPU0_SCALINGMAXFREQ_PATH, scaling_max_freq);
         sysfs_write(CPU1_SCALINGMAXFREQ_PATH, scaling_max_freq);
         sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
+
+        sysfs_write(TOUCH_SUSPEND_PATH, "0");
+        sysfs_write(MPU3050_SUSPEND_PATH, "0");
     }
 }
 
