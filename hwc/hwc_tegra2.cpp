@@ -551,7 +551,7 @@ static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev,
     unsigned int *value, struct timespec *ts)
 {
     unsigned int syncpt = 0;
-    int32_t max_wait_us = NVHOST_NO_TIMEOUT;
+    int32_t max_wait_ms = 2*(pdev->time_between_frames_us/1000ULL);
     int res = -1;
 
     /* wait for the next value with timeout*/
@@ -568,9 +568,11 @@ static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev,
     }
 
     if (pdev->nvhost_wait_type == NVHOST_IOCTL_CTRL_SYNCPT_WAITMEX) {
-        res = nvhost_syncpt_waitmex(pdev->nvhost_fd, pdev->vblank_syncpt_id, syncpt, max_wait_us, value, ts);    
+        res = nvhost_syncpt_waitmex(pdev->nvhost_fd,
+            pdev->vblank_syncpt_id, syncpt, max_wait_ms, value, ts);
     } else if (pdev->nvhost_wait_type == NVHOST_IOCTL_CTRL_SYNCPT_WAITEX) {
-        res = nvhost_syncpt_waitex(pdev->nvhost_fd, pdev->vblank_syncpt_id, syncpt, max_wait_us, value);
+        res = nvhost_syncpt_waitex(pdev->nvhost_fd,
+            pdev->vblank_syncpt_id, syncpt, max_wait_ms, value);
         if (ts)
             clock_gettime(CLOCK_MONOTONIC,ts);
     }
