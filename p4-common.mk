@@ -114,6 +114,9 @@ PRODUCT_PACKAGES += \
     audio.usb.default \
     audio.r_submix.default
 
+PRODUCT_PACKAGES += \
+	input.evdev.default
+
 # audio mixer paths
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/libaudio/mixer_paths.xml:system/etc/mixer_paths.xml
