@@ -552,7 +552,7 @@ static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev,
 {
     unsigned int syncpt = 0;
     int32_t max_wait_ms = 2*(pdev->time_between_frames_us/1000ULL);
-    int res = -1;
+    int res = -EINVAL;
 
     /* wait for the next value with timeout*/
     if (value) {
@@ -561,7 +561,7 @@ static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev,
         /* get syncpt threshold */
         if (nvhost_syncpt_read(pdev->nvhost_fd, pdev->vblank_syncpt_id, &syncpt)) {
             ALOGE("Failed to read VBLANK syncpoint value!");
-            return NULL;
+            return -EINVAL;
         }
 
         syncpt += 1;
@@ -578,8 +578,8 @@ static int tegra2_wait_vsync(struct tegra2_hwc_composer_device_1_t *pdev,
     }
 
     if (res < 0) {
-        ALOGE("Failed to wait for VBLANK!");
-        return -1;
+        ALOGW("Failed to wait for VBLANK!");
+        return res;
     }
     /* Done waiting ! */
     return 0;
@@ -592,6 +592,7 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
             (struct tegra2_hwc_composer_device_1_t *) data;
     unsigned int value = 0;
     struct timespec now;
+    int err;
 
     ALOGD("NVidia VSYNC thread started");
 
@@ -626,7 +627,10 @@ static void *tegra2_hwc_nv_vsync_thread(void *data)
         pthread_mutex_unlock(&pdev->vsync_mutex);
 
         // Wait for the next vsync
-        tegra2_wait_vsync(pdev, &value, &now);
+        err = tegra2_wait_vsync(pdev, &value, &now);
+
+        if (err)
+            clock_gettime(CLOCK_MONOTONIC, &now);
 
         // Do the VSYNC call
         if (pdev->enabled_vsync && !pdev->fbblanked) {
