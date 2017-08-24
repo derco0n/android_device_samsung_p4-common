@@ -1483,7 +1483,8 @@ static int out_get_presentation_position(const struct audio_stream_out *stream,
     if (out->pcm == NULL) {
         ALOGV("out_get_presentation_position() out->pcm is NULL");
         out_unlock(out);
-        return ret;
+        *frames = 0;
+        return 0;
     }
 
     size_t avail;
@@ -1494,8 +1495,11 @@ static int out_get_presentation_position(const struct audio_stream_out *stream,
         // It would be unusual for this value to be negative, but check just in case ...
         if (signed_frames >= 0) {
             *frames = signed_frames;
-            ret = 0;
+        } else {
+            *frames = 0;
         }
+
+        ret = 0;
     }
 
     out_unlock(out);
