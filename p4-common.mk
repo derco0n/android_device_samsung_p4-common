@@ -177,7 +177,8 @@ PRODUCT_PACKAGES += \
     libgui_shim \
     libutils_shim \
     libp4shim \
-    libshims_wvm
+    libshims_wvm \
+    libc_util
 
 PRODUCT_PACKAGES += \
     android.hardware.graphics.allocator@2.0-impl
