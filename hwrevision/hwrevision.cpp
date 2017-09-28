@@ -28,6 +28,7 @@
 #include <sys/un.h>
 
 #include <cutils/properties.h>
+#include <utils/Log.h>
 
 #include "log.h"
 #include "util.h"
@@ -46,14 +47,14 @@ void parse_hardware_revision(unsigned int *revision)
     for (;;) {
         x = (char*)realloc(data, limit);
         if (!x) {
-            ERROR("hwrev: Failed to allocate memory to read %s\n", cpuinfo);
+            ALOGE("hwrev: Failed to allocate memory to read %s\n", cpuinfo);
             goto done;
         }
         data = x;
 
         n = read(fd, data + len, limit - len);
         if (n < 0) {
-            ERROR("hwrev: Failed reading %s: %s (%d)\n", cpuinfo, strerror(errno), errno);
+            ALOGE("hwrev: Failed reading %s: %s (%d)\n", cpuinfo, strerror(errno), errno);
             goto done;
         }
         len += n;

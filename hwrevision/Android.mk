@@ -20,7 +20,7 @@ LOCAL_SRC_FILES := hwrevision.cpp
 
 LOCAL_C_INCLUDES := system/core/init
 
-LOCAL_SHARED_LIBRARIES := libcutils
+LOCAL_SHARED_LIBRARIES := libcutils libbase libselinux liblog
 
 LOCAL_STATIC_LIBRARIES := libinit
 
