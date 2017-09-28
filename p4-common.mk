@@ -83,8 +83,11 @@ PRODUCT_PROPERTY_OVERRIDES += \
     dalvik.vm.dex2oat-threads=1
 
 PRODUCT_PACKAGES += \
+    android.hardware.wifi@1.0-service \
     libwpa_client \
     hostapd \
+    wificond \
+    wifilogd \
     wpa_supplicant \
     wpa_supplicant.conf \
     macloader
@@ -175,6 +178,31 @@ PRODUCT_PACKAGES += \
     libutils_shim \
     libp4shim \
     libshims_wvm
+
+PRODUCT_PACKAGES += \
+    android.hardware.graphics.allocator@2.0-impl
+
+PRODUCT_PACKAGES += \
+    android.hardware.audio@2.0-impl \
+    android.hardware.audio.effect@2.0-impl \
+    android.hardware.broadcastradio@1.0-impl \
+    android.hardware.soundtrigger@2.0-impl
+
+PRODUCT_PACKAGES += android.hardware.power@1.0-impl
+
+# Keymaster HAL
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@3.0-impl
+
+PRODUCT_PACKAGES += android.hardware.sensors@1.0-impl
+
+# Light HAL
+PRODUCT_PACKAGES += \
+    android.hardware.light@2.0-impl
+
+PRODUCT_PACKAGES += \
+	android.hardware.bluetooth@1.0-impl \
+	libbt-vendor
 
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
