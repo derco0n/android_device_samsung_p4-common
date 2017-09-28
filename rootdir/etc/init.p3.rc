@@ -319,6 +319,14 @@ service macloader /system/bin/macloader
 
 # end of wifi
 
+# Start GPS daemon
+service gps-daemon /system/bin/gps_daemon.sh
+    class main
+    socket gps seqpacket 0660 gps system
+    user gps
+    group system inet
+    seclabel u:r:gpsd:s0
+
 # bugreport is triggered by the VOLUME-DOWN and VOLUME-UP keys
 service bugreport /system/bin/dumpstate -d -p -B -z \
         -o /data/user_de/0/com.android.shell/files/bugreports/bugreport
