@@ -31,6 +31,6 @@ LOCAL_SHARED_LIBRARIES := \
 # LOCAL_CFLAGS := -Werror
 LOCAL_C_INCLUDES += external/safe-iop/include
 
-LOCAL_CLANG := false
+# LOCAL_CLANG := false
 # LOCAL_SANITIZE := integer
 include $(BUILD_SHARED_LIBRARY)
