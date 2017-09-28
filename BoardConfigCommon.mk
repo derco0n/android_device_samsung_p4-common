@@ -160,9 +160,6 @@ TW_MAX_BRIGHTNESS := 255
 TW_NO_EXFAT := true
 TW_EXCLUDE_SUPERSU := true
 
-# Seccomp filters
-BOARD_SECCOMP_POLICY += device/samsung/p4-common/seccomp
-
 BOARD_SEPOLICY_DIRS += \
 	device/samsung/p4-common/sepolicy \
 

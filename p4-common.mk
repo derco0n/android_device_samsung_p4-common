@@ -180,6 +180,10 @@ PRODUCT_PACKAGES += \
     libshims_wvm \
     libc_util
 
+PRODUCT_COPY_FILES += \
+	device/samsung/p4-common/seccomp/mediacodec-seccomp.policy:/system/vendor/etc/seccomp_policy/mediacodec.policy \
+	device/samsung/p4-common/seccomp/mediaextractor-seccomp.policy:/system/vendor/etc/seccomp_policy/mediaextractor.policy
+
 PRODUCT_PACKAGES += \
     android.hardware.graphics.allocator@2.0-impl
 
