@@ -29,9 +29,6 @@
 
 #include <binder/IPCThreadState.h>
 
-#include "SurfaceComposerClient.h"
-#include "SurfaceControl.h"
-
 #include <ui/DisplayInfo.h>
 #include <ui/GraphicBuffer.h>
 #include <ui/Rect.h>
@@ -39,6 +36,8 @@
 #include <gui/BufferQueueCore.h>
 #include <gui/ISurfaceComposer.h>
 #include <gui/Surface.h>
+#include <gui/SurfaceComposerClient.h>
+#include <gui/SurfaceControl.h>
 
 namespace android {
 
@@ -103,21 +102,23 @@ status_t SurfaceControl::setLayerStack(uint32_t layerStack) {
     if (err < 0) return err;
     return mClient->setLayerStack(mHandle, layerStack);
 }
-status_t SurfaceControl::setLayer(uint32_t layer) {
+
+status_t SurfaceControl::setLayer(int32_t layer) {
     status_t err = validate();
     if (err < 0) return err;
     return mClient->setLayer(mHandle, layer);
 }
-status_t SurfaceControl::setLayer(int32_t layer) {
-    return setLayer(static_cast<uint32_t>(layer));
+
+status_t SurfaceControl::setRelativeLayer(const sp<IBinder>& relativeTo, int32_t layer) {
+    status_t err = validate();
+    if (err < 0) return err;
+    return mClient->setRelativeLayer(mHandle, relativeTo, layer);
 }
+
 status_t SurfaceControl::setPosition(float x, float y) {
     status_t err = validate();
     if (err < 0) return err;
     return mClient->setPosition(mHandle, x, y);
-}
-status_t SurfaceControl::setPosition(int32_t x, int32_t y) {
-    return setPosition(static_cast<float>(x), static_cast<float>(y));
 }
 status_t SurfaceControl::setGeometryAppliesWithResize() {
     status_t err = validate();
@@ -154,10 +155,10 @@ status_t SurfaceControl::setAlpha(float alpha) {
     if (err < 0) return err;
     return mClient->setAlpha(mHandle, alpha);
 }
-status_t SurfaceControl::setMatrix(float dsdx, float dtdx, float dsdy, float dtdy) {
+status_t SurfaceControl::setMatrix(float dsdx, float dtdx, float dtdy, float dsdy) {
     status_t err = validate();
     if (err < 0) return err;
-    return mClient->setMatrix(mHandle, dsdx, dtdx, dsdy, dtdy);
+    return mClient->setMatrix(mHandle, dsdx, dtdx, dtdy, dsdy);
 }
 status_t SurfaceControl::setCrop(const Rect& crop) {
     status_t err = validate();
@@ -170,11 +171,30 @@ status_t SurfaceControl::setFinalCrop(const Rect& crop) {
     return mClient->setFinalCrop(mHandle, crop);
 }
 
-status_t SurfaceControl::deferTransactionUntil(sp<IBinder> handle,
+status_t SurfaceControl::deferTransactionUntil(const sp<IBinder>& handle,
         uint64_t frameNumber) {
     status_t err = validate();
     if (err < 0) return err;
     return mClient->deferTransactionUntil(mHandle, handle, frameNumber);
+}
+
+status_t SurfaceControl::deferTransactionUntil(const sp<Surface>& handle,
+        uint64_t frameNumber) {
+    status_t err = validate();
+    if (err < 0) return err;
+    return mClient->deferTransactionUntil(mHandle, handle, frameNumber);
+}
+
+status_t SurfaceControl::reparentChildren(const sp<IBinder>& newParentHandle) {
+    status_t err = validate();
+    if (err < 0) return err;
+    return mClient->reparentChildren(mHandle, newParentHandle);
+}
+
+status_t SurfaceControl::detachChildren() {
+    status_t err = validate();
+    if (err < 0) return err;
+    return mClient->detachChildren(mHandle);
 }
 
 status_t SurfaceControl::setOverrideScalingMode(int32_t overrideScalingMode) {
@@ -197,13 +217,6 @@ status_t SurfaceControl::getLayerFrameStats(FrameStats* outStats) const {
     return client->getLayerFrameStats(mHandle, outStats);
 }
 
-status_t SurfaceControl::getTransformToDisplayInverse(bool* outTransformToDisplayInverse) const {
-    status_t err = validate();
-    if (err < 0) return err;
-    const sp<SurfaceComposerClient>& client(mClient);
-    return client->getTransformToDisplayInverse(mHandle, outTransformToDisplayInverse);
-}
-
 status_t SurfaceControl::validate() const
 {
     if (mHandle==0 || mClient==0) {
@@ -224,15 +237,28 @@ status_t SurfaceControl::writeSurfaceToParcel(
     return parcel->writeStrongBinder(IInterface::asBinder(bp));
 }
 
+sp<Surface> SurfaceControl::generateSurfaceLocked() const
+{
+    // This surface is always consumed by SurfaceFlinger, so the
+    // producerControlledByApp value doesn't matter; using false.
+    mSurfaceData = new Surface(mGraphicBufferProducer, false);
+
+    return mSurfaceData;
+}
+
 sp<Surface> SurfaceControl::getSurface() const
 {
     Mutex::Autolock _l(mLock);
     if (mSurfaceData == 0) {
-        // This surface is always consumed by SurfaceFlinger, so the
-        // producerControlledByApp value doesn't matter; using false.
-        mSurfaceData = new Surface(mGraphicBufferProducer, false);
+        return generateSurfaceLocked();
     }
     return mSurfaceData;
+}
+
+sp<Surface> SurfaceControl::createSurface() const
+{
+    Mutex::Autolock _l(mLock);
+    return generateSurfaceLocked();
 }
 
 sp<IBinder> SurfaceControl::getHandle() const

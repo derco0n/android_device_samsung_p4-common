@@ -38,6 +38,8 @@ LOCAL_CPPFLAGS += -Wno-padded
 
 LOCAL_CPPFLAGS += -DDEBUG_ONLY_CODE=$(if $(filter userdebug eng,$(TARGET_BUILD_VARIANT)),1,0)
 
+LOCAL_CPPFLAGS += -Wno-float-equal
+
 LOCAL_SRC_FILES := \
 	SurfaceControl.cpp \
 	SurfaceComposerClient.cpp \
@@ -51,7 +53,8 @@ LOCAL_SHARED_LIBRARIES := \
 	libui \
 	libutils \
 	liblog \
-	libgui
+	libgui \
+	libnativewindow
 
 ifeq ($(BOARD_EGL_SKIP_FIRST_DEQUEUE),true)
     LOCAL_CFLAGS += -DSURFACE_SKIP_FIRST_DEQUEUE
