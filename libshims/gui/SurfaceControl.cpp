@@ -29,6 +29,9 @@
 
 #include <binder/IPCThreadState.h>
 
+#include "SurfaceComposerClient.h"
+#include "SurfaceControl.h"
+
 #include <ui/DisplayInfo.h>
 #include <ui/GraphicBuffer.h>
 #include <ui/Rect.h>
@@ -36,8 +39,6 @@
 #include <gui/BufferQueueCore.h>
 #include <gui/ISurfaceComposer.h>
 #include <gui/Surface.h>
-#include <gui/SurfaceComposerClient.h>
-#include <gui/SurfaceControl.h>
 
 namespace android {
 
@@ -119,6 +120,9 @@ status_t SurfaceControl::setPosition(float x, float y) {
     status_t err = validate();
     if (err < 0) return err;
     return mClient->setPosition(mHandle, x, y);
+}
+status_t SurfaceControl::setPosition(int32_t x, int32_t y) {
+    return setPosition(static_cast<float>(x), static_cast<float>(y));
 }
 status_t SurfaceControl::setGeometryAppliesWithResize() {
     status_t err = validate();
