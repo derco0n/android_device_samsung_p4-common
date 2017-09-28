@@ -210,6 +210,9 @@ PRODUCT_PACKAGES += \
     android.hardware.light@2.0-impl
 
 PRODUCT_PACKAGES += \
+	android.hardware.vibrator@1.0-service.p3
+
+PRODUCT_PACKAGES += \
 	android.hardware.bluetooth@1.0-impl \
 	libbt-vendor
 
