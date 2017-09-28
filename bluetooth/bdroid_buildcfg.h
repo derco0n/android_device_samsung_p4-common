@@ -19,4 +19,7 @@
 
 #define BTM_DEF_LOCAL_NAME "Galaxy Tab 10.1"
 
+/* Disables Sco Enhanced Absent on pre-Oreo bluetooth Firmware */
+#define BTM_SCO_ENHANCED_SYNC_DISABLED
+
 #endif
