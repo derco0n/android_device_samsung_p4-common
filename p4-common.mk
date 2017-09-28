@@ -197,8 +197,13 @@ PRODUCT_PACKAGES += android.hardware.power@1.0-impl
 # Keymaster HAL
 PRODUCT_PACKAGES += \
     android.hardware.keymaster@3.0-impl
+# Sensors
+PRODUCT_PACKAGES += \
+	android.hardware.sensors@1.0-impl \
+	sensors.tegra
 
-PRODUCT_PACKAGES += android.hardware.sensors@1.0-impl
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/sensors/_hals.conf:system/vendor/etc/sensors/_hals.conf
 
 # Light HAL
 PRODUCT_PACKAGES += \
