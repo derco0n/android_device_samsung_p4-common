@@ -217,6 +217,9 @@ PRODUCT_PACKAGES += \
     android.hardware.gnss@1.0-impl.p3 \
     android.hardware.gnss@1.0-service.p3
 
+PRODUCT_PACKAGES += \
+	android.hardware.configstore@1.0-service.p3
+
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
 
