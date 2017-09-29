@@ -16,5 +16,5 @@
 
 const char* linker_non_pie_executables[] = {
     "/system/bin/cameraserver",
-    "/system/bin/gpsd",
+    "/system/vendor/bin/gpsd",
 };

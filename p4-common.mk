@@ -43,8 +43,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/sec_touchscreen.idc:system/usr/idc/sec_touchscreen.idc
 
 PRODUCT_COPY_FILES += \
-     $(LOCAL_PATH)/gps.conf:system/etc/gps.conf \
-     $(LOCAL_PATH)/prebuilt/bin/gps_daemon.sh:system/bin/gps_daemon.sh
+     $(LOCAL_PATH)/gps.conf:system/vendor/etc/gps.conf
 
 PRODUCT_PROPERTY_OVERRIDES := \
     wifi.interface=wlan0 \
