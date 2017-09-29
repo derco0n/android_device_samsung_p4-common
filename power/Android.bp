@@ -21,5 +21,8 @@ cc_library_shared {
         "libhardware_headers",
         "libutils_headers",
     ],
-    shared_libs: ["liblog libcutils"],
+    shared_libs: [
+        "liblog",
+        "libcutils"
+    ],
 }
