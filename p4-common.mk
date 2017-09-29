@@ -213,6 +213,11 @@ PRODUCT_PACKAGES += \
 	android.hardware.bluetooth@1.0-impl \
 	libbt-vendor
 
+# GNSS HAL
+PRODUCT_PACKAGES += \
+    android.hardware.gnss@1.0-impl.p3 \
+    android.hardware.gnss@1.0-service.p3
+
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
 
