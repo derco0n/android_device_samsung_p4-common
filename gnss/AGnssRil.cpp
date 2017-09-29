@@ -135,14 +135,15 @@ Return<bool> AGnssRil::updateNetworkState(bool connected,
     return true;
 }
 
-Return<bool> AGnssRil::updateNetworkAvailability(bool available, const hidl_string& apn)  {
+Return<bool> AGnssRil::updateNetworkAvailability(bool, const hidl_string&)  {
     if (mAGnssRilIface == nullptr) {
         ALOGE("%s: AGnssRil interface is unavailable", __func__);
         return false;
     }
 
-    mAGnssRilIface->update_network_availability(available, apn.c_str());
-    return true;
+    // mAGnssRilIface->update_network_availability(available, apn.c_str());
+    // return true;
+    return false;
 }
 
 }  // namespace implementation
