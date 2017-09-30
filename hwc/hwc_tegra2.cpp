@@ -17,6 +17,8 @@
 
 #define LOG_TAG "hwc"
 
+// #define SIMD_LAYER_COPY
+
 #include <utils/Log.h>
 
 #include <errno.h>
@@ -134,63 +136,35 @@ struct tegra2_hwc_composer_device_1_t {
     volatile bool fbblanked;    // Framebuffer disabled
 };
 
-static void copy_layer1_to_layer(hwc_layer_t* dst,hwc_layer_1_t* src)
+static void move_layer(void* dst, void* src)
 {
-    dst->compositionType = src->compositionType;
-    dst->hints = src->hints;
-    dst->flags = src->flags;
-    dst->handle = src->handle;
-    dst->transform = src->transform;
-    dst->blending = src->blending;
-    // memcpy(&dst->sourceCrop,&src->sourceCrop,sizeof( hwc_rect_t ));
-    // memcpy(&dst->displayFrame,&src->displayFrame,sizeof( hwc_rect_t ));
-    // memcpy(&dst->visibleRegionScreen,&src->visibleRegionScreen,sizeof( hwc_region_t ));
-
-    dst->sourceCrop.left = src->sourceCrop.left;
-    dst->sourceCrop.top = src->sourceCrop.top;
-    dst->sourceCrop.bottom = src->sourceCrop.bottom;
-    dst->sourceCrop.right = src->sourceCrop.right;
-    dst->displayFrame.left = src->displayFrame.left;
-    dst->displayFrame.top = src->displayFrame.top;
-    dst->displayFrame.bottom = src->displayFrame.bottom;
-    dst->displayFrame.right = src->displayFrame.right;
-
-    // dst->visibleRegionScreen.numRects = src->visibleRegionScreen.numRects;
-    // dst->visibleRegionScreen.rects->left = src->visibleRegionScreen.rects->left;
-    // dst->visibleRegionScreen.rects->top; = src->visibleRegionScreen.rects->top;
-    // dst->visibleRegionScreen.rects->bottom = src->visibleRegionScreen.rects->bottom;
-    // dst->visibleRegionScreen.rects->right = src->visibleRegionScreen.rects->right;
-
-    memcpy(&dst->visibleRegionScreen,&src->visibleRegionScreen,sizeof( hwc_region_t ));
-}
-
-static void copy_layer_to_layer1(hwc_layer_1_t* dst,hwc_layer_t* src)
-{
-    dst->compositionType = src->compositionType;
-    dst->hints = src->hints;
-    dst->flags = src->flags;
-    dst->handle = src->handle;
-    dst->transform = src->transform;
-    dst->blending = src->blending;
-    // memcpy(&dst->sourceCrop,&src->sourceCrop,sizeof( hwc_rect_t ));
-    // memcpy(&dst->displayFrame,&src->displayFrame,sizeof( hwc_rect_t ));
-    // memcpy(&dst->visibleRegionScreen,&src->visibleRegionScreen,sizeof( hwc_region_t ));
-
-    dst->sourceCrop.left = src->sourceCrop.left;
-    dst->sourceCrop.top = src->sourceCrop.top;
-    dst->sourceCrop.bottom = src->sourceCrop.bottom;
-    dst->sourceCrop.right = src->sourceCrop.right;
-    dst->displayFrame.left = src->displayFrame.left;
-    dst->displayFrame.top = src->displayFrame.top;
-    dst->displayFrame.bottom = src->displayFrame.bottom;
-    dst->displayFrame.right = src->displayFrame.right;
-
-    // dst->visibleRegionScreen.numRects = src->visibleRegionScreen.numRects;
-    // dst->visibleRegionScreen.rects->left = src->visibleRegionScreen.rects->left;
-    // dst->visibleRegionScreen.rects->top; = src->visibleRegionScreen.rects->top;
-    // dst->visibleRegionScreen.rects->bottom = src->visibleRegionScreen.rects->bottom;
-    // dst->visibleRegionScreen.rects->right = src->visibleRegionScreen.rects->right;
-    memcpy(&dst->visibleRegionScreen,&src->visibleRegionScreen,sizeof( hwc_region_t ));
+#ifdef SIMD_LAYER_COPY
+    __asm__ volatile(
+        "vpush {d0}\n"
+        "vldr d0, [%0, #0x00]\n"
+        "vstr d0, [%1, #0x00]\n"
+        "vldr d0, [%0, #0x08]\n"
+        "vstr d0, [%1, #0x08]\n"
+        "vldr d0, [%0, #0x10]\n"
+        "vstr d0, [%1, #0x10]\n"
+        "vldr d0, [%0, #0x18]\n"
+        "vstr d0, [%1, #0x18]\n"
+        "vldr d0, [%0, #0x20]\n"
+        "vstr d0, [%1, #0x20]\n"
+        "vldr d0, [%0, #0x28]\n"
+        "vstr d0, [%1, #0x28]\n"
+        "vldr d0, [%0, #0x30]\n"
+        "vstr d0, [%1, #0x30]\n"
+        "vldr d0, [%0, #0x38]\n"
+        "vstr d0, [%1, #0x38]\n"
+        "vpop {d0}\n"
+        : : "r" (src), "r" (dst) :
+    );
+#else
+    // It is valid to copy a block the size of hwc_layer_t
+    // hwc_layer_1_t is an extension of hwc_layer_t
+    memcpy(dst, src, sizeof(hwc_layer_t));
+#endif
 }
 
 static void copy_display_contents_1_to_layer_list(hwc_layer_list_t* dst,hwc_display_contents_1_t* src)
@@ -198,7 +172,7 @@ static void copy_display_contents_1_to_layer_list(hwc_layer_list_t* dst,hwc_disp
     dst->flags = src->flags;
     unsigned int s,d;
     for (s = 0, d = 0; s < src->numHwLayers; s++) {
-        copy_layer1_to_layer(&dst->hwLayers[d++],&src->hwLayers[s]);
+        move_layer(&dst->hwLayers[d++],&src->hwLayers[s]);
     }
     dst->numHwLayers = d;
 }
@@ -208,7 +182,7 @@ static void copy_layer_list_to_display_contents_1(hwc_display_contents_1_t* dst,
     dst->flags = src->flags;
     unsigned int s,d;
     for (s = 0, d = 0; d < dst->numHwLayers; d++) {
-        copy_layer_to_layer1(&dst->hwLayers[d],&src->hwLayers[s++]);
+        move_layer(&dst->hwLayers[d],&src->hwLayers[s++]);
     }
 }
 
