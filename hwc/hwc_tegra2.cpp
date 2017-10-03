@@ -210,6 +210,23 @@ static void copy_layer_list_to_display_contents_1(hwc_display_contents_1_t* dst,
     for (s = 0, d = 0; d < dst->numHwLayers; d++) {
         copy_layer_to_layer1(&dst->hwLayers[d],&src->hwLayers[s++]);
     }
+
+// Make sure we have enough space on the translation buffer
+static inline size_t ensure_xlatebuf(void** buf, size_t bufsz, size_t reqsz)
+{
+    if (bufsz < reqsz) {
+        if (*buf)
+            *buf = realloc(*buf, reqsz);
+        else
+            *buf = malloc(reqsz);
+
+        if (!*buf) {
+            ALOGE("Failed to allocate buffer.");
+            abort();
+        }
+    }
+
+    return reqsz;
 }
 
 static int tegra2_set(struct hwc_composer_device_1 *dev,
@@ -232,17 +249,10 @@ static int tegra2_set(struct hwc_composer_device_1 *dev,
         return -ENODEV;
 
     int reqsz = sizeof (hwc_layer_list_t) + sizeof(hwc_layer_t) * contents->numHwLayers;
+    pdev->set_xlatebufsz =
+        ensure_xlatebuf(&pdev->set_xlatebuf, pdev->set_xlatebufsz, reqsz);
 
-    // Make sure we have enough space on the translation buffer
-    if (pdev->set_xlatebufsz < reqsz) {
-        if (!pdev->set_xlatebuf) {
-            pdev->set_xlatebuf = malloc(reqsz);
-        } else {
-            pdev->set_xlatebuf = realloc(pdev->set_xlatebuf,reqsz);
-        }
-        pdev->set_xlatebufsz = reqsz;
-    }
-    hwc_layer_list_t* lst = (hwc_layer_list_t*) pdev->set_xlatebuf;
+    hwc_layer_list_t* lst = (hwc_layer_list_t*)pdev->set_xlatebuf;
 
     copy_display_contents_1_to_layer_list(lst,contents);
     int ret = pdev->org->set(pdev->org, contents->dpy, contents->sur, lst);
@@ -284,15 +294,9 @@ static int tegra2_prepare(hwc_composer_device_1_t *dev,
     ALOGV("preparing %u layers", contents->numHwLayers);
 
     int reqsz = sizeof (hwc_layer_list_t) + sizeof(hwc_layer_t) * contents->numHwLayers;
-    // Make sure we have enough space on the translation buffer
-    if (pdev->prepare_xlatebufsz < reqsz) {
-        if (!pdev->prepare_xlatebuf) {
-            pdev->prepare_xlatebuf = malloc(reqsz);
-        } else {
-            pdev->prepare_xlatebuf = realloc(pdev->prepare_xlatebuf,reqsz);
-        }
-        pdev->prepare_xlatebufsz = reqsz;
-    }
+    pdev->prepare_xlatebufsz =
+        ensure_xlatebuf(&pdev->prepare_xlatebuf, pdev->set_xlatebufsz, reqsz);
+
     hwc_layer_list_t* lst = (hwc_layer_list_t*) pdev->prepare_xlatebuf;
 
 #ifdef SAMSUNG_T20_HWCOMPOSER
