@@ -164,7 +164,7 @@ static void copy_layer_list_to_display_contents_1(hwc_display_contents_1_t* dst,
 // Make sure we have enough space on the translation buffer
 static inline size_t ensure_xlatebuf(void** buf, size_t bufsz, size_t reqsz)
 {
-    if (bufsz < reqsz) {
+    if (unlikely(bufsz < reqsz)) {
         if (*buf)
             *buf = realloc(*buf, reqsz);
         else
