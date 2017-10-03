@@ -134,20 +134,37 @@ struct tegra2_hwc_composer_device_1_t {
     volatile bool fbblanked;    // Framebuffer disabled
 };
 
-static void move_layer(void* dst, void* src)
-{
-    // It is valid to copy a block the size of hwc_layer_t
-    // hwc_layer_1_t is an extension of hwc_layer_t
-    memcpy(dst, src, sizeof(hwc_layer_t));
-}
-
 static void copy_display_contents_1_to_layer_list(hwc_layer_list_t* dst,hwc_display_contents_1_t* src)
 {
     dst->flags = src->flags;
     unsigned int s,d;
+
+    __asm__ volatile("vpush {d0}\n" : : );
     for (s = 0, d = 0; s < src->numHwLayers; s++) {
-        move_layer(&dst->hwLayers[d++], &src->hwLayers[s]);
+        void *src_buf = &src->hwLayers[s];
+        void *dst_buf = &dst->hwLayers[d++];
+        __asm__ volatile(
+            "pld [%0, #64]\n"
+            "pld [%0, #96]\n"
+            "vldr d0, [%0, #0x00]\n"
+            "vstr d0, [%1, #0x00]\n"
+            "vldr d0, [%0, #0x08]\n"
+            "vstr d0, [%1, #0x08]\n"
+            "vldr d0, [%0, #0x10]\n"
+            "vstr d0, [%1, #0x10]\n"
+            "vldr d0, [%0, #0x18]\n"
+            "vstr d0, [%1, #0x18]\n"
+            "vldr d0, [%0, #0x20]\n"
+            "vstr d0, [%1, #0x20]\n"
+            "vldr d0, [%0, #0x28]\n"
+            "vstr d0, [%1, #0x28]\n"
+            "vldr d0, [%0, #0x30]\n"
+            "vstr d0, [%1, #0x30]\n"
+            "vldr d0, [%0, #0x38]\n"
+            "vstr d0, [%1, #0x38]\n"
+            : : "r" (src_buf), "r" (dst_buf) : );
     }
+    __asm__ volatile("vpop {d0}\n" : : );
     dst->numHwLayers = d;
 }
 
@@ -156,9 +173,32 @@ static void copy_layer_list_to_display_contents_1(hwc_display_contents_1_t* dst,
     dst->flags = src->flags;
     unsigned int s,d;
 
+    __asm__ volatile("vpush {d0}\n" : : );
     for (s = 0, d = 0; d < dst->numHwLayers; d++) {
-        move_layer(&src->hwLayers[s++], &dst->hwLayers[d]);
+        void *src_buf = &src->hwLayers[s++];
+        void *dst_buf = &dst->hwLayers[d];
+        __asm__ volatile(
+            "pld [%0, #64]\n"
+            "pld [%0, #96]\n"
+            "vldr d0, [%0, #0x00]\n"
+            "vstr d0, [%1, #0x00]\n"
+            "vldr d0, [%0, #0x08]\n"
+            "vstr d0, [%1, #0x08]\n"
+            "vldr d0, [%0, #0x10]\n"
+            "vstr d0, [%1, #0x10]\n"
+            "vldr d0, [%0, #0x18]\n"
+            "vstr d0, [%1, #0x18]\n"
+            "vldr d0, [%0, #0x20]\n"
+            "vstr d0, [%1, #0x20]\n"
+            "vldr d0, [%0, #0x28]\n"
+            "vstr d0, [%1, #0x28]\n"
+            "vldr d0, [%0, #0x30]\n"
+            "vstr d0, [%1, #0x30]\n"
+            "vldr d0, [%0, #0x38]\n"
+            "vstr d0, [%1, #0x38]\n"
+            : : "r" (src_buf), "r" (dst_buf) : );
     }
+    __asm__ volatile("vpop {d0}\n" : : );
 }
 
 // Make sure we have enough space on the translation buffer
