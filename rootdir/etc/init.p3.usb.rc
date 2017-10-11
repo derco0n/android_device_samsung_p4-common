@@ -30,4 +30,4 @@ on init
 on boot
     setprop sys.usb.configfs 1
     #Replace "ci_hdrc.0" with your platform UDC driver as found in /sys/class/udc/
-    setprop sys.usb.controller c5000000.usb
+    setprop sys.usb.controller ci_hdrc.0
