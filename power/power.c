@@ -100,6 +100,7 @@ static int sysfs_write(char *path, char *s)
     if (len < 0) {
         strerror_r(errno, buf, sizeof(buf));
         ALOGE("Error writing to %s: %s\n", path, buf);
+        close(fd);
         return -1;
     }
 
