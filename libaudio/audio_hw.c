@@ -1420,7 +1420,7 @@ exit:
 static int out_get_render_position(const struct audio_stream_out *stream,
                                    uint32_t *dsp_frames)
 {
-    return -EINVAL;
+    return -ENODATA;
 }
 
 static int out_add_audio_effect(const struct audio_stream *stream, effect_handle_t effect)
@@ -1446,7 +1446,7 @@ static int out_remove_audio_effect(const struct audio_stream *stream, effect_han
 static int out_get_next_write_timestamp(const struct audio_stream_out *stream,
                                         int64_t *timestamp)
 {
-    return -EINVAL;
+    return -ENOSYS;
 }
 
 static int out_flush(struct audio_stream_out* stream)
@@ -1475,18 +1475,15 @@ static int out_get_presentation_position(const struct audio_stream_out *stream,
                                    uint64_t *frames, struct timespec *timestamp)
 {
     struct stream_out *out = (struct stream_out *)stream;
-    int ret = -1;
+    int ret = -ENODATA;
+
+    if (out->pcm == NULL) {
+        return ret;
+    }
 
     out->sleep_req = true;
     out_lock(out);
     out->sleep_req = false;
-
-    if (out->pcm == NULL) {
-        ALOGV("out_get_presentation_position() out->pcm is NULL");
-        out_unlock(out);
-        *frames = 0;
-        return 0;
-    }
 
     size_t avail;
     if (pcm_get_htimestamp(out->pcm, &avail, timestamp) == 0) {
@@ -1496,11 +1493,8 @@ static int out_get_presentation_position(const struct audio_stream_out *stream,
         // It would be unusual for this value to be negative, but check just in case ...
         if (signed_frames >= 0) {
             *frames = signed_frames;
-        } else {
-            *frames = 0;
+            ret = 0;
         }
-
-        ret = 0;
     }
 
     out_unlock(out);
@@ -1644,7 +1638,7 @@ static char * in_get_parameters(const struct audio_stream *stream,
 
 static int in_set_gain(struct audio_stream_in *stream, float gain)
 {
-    return 0;
+    return -ENOSYS;
 }
 
 static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
