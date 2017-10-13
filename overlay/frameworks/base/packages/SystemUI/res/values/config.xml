@@ -21,12 +21,12 @@
      for different hardware and product builds. -->
 <resources>
 
-    <!-- Whether we're using the tablet-optimized recents interface (we use this
-     value at runtime for some things) -->
-    <bool name="config_recents_interface_for_tablets">true</bool>
-
     <!-- Disable expensive shadows -->
     <bool name="config_recents_fake_shadows">true</bool>
+
+    <!-- Whether to clip notification contents with a rounded rectangle. Might be expensive on
+     certain GPU's and thus can be turned off with only minimal visual impact. -->
+    <bool name="config_notifications_round_rect_clipping">false</bool>
 
     <!-- Use hardware layers in recents -->
     <bool name="config_recents_use_hardware_layers">true</bool>
