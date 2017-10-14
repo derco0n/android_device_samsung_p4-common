@@ -836,6 +836,12 @@ static int tegra2_open(const struct hw_module_t *module, const char *name,
     // Open framebuffer
     dev->fb_fd = open("/dev/graphics/fb0", O_RDWR);
 
+    if (dev->fb_fd < 0) {
+        ALOGE("Could not open fb0. %s", strerror(errno));
+        free(dev);
+        return -ENODEV;
+    }
+
     // Get framebuffer info
     if (dev->fb_fd >= 0 && ioctl(dev->fb_fd, FBIOGET_VSCREENINFO, &info) != -1) {
 
