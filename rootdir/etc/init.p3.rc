@@ -132,15 +132,12 @@ on post-fs-data
     write /dev/cpuset/top-app/cpus 0-1
 
     # foreground should contain most cores
-    write /dev/cpuset/foreground/cpus 0
+    write /dev/cpuset/foreground/cpus 0-1
 
     # background contains a small subset
     write /dev/cpuset/background/cpus 0
 
     # add system-background cpuset, a new cpuset for system services
-    # that should not run on larger cores
-    # system-background is for system tasks that should only run on
-    # little cores, not on bigs to be used only by init
     write /dev/cpuset/system-background/cpus 0
 
     #
