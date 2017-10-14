@@ -20,6 +20,7 @@ cc_library_shared {
         "power.c",
         "util.c",
         "interactive.c",
+        "schedtune.c",
     ],
     header_libs: [
         "libhardware_headers",

@@ -31,7 +31,7 @@
 #include "util.h"
 
 #include "interactive.h"
-
+#include "schedtune.h"
 
 #define TOUCH_SUSPEND_PATH "/sys/bus/i2c/drivers/sec_touch/4-004c/mxt1386/suspended"
 #define MPU3050_SUSPEND_PATH "/sys/bus/i2c/drivers/mpu3050/0-0068/mpu3050/suspended"
@@ -43,6 +43,8 @@
 static char screen_off_max_freq[MAX_BUF_SZ] = "456000";
 static char scaling_max_freq[MAX_BUF_SZ] = "1000000";
 static char normal_max_freq[MAX_BUF_SZ] = "1000000";
+
+#define NSEC_PER_SEC 1000000000LL
 
 static void store_max_freq(char* max_freq, bool low_power_mode)
 {
@@ -80,6 +82,8 @@ static void p3_power_init(struct power_module *module)
     // sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
 
     boostpulse_init(p3);
+
+    schedtune_power_init(p3);
 }
 
 static void p3_power_set_interactive(struct power_module *module, int on)
@@ -126,8 +130,9 @@ static void p3_power_hint(struct power_module *module, power_hint_t hint,
     case POWER_HINT_VSYNC:
         break;
     case POWER_HINT_INTERACTION:
+        ALOGV("POWER_HINT_INTERACTION\n");
         // boostpulse(p3);
-        ALOGI("POWER_HINT_INTERACTION\n");
+        schedtune_boost(p3, 1*NSEC_PER_SEC);
         break;
     case POWER_HINT_LOW_POWER:
         pthread_mutex_lock(&p3->lock);
@@ -148,8 +153,9 @@ static void p3_power_hint(struct power_module *module, power_hint_t hint,
         break;
 
     case POWER_HINT_LAUNCH:
-        ALOGI("POWER_HINT_LAUNCH\n");
-        boost_on(p3, data);
+        ALOGV("POWER_HINT_LAUNCH\n");
+        // boost_on(p3, data);
+        schedtune_boost(p3, 5*NSEC_PER_SEC);
         break;
     default:
         break;
