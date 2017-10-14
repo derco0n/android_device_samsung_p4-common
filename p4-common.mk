@@ -219,6 +219,11 @@ PRODUCT_PACKAGES += \
     android.hardware.gnss@1.0-impl.p3 \
     android.hardware.gnss@1.0-service.p3
 
+# DRM
+PRODUCT_PACKAGES += \
+    android.hardware.drm@1.0-impl \
+    android.hardware.drm@1.0-service
+
 PRODUCT_PACKAGES += \
 	android.hardware.configstore@1.0-service.p3
 
