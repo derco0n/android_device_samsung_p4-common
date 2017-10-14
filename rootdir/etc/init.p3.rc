@@ -127,6 +127,20 @@ on post-fs-data
     chown root system /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
     chmod 0664 /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
 
+    #
+    # EAS stune boosting interfaces
+    #
+    chown system system /dev/stune/top-app/schedtune.boost
+    chown system system /dev/stune/top-app/schedtune.prefer_idle
+    chown system system /dev/stune/foreground/schedtune.boost
+    chown system system /dev/stune/foreground/schedtune.prefer_idle
+    chown system system /dev/stune/schedtune.boost
+    write /dev/stune/top-app/schedtune.boost 10
+    write /dev/stune/top-app/schedtune.prefer_idle 1
+    write /dev/stune/foreground/schedtune.boost 0
+    write /dev/stune/foreground/schedtune.prefer_idle 1
+    write /dev/stune/schedtune.boost 0
+
 on boot
     # OTG Test
     chown system radio /sys/class/host_notify/usb_otg/booster
