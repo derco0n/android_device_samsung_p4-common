@@ -205,7 +205,8 @@ PRODUCT_COPY_FILES += \
 
 # Light HAL
 PRODUCT_PACKAGES += \
-    android.hardware.light@2.0-impl
+    android.hardware.light@2.0-impl \
+    android.hardware.light@2.0-service
 
 PRODUCT_PACKAGES += \
 	android.hardware.vibrator@1.0-service.p3
