@@ -24,7 +24,8 @@ LOCAL_SHARED_LIBRARIES := liblog libcutils
 LOCAL_SRC_FILES := \
 	power.c \
 	util.c \
-	interactive.c
+	interactive.c \
+	schedtune.c
 
 LOCAL_MODULE := power.p3
 LOCAL_MODULE_TAGS := optional

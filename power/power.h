@@ -17,6 +17,8 @@
 #ifndef __POWER_H__
 #define __POWER_H__
 
+#include <semaphore.h>
+
 #include <hardware/hardware.h>
 #include <hardware/power.h>
 
@@ -26,12 +28,18 @@ struct p3_power_module {
 
     bool low_power_mode;
 
+    /* interactive governor boost values */
     int boost_fd;
     int boost_warned;
     int boostpulse_fd;
     int boostpulse_warned;
     uint32_t pulse_duration;
     struct timespec last_boost_time; /* latest POWER_HINT_INTERACTION boost */
+
+    /* EAS schedtune values */
+    int schedtune_boost_fd;
+    long long deboost_time;
+    sem_t signal_lock;
 };
 
 
