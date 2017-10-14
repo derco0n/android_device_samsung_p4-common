@@ -16,7 +16,11 @@ cc_library_shared {
     name: "power.p3",
     relative_install_path: "hw",
     proprietary: true,
-    srcs: ["power.c"],
+    srcs: [
+        "power.c",
+        "util.c",
+        "interactive.c",
+    ],
     header_libs: [
         "libhardware_headers",
         "libutils_headers",
