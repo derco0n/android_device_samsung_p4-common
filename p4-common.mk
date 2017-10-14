@@ -93,8 +93,8 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/bcmdhd_apsta.bin:system/vendor/firmware/bcmdhd_apsta.bin \
     $(LOCAL_PATH)/wifi/bcmdhd_p2p.bin:system/vendor/firmware/bcmdhd_p2p.bin \
     $(LOCAL_PATH)/wifi/bcmdhd_sta.bin:system/vendor/firmware/bcmdhd_sta.bin \
-    $(LOCAL_PATH)/wifi/wpa_supplicant_overlay.conf:system/vendor/etc/wifi/wpa_supplicant_overlay.conf \
-    $(LOCAL_PATH)/wifi/p2p_supplicant_overlay.conf:system/vendor/etc/wifi/p2p_supplicant_overlay.conf \
+    $(LOCAL_PATH)/wifi/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf \
+    $(LOCAL_PATH)/wifi/p2p_supplicant_overlay.conf:system/etc/wifi/p2p_supplicant_overlay.conf \
 
 PRODUCT_PACKAGES += \
         libinvensense_mpl
