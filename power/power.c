@@ -162,8 +162,39 @@ static void p3_power_hint(struct power_module *module, power_hint_t hint,
     }
 }
 
+static int power_open(const hw_module_t* module, const char* name,
+                    hw_device_t** device)
+{
+    ALOGD("%s: enter; name=%s", __FUNCTION__, name);
+    int retval = 0; /* 0 is ok; -1 is error */
+
+    if (strcmp(name, POWER_HARDWARE_MODULE_ID) == 0) {
+        power_module_t *dev = (power_module_t *)calloc(1,
+                sizeof(power_module_t));
+
+        if (dev) {
+            /* Common hw_device_t fields */
+            dev->common.tag = HARDWARE_DEVICE_TAG;
+            dev->common.module_api_version = POWER_MODULE_API_VERSION_0_2;
+            dev->common.module_api_version = HARDWARE_HAL_API_VERSION;
+
+            dev->init = p3_power_init;
+            dev->powerHint = p3_power_hint;
+            dev->setInteractive = p3_power_set_interactive;
+
+            *device = (hw_device_t*)dev;
+        } else
+            retval = -ENOMEM;
+    } else {
+        retval = -EINVAL;
+    }
+
+    ALOGD("%s: exit %d", __FUNCTION__, retval);
+    return retval;
+}
+
 static struct hw_module_methods_t power_module_methods = {
-    .open = NULL,
+    .open = power_open,
 };
 
 struct p3_power_module HAL_MODULE_INFO_SYM = {

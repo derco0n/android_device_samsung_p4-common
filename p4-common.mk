@@ -188,7 +188,9 @@ PRODUCT_PACKAGES += \
     android.hardware.broadcastradio@1.0-impl \
     android.hardware.soundtrigger@2.0-impl
 
-PRODUCT_PACKAGES += android.hardware.power@1.0-impl
+PRODUCT_PACKAGES += \
+	android.hardware.power@1.0-impl \
+	android.hardware.power@1.0-service
 
 # Keymaster HAL
 PRODUCT_PACKAGES += \
