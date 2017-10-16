@@ -104,16 +104,18 @@ static void p3_power_set_interactive(struct power_module *module, int on)
 
         sysfs_write(TOUCH_SUSPEND_PATH, "1");
         sysfs_write(MPU3050_SUSPEND_PATH, "1");
-    } else if (p3->low_power_mode) {
-        store_max_freq(scaling_max_freq, p3->low_power_mode);
-
-        sysfs_write(CPU0_SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
-        sysfs_write(CPU1_SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
-        // sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "99");
     } else {
-        sysfs_write(CPU0_SCALINGMAXFREQ_PATH, scaling_max_freq);
-        sysfs_write(CPU1_SCALINGMAXFREQ_PATH, scaling_max_freq);
-        // sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
+        if (p3->low_power_mode) {
+            store_max_freq(scaling_max_freq, p3->low_power_mode);
+
+            sysfs_write(CPU0_SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
+            sysfs_write(CPU1_SCALINGMAXFREQ_PATH, LOW_POWER_MAX_FREQ);
+            // sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "99");
+        } else {
+            sysfs_write(CPU0_SCALINGMAXFREQ_PATH, scaling_max_freq);
+            sysfs_write(CPU1_SCALINGMAXFREQ_PATH, scaling_max_freq);
+            // sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
+        }
 
         sysfs_write(TOUCH_SUSPEND_PATH, "0");
         sysfs_write(MPU3050_SUSPEND_PATH, "0");
