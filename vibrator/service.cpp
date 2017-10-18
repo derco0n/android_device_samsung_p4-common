@@ -30,6 +30,7 @@ using android::hardware::vibrator::V1_0::implementation::Vibrator;
 using namespace android;
 
 static const char *ENABLE_PATH = "/sys/class/timed_output/vibrator/enable";
+static const char *AMPLITUDE_PATH = "/sys/devices/soc0/i2c@15/i2c-16/16-0048/duty_cycle";
 
 status_t registerVibratorService() {
     std::ofstream enable{ENABLE_PATH};
@@ -39,7 +40,14 @@ status_t registerVibratorService() {
         return -error;
     }
 
-    sp<IVibrator> vibrator = new Vibrator(std::move(enable));
+    std::ofstream amplitude{AMPLITUDE_PATH};
+    if (!amplitude) {
+        int error = errno;
+        ALOGE("Failed to open %s (%d): %s", AMPLITUDE_PATH, error, strerror(error));
+        return -error;
+    }
+
+    sp<IVibrator> vibrator = new Vibrator(std::move(enable), std::move(amplitude));
     vibrator->registerAsService();
     return OK;
 }

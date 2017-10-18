@@ -35,11 +35,18 @@ namespace vibrator {
 namespace V1_0 {
 namespace implementation {
 
-Vibrator::Vibrator(std::ofstream&& enable) :
-        mEnable(std::move(enable)) {}
+static constexpr int MAX_PERCENT = 97;
+static constexpr int MIN_PERCENT = 25;
+
+static constexpr uint32_t CLICK_TIMING_MS = 20;
+
+Vibrator::Vibrator(std::ofstream&& enable, std::ofstream&& amplitude) :
+        mEnable(std::move(enable)),
+        mAmplitude(std::move(amplitude)) {}
 
 // Methods from ::android::hardware::vibrator::V1_0::IVibrator follow.
 Return<Status> Vibrator::on(uint32_t timeout_ms) {
+    mAmplitude << mDutyCyclePercent << std::endl;
     mEnable << timeout_ms << std::endl;
     if (!mEnable) {
         ALOGE("Failed to turn vibrator on (%d): %s", errno, strerror(errno));
@@ -58,15 +65,49 @@ Return<Status> Vibrator::off()  {
 }
 
 Return<bool> Vibrator::supportsAmplitudeControl()  {
-    return false;
+    return !!mAmplitude;
 }
 
-Return<Status> Vibrator::setAmplitude(uint8_t) {
-    return Status::UNSUPPORTED_OPERATION;
+Return<Status> Vibrator::setAmplitude(uint8_t amplitude) {
+    if (amplitude == 0) {
+        return Status::BAD_VALUE;
+    }
+
+    int percent =
+            std::lround((amplitude - 1) / 254.0 * (MAX_PERCENT - MIN_PERCENT) + MIN_PERCENT);
+    ALOGE("Setting amplitude (duty cycle percent) to: %ld", percent);
+    mAmplitude << percent << std::endl;
+    if (!mAmplitude) {
+        ALOGE("Failed to set amplitude (%d): %s", errno, strerror(errno));
+        return Status::UNKNOWN_ERROR;
+    }
+    mDutyCyclePercent = percent;
+    return Status::OK;
 }
 
-Return<void> Vibrator::perform(Effect, EffectStrength, perform_cb _hidl_cb) {
-    _hidl_cb(Status::UNSUPPORTED_OPERATION, 0);
+Return<void> Vibrator::perform(Effect effect, EffectStrength strength, perform_cb _hidl_cb) {
+    if (effect == Effect::CLICK) {
+        uint8_t amplitude;
+        switch (strength) {
+        case EffectStrength::LIGHT:
+            amplitude = 36;
+            break;
+        case EffectStrength::MEDIUM:
+            amplitude = 128;
+            break;
+        case EffectStrength::STRONG:
+            amplitude = 255;
+            break;
+        default:
+            _hidl_cb(Status::UNSUPPORTED_OPERATION, 0);
+            return Void();
+        }
+        setAmplitude(amplitude);
+        on(CLICK_TIMING_MS);
+        _hidl_cb(Status::OK, CLICK_TIMING_MS);
+    } else {
+        _hidl_cb(Status::UNSUPPORTED_OPERATION, 0);
+    }
     return Void();
 }
 
