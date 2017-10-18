@@ -245,7 +245,7 @@ on boot
     write /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq 1000000
 
     write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor schedutil
-    write /sys/devices/system/cpu/cpufreq/schedutil/down_rate_limit_us 40000
+    write /sys/devices/system/cpu/cpufreq/schedutil/down_rate_limit_us 1000
     write /sys/devices/system/cpu/cpufreq/schedutil/up_rate_limit_us 1000
 
     # Power HAL permissions
