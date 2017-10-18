@@ -13,7 +13,19 @@ EXTRA_FILES := \
 	libcrypto.so \
 	libft2.so \
 	libpng.so \
-	libminuitwrp.so
+	libminuitwrp.so \
+	libext2fs.so \
+	libtwrpmtp.so \
+	libblkid.so \
+	libext4_utils.so \
+	libminadbd.so \
+	unpigz \
+	resize2fs \
+	fsck.fat \
+	bu \
+	libbacktrace.so \
+	libtar.so \
+	libsparse.so
 
 EXTRA_TMP := extra_tmp
 # Needs to be actual working path on the device
