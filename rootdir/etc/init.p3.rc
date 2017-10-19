@@ -310,8 +310,9 @@ on boot
     # Wifi firmware reload path
     chown wifi wifi /sys/module/dhd/parameters/firmware_path
 
-    # isa1200 vibrator amplitude
-    chown system system /sys/devices/soc0/i2c@15/i2c-16/16-0048/duty_cycle
+    # isa1200 vibrator
+    chown system system /sys/class/leds/isa1200/enable
+    chown system system /sys/class/leds/isa1200/amplitude
 
 on property:sys.boot_completed=1
     write /sys/block/mmcblk0/queue/scheduler cfq
