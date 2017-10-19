@@ -157,7 +157,7 @@ static void copy_layer_list_to_display_contents_1(hwc_display_contents_1_t* dst,
     unsigned int s,d;
 
     for (s = 0, d = 0; d < dst->numHwLayers; d++) {
-        move_layer(&src->hwLayers[s++], &dst->hwLayers[d]);
+        move_layer(&dst->hwLayers[d], &src->hwLayers[s++]);
     }
 }
 
