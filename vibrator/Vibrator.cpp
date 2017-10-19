@@ -43,7 +43,7 @@ Vibrator::Vibrator(std::ofstream&& enable, std::ofstream&& amplitude) :
 
 // Methods from ::android::hardware::vibrator::V1_0::IVibrator follow.
 Return<Status> Vibrator::on(uint32_t timeout_ms) {
-    ALOGD("%s", __func__);
+    ALOGV("%s", __func__);
     mAmplitudeFile << mAmplitude << std::endl;
     mEnableFile << timeout_ms << std::endl;
     if (!mEnableFile || !mAmplitudeFile) {
@@ -54,7 +54,7 @@ Return<Status> Vibrator::on(uint32_t timeout_ms) {
 }
 
 Return<Status> Vibrator::off()  {
-    ALOGD("%s", __func__);
+    ALOGV("%s", __func__);
     mAmplitudeFile << 0 << std::endl;
     mEnableFile << 0 << std::endl;
     if (!mEnableFile || !mAmplitudeFile) {
@@ -73,7 +73,7 @@ Return<Status> Vibrator::setAmplitude(uint8_t amplitude) {
         return Status::BAD_VALUE;
     }
 
-    ALOGD("Setting amplitude to: %d", amplitude);
+    ALOGV("Setting amplitude to: %d", amplitude);
     mAmplitudeFile << amplitude << std::endl;
     if (!mAmplitudeFile) {
         ALOGE("Failed to set amplitude (%d): %s", errno, strerror(errno));
