@@ -39,9 +39,9 @@ public:
   Return<void> perform(Effect effect, EffectStrength strength, perform_cb _hidl_cb) override;
 
 private:
-  std::ofstream mEnable;
-  std::ofstream mAmplitude;
-  int mDutyCyclePercent;
+  std::ofstream mEnableFile;
+  std::ofstream mAmplitudeFile;
+  int mAmplitude;
 };
 }  // namespace implementation
 }  // namespace V1_0

@@ -35,20 +35,18 @@ namespace vibrator {
 namespace V1_0 {
 namespace implementation {
 
-static constexpr int MAX_PERCENT = 97;
-static constexpr int MIN_PERCENT = 25;
-
 static constexpr uint32_t CLICK_TIMING_MS = 20;
 
 Vibrator::Vibrator(std::ofstream&& enable, std::ofstream&& amplitude) :
-        mEnable(std::move(enable)),
-        mAmplitude(std::move(amplitude)) {}
+        mEnableFile(std::move(enable)),
+        mAmplitudeFile(std::move(amplitude)) {}
 
 // Methods from ::android::hardware::vibrator::V1_0::IVibrator follow.
 Return<Status> Vibrator::on(uint32_t timeout_ms) {
-    mAmplitude << mDutyCyclePercent << std::endl;
-    mEnable << timeout_ms << std::endl;
-    if (!mEnable) {
+    ALOGD("%s", __func__);
+    mAmplitudeFile << mAmplitude << std::endl;
+    mEnableFile << timeout_ms << std::endl;
+    if (!mEnableFile || !mAmplitudeFile) {
         ALOGE("Failed to turn vibrator on (%d): %s", errno, strerror(errno));
         return Status::UNKNOWN_ERROR;
     }
@@ -56,8 +54,10 @@ Return<Status> Vibrator::on(uint32_t timeout_ms) {
 }
 
 Return<Status> Vibrator::off()  {
-    mEnable << 0 << std::endl;
-    if (!mEnable) {
+    ALOGD("%s", __func__);
+    mAmplitudeFile << 0 << std::endl;
+    mEnableFile << 0 << std::endl;
+    if (!mEnableFile || !mAmplitudeFile) {
         ALOGE("Failed to turn vibrator off (%d): %s", errno, strerror(errno));
         return Status::UNKNOWN_ERROR;
     }
@@ -65,7 +65,7 @@ Return<Status> Vibrator::off()  {
 }
 
 Return<bool> Vibrator::supportsAmplitudeControl()  {
-    return !!mAmplitude;
+    return !!mAmplitudeFile;
 }
 
 Return<Status> Vibrator::setAmplitude(uint8_t amplitude) {
@@ -73,15 +73,13 @@ Return<Status> Vibrator::setAmplitude(uint8_t amplitude) {
         return Status::BAD_VALUE;
     }
 
-    int percent =
-            std::lround((amplitude - 1) / 254.0 * (MAX_PERCENT - MIN_PERCENT) + MIN_PERCENT);
-    ALOGE("Setting amplitude (duty cycle percent) to: %ld", percent);
-    mAmplitude << percent << std::endl;
-    if (!mAmplitude) {
+    ALOGD("Setting amplitude to: %d", amplitude);
+    mAmplitudeFile << amplitude << std::endl;
+    if (!mAmplitudeFile) {
         ALOGE("Failed to set amplitude (%d): %s", errno, strerror(errno));
         return Status::UNKNOWN_ERROR;
     }
-    mDutyCyclePercent = percent;
+    mAmplitude = amplitude;
     return Status::OK;
 }
 
