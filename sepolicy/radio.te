@@ -1,0 +1,1 @@
+allow radio ics_blob_file:file { read open getattr execute execmod };

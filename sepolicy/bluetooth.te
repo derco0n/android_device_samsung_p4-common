@@ -1,4 +1,1 @@
-# Kernel bug for Linux < 3.3: sysfs inodes can lose their security context
-# and revert to the base sysfs type.
-allow bluetooth sysfs:file write;
-allow bluetooth kernel:system module_request;
+allow bluetooth ics_blob_file:file { read open getattr execute execmod };

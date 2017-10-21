@@ -1,0 +1,1 @@
+allow hal_power_default { sysfs sysfs_devices_system_cpu }:file { open write };
