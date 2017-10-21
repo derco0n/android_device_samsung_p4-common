@@ -92,26 +92,6 @@ on post-fs-data
     chown system radio /sys/class/power_supply/battery/fg_reg
     chown system radio /sys/class/power_supply/battery/charging_mode_booting
 
-    # global writeable for voodoo sound app
-    restorecon /sys/devices/virtual/misc/voodoo_sound/mono_downmix
-    restorecon /sys/devices/virtual/misc/voodoo_sound/stereo_expansion
-    restorecon /sys/devices/virtual/misc/voodoo_sound/adc_osr128
-    restorecon /sys/devices/virtual/misc/voodoo_sound/dac_direct
-    restorecon /sys/devices/virtual/misc/voodoo_sound/dac_osr128
-    restorecon /sys/devices/virtual/misc/voodoo_sound/digital_gain
-    restorecon /sys/devices/virtual/misc/voodoo_sound/headphone_amplifier_level
-    restorecon /sys/devices/virtual/misc/voodoo_sound/headphone_eq
-    restorecon /sys/devices/virtual/misc/voodoo_sound/headphone_eq_b1_gain
-    restorecon /sys/devices/virtual/misc/voodoo_sound/headphone_eq_b2_gain
-    restorecon /sys/devices/virtual/misc/voodoo_sound/headphone_eq_b3_gain
-    restorecon /sys/devices/virtual/misc/voodoo_sound/headphone_eq_b4_gain
-    restorecon /sys/devices/virtual/misc/voodoo_sound/headphone_eq_b5_gain
-    restorecon /sys/devices/virtual/misc/voodoo_sound/mono_downmix
-    restorecon /sys/devices/virtual/misc/voodoo_sound/recording_preset
-    restorecon /sys/devices/virtual/misc/voodoo_sound/stereo_expansion
-    restorecon /sys/devices/virtual/misc/voodoo_sound/stereo_expansion_gain
-    restorecon /sys/devices/virtual/misc/voodoo_sound/version
-
     # allow system to modify cpufreq control files
     chown root system /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
     chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
