@@ -35,7 +35,7 @@ namespace vibrator {
 namespace V1_0 {
 namespace implementation {
 
-static constexpr uint32_t CLICK_TIMING_MS = 20;
+static constexpr uint32_t CLICK_TIMING_MS = 15;
 
 Vibrator::Vibrator(std::ofstream&& enable, std::ofstream&& amplitude) :
         mEnableFile(std::move(enable)),
