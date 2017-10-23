@@ -44,7 +44,6 @@ Vibrator::Vibrator(std::ofstream&& enable, std::ofstream&& amplitude) :
 // Methods from ::android::hardware::vibrator::V1_0::IVibrator follow.
 Return<Status> Vibrator::on(uint32_t timeout_ms) {
     ALOGV("%s", __func__);
-    mAmplitudeFile << mAmplitude << std::endl;
     mEnableFile << timeout_ms << std::endl;
     if (!mEnableFile || !mAmplitudeFile) {
         ALOGE("Failed to turn vibrator on (%d): %s", errno, strerror(errno));
@@ -55,7 +54,6 @@ Return<Status> Vibrator::on(uint32_t timeout_ms) {
 
 Return<Status> Vibrator::off()  {
     ALOGV("%s", __func__);
-    mAmplitudeFile << 0 << std::endl;
     mEnableFile << 0 << std::endl;
     if (!mEnableFile || !mAmplitudeFile) {
         ALOGE("Failed to turn vibrator off (%d): %s", errno, strerror(errno));
