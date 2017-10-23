@@ -399,16 +399,14 @@ int sensors_poll_context_t::batch(int handle, int flags, int64_t period_ns, int6
             // The HAL should silently clamp period_ns. Here it is assumed
             // that maxDelay and minDelay are set properly
             int sub_index = get_module_index(handle);
-            int minDelay, maxDelay;
+            int minDelay = 0, maxDelay = 0;
 
-            if (halIsAPILevelCompliant(this, handle, SENSORS_DEVICE_API_VERSION_1_0)) {
-                minDelay = global_sensors_list[sub_index].minDelay;
+            minDelay = global_sensors_list[sub_index].minDelay;
+            if (halIsAPILevelCompliant(this, handle, SENSORS_DEVICE_API_VERSION_1_0))
                 maxDelay = global_sensors_list[sub_index].maxDelay;
-            } else if (halIsAPILevelCompliant(this, handle, 0)) {
+            else if (halIsAPILevelCompliant(this, handle, 0))
                 // maxDelay was introduced in HAL v1
-                minDelay = global_sensors_list[sub_index].minDelay;
                 maxDelay = 60 * 1000 * 1000;
-            }
 
             if (period_ns < minDelay) {
                 period_ns = minDelay;
