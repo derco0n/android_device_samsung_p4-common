@@ -268,6 +268,8 @@ static bool halIsAPILevelCompliant(sensors_poll_context_t *ctx, int handle, int 
 
 const char *apiNumToStr(int version) {
     switch(version) {
+    case 0:
+        return "Sensor module version 0";
     case SENSORS_DEVICE_API_VERSION_1_0:
         return "SENSORS_DEVICE_API_VERSION_1_0";
     case SENSORS_DEVICE_API_VERSION_1_1:
@@ -397,15 +399,33 @@ int sensors_poll_context_t::batch(int handle, int flags, int64_t period_ns, int6
             // The HAL should silently clamp period_ns. Here it is assumed
             // that maxDelay and minDelay are set properly
             int sub_index = get_module_index(handle);
-            int maxDelay = global_sensors_list[sub_index].maxDelay;
-            int minDelay = global_sensors_list[sub_index].minDelay;
+            int minDelay, maxDelay;
+
+            if (halIsAPILevelCompliant(this, handle, SENSORS_DEVICE_API_VERSION_1_0)) {
+                minDelay = global_sensors_list[sub_index].minDelay;
+                maxDelay = global_sensors_list[sub_index].maxDelay;
+            } else if (halIsAPILevelCompliant(this, handle, 0)) {
+                // maxDelay was introduced in HAL v1
+                minDelay = global_sensors_list[sub_index].minDelay;
+                maxDelay = 60 * 1000 * 1000;
+            }
+
             if (period_ns < minDelay) {
                 period_ns = minDelay;
             } else if (period_ns > maxDelay) {
                 period_ns = maxDelay;
             }
 
-            retval = v1->setDelay((sensors_poll_device_t*)v1, handle, period_ns);
+            if (halIsAPILevelCompliant(this, handle, SENSORS_DEVICE_API_VERSION_1_0)) {
+                retval = v1->setDelay((sensors_poll_device_t*)v1, handle, period_ns);
+            } else if (halIsAPILevelCompliant(this, handle, 0)) {
+                sensors_poll_device_t* v0 = this->get_v0_device_by_handle(handle);
+                if (!v0) {
+                    ALOGE("Could not get v0 device.");
+                    return -ENODEV;
+                }
+                retval = v0->setDelay((sensors_poll_device_t*)v0, handle, period_ns);
+            }
 
             // Batch should only fail for internal errors
             if (retval < 0) {
@@ -762,8 +782,8 @@ static int open_sensors(const struct hw_module_t* hw_module, const char* name,
         struct hw_device_t* sub_hw_device;
         int sub_open_result = sensors_module->common.methods->open(*it, name, &sub_hw_device);
         if (!sub_open_result) {
-            ALOGV("This HAL reports API level : %s",
-                    apiNumToStr(sub_hw_device->version));
+            ALOGD("This HAL reports API level : %s (version=%d)",
+                    apiNumToStr(sub_hw_device->version), sub_hw_device->version);
             dev->addSubHwDevice(sub_hw_device);
             sub_hw_versions->insert(std::make_pair(*it, sub_hw_device->version));
         }
