@@ -72,7 +72,7 @@ Return<Status> Vibrator::setAmplitude(uint8_t amplitude) {
     }
 
     ALOGV("Setting amplitude to: %d", amplitude);
-    mAmplitudeFile << amplitude << std::endl;
+    mAmplitudeFile << (int)amplitude << std::endl;
     if (!mAmplitudeFile) {
         ALOGE("Failed to set amplitude (%d): %s", errno, strerror(errno));
         return Status::UNKNOWN_ERROR;
