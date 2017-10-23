@@ -35,7 +35,7 @@ namespace vibrator {
 namespace V1_0 {
 namespace implementation {
 
-static constexpr uint32_t CLICK_TIMING_MS = 15;
+static constexpr uint32_t CLICK_TIMING_MS = 12;
 
 Vibrator::Vibrator(std::ofstream&& enable, std::ofstream&& amplitude) :
         mEnableFile(std::move(enable)),
@@ -89,7 +89,7 @@ Return<void> Vibrator::perform(Effect effect, EffectStrength strength, perform_c
             amplitude = 36;
             break;
         case EffectStrength::MEDIUM:
-            amplitude = 128;
+            amplitude = 90;
             break;
         case EffectStrength::STRONG:
             amplitude = 255;
