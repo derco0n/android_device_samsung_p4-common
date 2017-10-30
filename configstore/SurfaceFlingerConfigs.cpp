@@ -25,7 +25,7 @@ Return<void> SurfaceFlingerConfigs::useContextPriority(useContextPriority_cb _hi
 }
 
 Return<void> SurfaceFlingerConfigs::maxFrameBufferAcquiredBuffers(maxFrameBufferAcquiredBuffers_cb _hidl_cb) {
-    _hidl_cb({true, 2});
+    _hidl_cb({true, 3});
     return Void();
 }
 
