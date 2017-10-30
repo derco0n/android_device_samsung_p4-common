@@ -234,6 +234,12 @@ PRODUCT_PACKAGES += \
 DEVICE_PACKAGE_OVERLAYS := \
     $(LOCAL_PATH)/overlay
 
+PRODUCT_DEXPREOPT_SPEED_APPS += \
+	SystemUI \
+	Settings \
+	Launcher3 \
+	webview
+
 # Recovery
 PRODUCT_COPY_FILES += $(LOCAL_PATH)/twrp.fstab:recovery/root/etc/twrp.fstab
 
