@@ -53,7 +53,9 @@ PRODUCT_PROPERTY_OVERRIDES := \
     ro.zygote.disable_gl_preload=true \
     persist.sys.media.legacy-drm=true \
     media.stagefright.legacyencoder=true \
-    persist.media.treble_omx=false
+    persist.media.treble_omx=false \
+    dalvik.vm.boot-dex2oat-threads=2 \
+    dalvik.vm.dex2oat-threads=1
 
 # Storage
 PRODUCT_PROPERTY_OVERRIDES += \
