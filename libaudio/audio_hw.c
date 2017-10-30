@@ -1379,7 +1379,11 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
     if (adev->legacy_kernel) {
         ret = legacy_out_write(stream, buffer, bytes);
     } else {
+        size_t frame_size = audio_stream_out_frame_size(stream);
+        size_t out_frames = bytes / frame_size;
         ret = pcm_write(out->pcm, (void *)buffer, bytes);
+        if (ret == 0)
+            out->written += out_frames;
     }
 
 exit:
