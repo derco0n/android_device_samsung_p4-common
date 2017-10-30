@@ -22,7 +22,7 @@ USE_CAMERA_STUB := false
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
 # USE_CLANG_PLATFORM_BUILD := false
-WITH_DEXPREOPT := false
+# WITH_DEXPREOPT := false
 # TARGET_NO_RECOVERY := true
 
 # Architecture
