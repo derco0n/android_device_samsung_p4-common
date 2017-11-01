@@ -7,3 +7,5 @@
 
 allow untrusted_app_25 ics_blob_file:file { read open getattr execute execmod };
 allow untrusted_app_25 sysfs_devices_tegradc:file { getattr open read };
+
+allow untrusted_app_25 sysfs_voodoo_sound:file rw_file_perms;
