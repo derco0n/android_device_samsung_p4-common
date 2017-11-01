@@ -1,3 +1,4 @@
+allow untrusted_app sysfs_voodoo_sound:dir rw_dir_perms;
 allow untrusted_app sysfs_voodoo_sound:file rw_file_perms;
 allow untrusted_app sysfs_devices_system_cpu:file rw_file_perms;
 
