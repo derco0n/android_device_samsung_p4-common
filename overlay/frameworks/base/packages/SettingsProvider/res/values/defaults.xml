@@ -19,6 +19,5 @@
 <resources>
     <string name="def_backup_transport">com.google.android.gms/.backup.BackupTransportService</string>
 
-    <bool name="def_bluetooth_on">false</bool>
     <bool name="def_wifi_on">true</bool>
 </resources>
