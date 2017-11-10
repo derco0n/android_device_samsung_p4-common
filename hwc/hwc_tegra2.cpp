@@ -63,8 +63,6 @@
 #define SYSTEM_HAL_PATH "/system/lib/hw/hwcomposer.tegra_v0.so"
 #define VENDOR_HAL_PATH "/system/vendor/lib/hw/hwcomposer.tegra_v0.so"
 
-#define GLES_COMPOSITION 1
-
 // Get the original hw composer
 static hwc_module_t* get_hwc(void)
 {
@@ -209,18 +207,6 @@ static int tegra2_set(struct hwc_composer_device_1 *dev,
     copy_display_contents_1_to_layer_list(lst,contents);
     int ret = pdev->org->set(pdev->org, contents->dpy, contents->sur, lst);
     copy_layer_list_to_display_contents_1(contents,lst);
-
-    /*
-     * The section below requires that the original HWC 0.1 binary
-     * be modified to return 1 (aka GLES_COMPOSITION) in place of the
-     * eglSwapBuffers call.
-     */
-    if (ret == GLES_COMPOSITION) {
-        ret = eglSwapBuffers(contents->dpy, contents->sur);
-        if (ret != EGL_TRUE) {
-            ALOGE("eglswapbuffers error. ret=%d", ret);
-        }
-    }
 
     //Wait until all buffers are available
     unsigned int d;
