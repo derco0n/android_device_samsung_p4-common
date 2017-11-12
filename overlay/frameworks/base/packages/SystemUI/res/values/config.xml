@@ -35,6 +35,6 @@
     <integer name="config_recents_max_icon_count">10</integer>
 
     <!-- Svelte specific logic, see RecentsConfiguration.SVELTE_* constants. -->
-    <integer name="recents_svelte_level">2</integer>
+    <integer name="recents_svelte_level">1</integer>
 
 </resources>
