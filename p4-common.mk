@@ -53,7 +53,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
     persist.sys.media.legacy-drm=true \
-    media.stagefright.legacyencoder=true
+    media.stagefright.legacyencoder=true \
+    sys.use_fifo_ui=1
 
 # Storage
 PRODUCT_PROPERTY_OVERRIDES += \
