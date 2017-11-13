@@ -53,7 +53,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
     ro.zygote.disable_gl_preload=true \
     persist.sys.media.legacy-drm=true \
     media.stagefright.legacyencoder=true \
-    persist.media.treble_omx=false
+    persist.media.treble_omx=false \
+    sys.use_fifo_ui=1
 
 # Storage
 PRODUCT_PROPERTY_OVERRIDES += \
