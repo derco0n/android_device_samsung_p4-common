@@ -10,12 +10,12 @@ namespace implementation {
 
 // Methods from ::android::hardware::configstore::V1_0::ISurfaceFlingerConfigs follow.
 Return<void> SurfaceFlingerConfigs::vsyncEventPhaseOffsetNs(vsyncEventPhaseOffsetNs_cb _hidl_cb) {
-    _hidl_cb({true, 0});
+    _hidl_cb({true, 6500000});
     return Void();
 }
 
 Return<void> SurfaceFlingerConfigs::vsyncSfEventPhaseOffsetNs(vsyncEventPhaseOffsetNs_cb _hidl_cb) {
-    _hidl_cb({true, 0});
+    _hidl_cb({true, 4000000});
     return Void();
 }
 
