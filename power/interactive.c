@@ -17,6 +17,7 @@
 
 #include "interactive.h"
 
+#define CPUFREQ_INTERACTIVE "/sys/devices/system/cpu/cpufreq/interactive/"
 #define BOOST_PATH      "/sys/devices/system/cpu/cpufreq/interactive/boost"
 #define BOOSTPULSE_PATH "/sys/devices/system/cpu/cpufreq/interactive/boostpulse"
 #define BOOST_DURATION_PATH "/sys/devices/system/cpu/cpufreq/interactive/boostpulse_duration"
