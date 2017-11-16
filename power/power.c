@@ -78,10 +78,8 @@ static void p3_power_init(struct power_module *module)
      */
 
     sysfs_write(CPUFREQ_INTERACTIVE "timer_rate", "30000");
-    sysfs_write(CPUFREQ_INTERACTIVE "min_sample_time", "80000");
-    sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "90");
-    sysfs_write(CPUFREQ_INTERACTIVE "target_loads",
-        "30 608000:40 760000:50 816000:60 912000:70 1000000:80");
+    sysfs_write(CPUFREQ_INTERACTIVE "min_sample_time", "40000");
+    sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "80");
 
     boostpulse_init(p3);
 
