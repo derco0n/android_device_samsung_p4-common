@@ -105,7 +105,7 @@ static int open_lights(const struct hw_module_t* module, char const* name,
 {
     struct light_device_t *dev;
 
-    if (!strcmp(LIGHT_ID_BACKLIGHT, name))
+    if (strcmp(LIGHT_ID_BACKLIGHT, name))
         return -EINVAL;
 
     pthread_once(&g_init, init_globals);
