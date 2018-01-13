@@ -246,3 +246,4 @@ PRODUCT_COPY_FILES += $(LOCAL_PATH)/twrp.fstab:recovery/root/etc/twrp.fstab
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product-if-exists, vendor/decatf/config/common.mk)
+$(call inherit-product, device/samsung/p4-common/go_custom.mk)
