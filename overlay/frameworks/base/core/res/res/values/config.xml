@@ -241,4 +241,7 @@
          and DRAM to be powered and refreshed through all stages of reboot. -->
     <bool name="config_supportPreRebootSecurityLogs">true</bool>
 
+    <!-- Boolean indicating whether the HWC setColorTransform function can be performed efficiently
+         in hardware. -->
+    <bool name="config_setColorTransformAccelerated">true</bool>
 </resources>
