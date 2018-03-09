@@ -2,3 +2,8 @@ service gnss_service /vendor/bin/hw/android.hardware.gnss@1.0-service.p3
     class main
     user root
     group system gps radio inet
+
+service gps-daemon /system/vendor/bin/gpsd -c /system/vendor/etc/gps.xml
+    class main
+    user root
+    group system gps radio inet
