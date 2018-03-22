@@ -178,3 +178,6 @@ MR_FSTAB := device/samsung/p4-common/twrp.fstab
 MR_KEXEC_MEM_MIN := 0x08000000
 MR_INFOS := device/samsung/p4-common/mrom_infos
 TARGET_RECOVERY_IS_MULTIROM := true
+
+ENABLE_CPUSETS := true
+ENABLE_SCHEDBOOST := true
