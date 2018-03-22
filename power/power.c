@@ -33,7 +33,7 @@
 #include "interactive.h"
 #include "schedtune.h"
 
-#define TOUCH_SUSPEND_PATH "/sys/bus/i2c/drivers/sec_touch/4-004c/mxt1386/suspended"
+#define TOUCH_SUSPEND_PATH "/sys/bus/i2c/drivers/atmel_mxt_ts/4-004c/suspended"
 #define MPU3050_SUSPEND_PATH "/sys/bus/i2c/drivers/mpu3050/0-0068/mpu3050/suspended"
 
 #define LOW_POWER_MAX_FREQ "456000"
