@@ -239,6 +239,9 @@ on boot
     chown system system /sys/bus/i2c/drivers/sec_touch/4-004c/mxt1386/suspended
     chmod 0666 /sys/bus/i2c/drivers/sec_touch/4-004c/mxt1386/suspended
 
+    chown system system /sys/bus/i2c/drivers/atmel_mxt_ts/4-004c/suspended
+    chmod 0666 /sys/bus/i2c/drivers/atmel_mxt_ts/4-004c/suspended
+
     chown system system /sys/bus/i2c/drivers/mpu3050/0-0068/mpu3050/suspended
     chmod 0666 /sys/bus/i2c/drivers/mpu3050/0-0068/mpu3050/suspended
 
