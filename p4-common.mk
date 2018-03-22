@@ -113,6 +113,10 @@ PRODUCT_PACKAGES += \
     audio.usb.default \
     audio.r_submix.default
 
+# Light HAL
+PRODUCT_PACKAGES += \
+    lights.p3
+
 PRODUCT_PACKAGES += \
 	input.evdev.default
 
