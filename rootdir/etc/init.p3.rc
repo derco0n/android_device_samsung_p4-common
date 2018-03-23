@@ -177,6 +177,10 @@ on boot
     # backlight
     chown system system /sys/class/backlight/pwm-backlight/brightness
 
+    # vibration motor
+    chown system system /sys/class/leds/isa1200/enable
+    chown system system /sys/class/leds/isa1200/amplitude
+
     # Sensor
     chmod 666 /dev/nvhost-ctrl
     chmod 666 /dev/nvhost-display
