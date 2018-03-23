@@ -117,6 +117,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     lights.p3
 
+# Vibration motor HAL
+PRODUCT_PACKAGES += \
+    vibrator.p3
+
 PRODUCT_PACKAGES += \
 	input.evdev.default
 
