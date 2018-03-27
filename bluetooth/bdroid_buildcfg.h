@@ -22,4 +22,8 @@
 /* Disables Sco Enhanced Absent on pre-Oreo bluetooth Firmware */
 #define BTM_SCO_ENHANCED_SYNC_DISABLED
 
+#define BLE_INCLUDED TRUE
+#define BTA_GATT_INCLUDED TRUE
+#define SMP_INCLUDED TRUE
+
 #endif
