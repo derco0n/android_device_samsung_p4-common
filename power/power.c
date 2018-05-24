@@ -98,8 +98,8 @@ static void p3_power_set_interactive(struct power_module *module, int on)
     if (!on) {
         store_max_freq(scaling_max_freq, p3->low_power_mode);
 
-        sysfs_write(CPU0_SCALINGMAXFREQ_PATH, screen_off_max_freq);
-        sysfs_write(CPU1_SCALINGMAXFREQ_PATH, screen_off_max_freq);
+        // sysfs_write(CPU0_SCALINGMAXFREQ_PATH, screen_off_max_freq);
+        // sysfs_write(CPU1_SCALINGMAXFREQ_PATH, screen_off_max_freq);
         // sysfs_write(CPUFREQ_INTERACTIVE "go_hispeed_load", "99");
 
         sysfs_write(TOUCH_SUSPEND_PATH, "1");
