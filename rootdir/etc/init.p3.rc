@@ -234,6 +234,7 @@ on boot
     write /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq 1000000
 
     write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor schedutil
+    write /sys/devices/system/cpu/cpufreq/schedutil/down_rate_limit_us 30000
 
     # Power HAL permissions
     chown system system /sys/bus/i2c/drivers/sec_touch/4-004c/mxt1386/suspended
