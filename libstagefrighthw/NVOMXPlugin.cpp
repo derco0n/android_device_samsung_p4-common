@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
+ * Copyright (c) 2014, The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +17,9 @@
 
 #include "NVOMXPlugin.h"
 
-#include <utils/Log.h>
-
-
 #include <dlfcn.h>
-#include <string.h>
 
-#include <media/hardware/HardwareAPI.h>
+#include <HardwareAPI.h>
 
 namespace android {
 
@@ -30,15 +27,16 @@ OMXPluginBase *createOMXPlugin() {
     return new NVOMXPlugin;
 }
 
+#define LIBOMX "libnvomx.so"
+
 NVOMXPlugin::NVOMXPlugin()
-    : mLibHandle(dlopen("libnvomx.so", RTLD_NOW)),
+    : mLibHandle(dlopen(LIBOMX, RTLD_NOW)),
       mInit(NULL),
       mDeinit(NULL),
       mComponentNameEnum(NULL),
       mGetHandle(NULL),
       mFreeHandle(NULL),
       mGetRolesOfComponentHandle(NULL) {
-
     if (mLibHandle != NULL) {
         mInit = (InitFunc)dlsym(mLibHandle, "OMX_Init");
         mDeinit = (DeinitFunc)dlsym(mLibHandle, "OMX_Deinit");
@@ -53,15 +51,9 @@ NVOMXPlugin::NVOMXPlugin()
             (GetRolesOfComponentFunc)dlsym(
                     mLibHandle, "OMX_GetRolesOfComponent");
 
-        if (!mInit || !mDeinit || !mComponentNameEnum || !mGetHandle ||
-             !mFreeHandle || !mGetRolesOfComponentHandle) {
-            ALOGE("Error with dlsym()");
-            dlclose(mLibHandle);
-            mLibHandle = NULL;
-        } else
         (*mInit)();
     } else {
-        ALOGE("%s", dlerror());
+        ALOGE("%s: failed to load %s", __func__, LIBOMX);
     }
 }
 
@@ -79,34 +71,23 @@ OMX_ERRORTYPE NVOMXPlugin::makeComponentInstance(
         const OMX_CALLBACKTYPE *callbacks,
         OMX_PTR appData,
         OMX_COMPONENTTYPE **component) {
-    OMX_ERRORTYPE err = OMX_ErrorUndefined;
     if (mLibHandle == NULL) {
-        goto exit;
-    }
-    err = (*mGetHandle)(reinterpret_cast<OMX_HANDLETYPE *>(component),
-            const_cast<char *>(name), appData,
-                const_cast<OMX_CALLBACKTYPE *>(callbacks));
-    if (strncmp(name, "OMX.Nvidia.drm.play", 19) == 0) {
-        gOMXDrmPlayComponent = *component;
+        return OMX_ErrorUndefined;
     }
 
-exit:
-    return err;
+    return (*mGetHandle)(
+            reinterpret_cast<OMX_HANDLETYPE *>(component),
+            const_cast<char *>(name),
+            appData, const_cast<OMX_CALLBACKTYPE *>(callbacks));
 }
 
 OMX_ERRORTYPE NVOMXPlugin::destroyComponentInstance(
         OMX_COMPONENTTYPE *component) {
-    OMX_ERRORTYPE err = OMX_ErrorUndefined;
     if (mLibHandle == NULL) {
-        goto exit;
+        return OMX_ErrorUndefined;
     }
-    if (component == gOMXDrmPlayComponent) {
-        gOMXDrmPlayComponent = NULL;
-    }
-    err = (*mFreeHandle)(reinterpret_cast<OMX_HANDLETYPE *>(component));
 
-exit:
-    return err;
+    return (*mFreeHandle)(reinterpret_cast<OMX_HANDLETYPE *>(component));
 }
 
 OMX_ERRORTYPE NVOMXPlugin::enumerateComponents(
@@ -114,6 +95,7 @@ OMX_ERRORTYPE NVOMXPlugin::enumerateComponents(
         size_t size,
         OMX_U32 index) {
     if (mLibHandle == NULL) {
+        ALOGE("mLibHandle is NULL!");
         return OMX_ErrorUndefined;
     }
 
@@ -143,21 +125,14 @@ OMX_ERRORTYPE NVOMXPlugin::getRolesOfComponent(
             array[i] = new OMX_U8[OMX_MAX_STRINGNAME_SIZE];
         }
 
-        OMX_U32 numRoles2;
         err = (*mGetRolesOfComponentHandle)(
-                const_cast<OMX_STRING>(name), &numRoles2, array);
-
-    if (err != OMX_ErrorNone) {
-      return err;
-    }
-
-    if (numRoles2 != numRoles) {
-      return err;
-    }
+                const_cast<OMX_STRING>(name), &numRoles, array);
 
         for (OMX_U32 i = 0; i < numRoles; ++i) {
-            String8 s((const char *)array[i]);
-            roles->push(s);
+            if (err == OMX_ErrorNone) {
+                String8 s((const char *)array[i]);
+                roles->push(s);
+            }
 
             delete[] array[i];
             array[i] = NULL;
@@ -167,7 +142,7 @@ OMX_ERRORTYPE NVOMXPlugin::getRolesOfComponent(
         array = NULL;
     }
 
-    return OMX_ErrorNone;
+    return err;
 }
 
 }  // namespace android
