@@ -20,8 +20,6 @@
 
 #include <media/hardware/OMXPluginBase.h>
 
-OMX_COMPONENTTYPE *gOMXDrmPlayComponent;
-
 namespace android {
 
 struct NVOMXPlugin : public OMXPluginBase {
