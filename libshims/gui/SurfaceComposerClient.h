@@ -40,9 +40,6 @@ namespace android {
 struct DisplayInfo;
 class Composer;
 class HdrCapabilities;
-#ifdef USE_MHEAP_SCREENSHOT
-class IMemoryHeap;
-#endif
 class ISurfaceComposerClient;
 class IGraphicBufferProducer;
 class Region;
@@ -264,9 +261,6 @@ public:
             uint32_t rotation,
             sp<GraphicBuffer>* outbuffer);
 private:
-#ifdef USE_MHEAP_SCREENSHOT
-    sp<IMemoryHeap> mHeap;
-#endif
     mutable sp<CpuConsumer> mCpuConsumer;
     mutable sp<IGraphicBufferProducer> mProducer;
     CpuConsumer::LockedBuffer mBuffer;
