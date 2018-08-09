@@ -54,7 +54,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
     persist.sys.media.legacy-drm=true \
     media.stagefright.legacyencoder=true \
     persist.media.treble_omx=false \
-    sys.use_fifo_ui=1
+    sys.use_fifo_ui=1 \
+    ro.sf.disable_triple_buffer=0
 
 # Storage
 PRODUCT_PROPERTY_OVERRIDES += \
