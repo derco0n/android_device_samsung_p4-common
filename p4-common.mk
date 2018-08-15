@@ -107,6 +107,7 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
     hwcomposer.tegra \
+    gralloc.tegra \
     libstagefrighthw
 
 # Audio
