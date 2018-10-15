@@ -113,6 +113,10 @@ PRODUCT_PACKAGES += \
     audio.usb.default \
     audio.r_submix.default
 
+PRODUCT_PACKAGES += \
+    sensors.iio \
+    activity_recognition.iio
+
 # Light HAL
 PRODUCT_PACKAGES += \
     lights.p3
