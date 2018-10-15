@@ -320,6 +320,7 @@ on boot
     chown system system /sys/bus/iio/devices/iio:device0/in_temp_offset
     chown system system /sys/bus/iio/devices/iio:device0/in_temp_raw
     chown system system /sys/bus/iio/devices/iio:device0/in_temp_scale
+    chown system system /sys/bus/iio/devices/iio:device0/mounting_matrix
     chown system system /sys/bus/iio/devices/iio:device0/name
     chown system system /sys/bus/iio/devices/iio:device0/power
     chown system system /sys/bus/iio/devices/iio:device0/sampling_frequency
@@ -362,6 +363,7 @@ on boot
     chown system system /sys/bus/iio/devices/iio:device1/in_accel_x_raw
     chown system system /sys/bus/iio/devices/iio:device1/in_accel_y_raw
     chown system system /sys/bus/iio/devices/iio:device1/in_accel_z_raw
+    chown system system /sys/bus/iio/devices/iio:device1/mounting_matrix
     chown system system /sys/bus/iio/devices/iio:device1/power
     chown system system /sys/bus/iio/devices/iio:device1/scan_elements/in_accel_x_en
     chown system system /sys/bus/iio/devices/iio:device1/scan_elements/in_accel_x_index
@@ -396,6 +398,7 @@ on boot
     chown system system /sys/bus/iio/devices/iio:device3/in_magn_y_scale
     chown system system /sys/bus/iio/devices/iio:device3/in_magn_z_raw
     chown system system /sys/bus/iio/devices/iio:device3/in_magn_z_scale
+    chown system system /sys/bus/iio/devices/iio:device3/mounting_matrix
     chown system system /sys/bus/iio/devices/iio:device3/name
     chown system system /sys/bus/iio/devices/iio:device3/power
     chown system system /sys/bus/iio/devices/iio:device3/scan_elements/in_magn_x_en
