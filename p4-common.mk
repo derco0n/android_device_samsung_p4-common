@@ -54,7 +54,9 @@ PRODUCT_PROPERTY_OVERRIDES := \
     ro.zygote.disable_gl_preload=true \
     persist.sys.media.legacy-drm=true \
     media.stagefright.legacyencoder=true \
-    sys.use_fifo_ui=1
+    sys.use_fifo_ui=1 \
+    ro.hardware.sensors=iio \
+    ro.iio.accel.quirks=no-trig
 
 # Storage
 PRODUCT_PROPERTY_OVERRIDES += \
