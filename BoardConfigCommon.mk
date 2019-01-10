@@ -47,7 +47,7 @@ TARGET_BOOTLOADER_BOARD_NAME := p3
 # Bionic
 LINKER_NON_PIE_EXECUTABLES_HEADER_DIR := device/samsung/p4-common/include
 
-MALLOC_IMPL := dlmalloc
+# MALLOC_IMPL := dlmalloc
 MALLOC_SVELTE := true
 
 TARGET_NEEDS_GCC_LIBC := true
